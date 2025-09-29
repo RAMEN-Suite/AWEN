@@ -1,0 +1,30 @@
+import neo4j, { Driver } from 'neo4j-driver';
+import { Neo4jConfig } from './neo4j-config.interface';
+
+export const createDriver = async (config: Neo4jConfig): Promise<Driver> => {
+  for (let j = 1; j <= 5; j++) {
+    const driver = neo4j.driver(
+      `${config.scheme}://${config.host}:${config.port}`,
+      neo4j.auth.basic(config.username, config.password),
+      { disableLosslessIntegers: true },
+    );
+
+    try {
+      await driver.getServerInfo();
+    } catch (e) {
+      console.info('[Neo4j Driver]', `Attempt Nr. ${j}`);
+      for (let i = 5; i > 0; i--) {
+        console.info(
+          '[Neo4j Driver]',
+          `Neo4j-Driver could not start. It will try again in ${i}...`,
+        );
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+      continue;
+    }
+
+    console.info('[Neo4j Driver]', 'Neo4j-Driver Created');
+    return driver;
+  }
+  throw new Error('Failed to create Neo4j driver after 5 attempts.');
+};
