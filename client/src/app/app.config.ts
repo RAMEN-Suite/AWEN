@@ -6,12 +6,25 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideApollo } from 'apollo-angular';
 import { HttpLink } from 'apollo-angular/http';
 import { InMemoryCache } from '@apollo/client/core';
+import {providePrimeNG} from 'primeng/config';
+import Aura from '@primeuix/themes/aura';
+
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
-    provideRouter(routes), provideHttpClient(), provideApollo(() => {
+    provideRouter(routes),
+    providePrimeNG({
+      theme: {
+        preset: Aura,
+        options: {
+          darkModeSelector: 'none'
+        }
+      }
+    }),
+    provideHttpClient(),
+    provideApollo(() => {
       const httpLink = inject(HttpLink);
 
       return {
