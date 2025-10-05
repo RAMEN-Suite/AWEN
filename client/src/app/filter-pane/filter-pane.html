@@ -1,1 +1,15 @@
-<p>filter-pane works!</p>
+<div class="flex justify-content-center">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex justify-center flex-col gap-4 md:w-56">
+    <div class="flex flex-col gap-1">
+      <p-auto-complete
+        formControlName="search"
+        [suggestions]="suggestions"
+        [invalid]="form.controls.search.invalid"
+        (completeMethod)="autocompleteChanges($event)"
+        fluid />
+      @if (form.controls.search.invalid) {
+        <p-message severity="error" size="small" variant="simple">Value is required to be longer then three characters.</p-message>
+      }
+    </div>
+  </form>
+</div>

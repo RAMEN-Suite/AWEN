@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import {ScrollTop} from 'primeng/scrolltop';
 import {Toast} from 'primeng/toast';
@@ -9,7 +9,6 @@ import {MessageService} from 'primeng/api';
   imports: [RouterOutlet, ScrollTop, Toast],
   providers: [MessageService],
   templateUrl: './app.html',
-  styleUrl: './app.scss'
 })
 export class App {
 
