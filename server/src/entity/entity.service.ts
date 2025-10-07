@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import { Neo4jService } from "../neo4j/neo4j.service";
 import { GuidelinesService } from "../guidelines/guidelines.service";
 import { EntityModel } from "./models/entity.model";
+import { EntityNameModel } from "./models/entity-name.model";
 
 @Injectable()
 export class EntityService {
@@ -37,5 +38,48 @@ export class EntityService {
     const entityNode = res.records[0].get('entity');
 
     return entityNode;
+  }
+
+  async findByName(name: string): Promise<EntityModel[]> {
+    const guidelines = await this.guidelinesService.get();
+
+    const res = await this.neo4jService.read<{ entities: EntityModel[] }>(
+      `
+      CALL db.index.fulltext.queryNodes("${guidelines.fulltextIndexes.search}", $query) YIELD node AS n, score
+      WITH n, score
+      ORDER BY score DESC
+      RETURN collect({
+        nodeLabel: '${guidelines.entity.nodeLabel}',
+        types: [l IN labels(n) WHERE l <> '${guidelines.entity.nodeLabel}'],
+        id: n.${guidelines.entity.idLabel},
+        properties: apoc.map.removeKeys(properties(n), ['${guidelines.entity.idLabel}'])
+      }) AS entities;`,
+      { query: name },
+    );
+
+
+    const entities = res.records[0].get('entities');
+
+    return entities;
+  }
+
+  async findNamesByName(name: string): Promise<EntityNameModel[]> {
+    const guidelines = await this.guidelinesService.get();
+
+    const res = await this.neo4jService.read<{ name: string, id: string }>(
+      `
+      CALL db.index.fulltext.queryNodes("${guidelines.fulltextIndexes.search}", $query) YIELD node, score
+      WITH DISTINCT node as n, score
+      RETURN n.${guidelines.entity.nameLabel} AS name, n.${guidelines.entity.idLabel} AS id ORDER BY score DESC, n.numberOfChilds DESC, n.pathLength ASC;`,
+      { query: name },
+    );
+
+
+    const entities = res.records.map(record => ({
+      name: record.get('name'),
+      id: record.get('id'),
+    }));
+
+    return entities;
   }
 }

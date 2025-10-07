@@ -1,11 +1,18 @@
 export interface IGuidelines {
-    entity: IEntity
+    entity: IEntity;
+
+    // names of the required fulltext indexes
+    fulltextIndexes: {
+      // A neo4j fulltext index, that queries the Entity-Node-Property `nameLabel`
+      search: string;
+    }
 }
 
 export type IEntity = {
     nodeLabel: string;
     types: string[];
     idLabel: string;
+    nameLabel: string;
     properties: PropertyConfig[]
 }
 

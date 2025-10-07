@@ -1,15 +1,18 @@
-<div class="flex justify-content-center">
-  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex justify-center flex-col gap-4 md:w-56">
-    <div class="flex flex-col gap-1">
+<div class="flex justify-content-center w-full">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex justify-center flex-col gap-4 w-full">
+    <div class="w-full">
       <p-auto-complete
         formControlName="search"
-        [suggestions]="suggestions"
-        [invalid]="form.controls.search.invalid"
+        [suggestions]="suggestions()"
+        [invalid]="form.controls.search.invalid && form.controls.search.touched"
         (completeMethod)="autocompleteChanges($event)"
-        fluid />
-      @if (form.controls.search.invalid) {
-        <p-message severity="error" size="small" variant="simple">Value is required to be longer then three characters.</p-message>
+        fluid
+        optionLabel="name"
+      />
+      @if (form.controls.search.invalid && form.controls.search.touched) {
+        <p-message severity="error" size="small" variant="simple" >Value is required to be longer then three characters.</p-message>
       }
     </div>
+    <p-button type="submitt" label="Search"/>
   </form>
 </div>
