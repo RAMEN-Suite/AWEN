@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { Neo4jService } from "../neo4j/neo4j.service";
 import { GuidelinesService } from "../guidelines/guidelines.service";
-import { EntityModel } from "./models/entity.model";
-import { EntityNameModel } from "./models/entity-name.model";
+import { EntityDto } from "./dto/entity.dto";
+
 
 @Injectable()
 export class EntityService {
@@ -16,10 +16,10 @@ export class EntityService {
    * @returns A promise that resolves to the found Entity node (IEntity).
    * @throws NotFoundException If the Entity node is not found or if more than one node with the {@link idLabel} exists.
    */
-  async findOneById(id: string): Promise<EntityModel> {
+  async findOneById(id: string): Promise<EntityDto> {
     const guidelines = await this.guidelinesService.get();
 
-    const res = await this.neo4jService.read<{ entity: EntityModel }>(
+    const res = await this.neo4jService.read<{ entity: EntityDto }>(
       `
       MATCH (n:${guidelines.entity.nodeLabel} {${guidelines.entity.idLabel}: $id}) 
       RETURN {
@@ -40,10 +40,10 @@ export class EntityService {
     return entityNode;
   }
 
-  async findByName(name: string): Promise<EntityModel[]> {
+  async findByName(name: string): Promise<EntityDto[]> {
     const guidelines = await this.guidelinesService.get();
 
-    const res = await this.neo4jService.read<{ entities: EntityModel[] }>(
+    const res = await this.neo4jService.read<{ entities: EntityDto[] }>(
       `
       CALL db.index.fulltext.queryNodes("${guidelines.fulltextIndexes.search}", $query) YIELD node AS n, score
       WITH n, score
@@ -63,7 +63,7 @@ export class EntityService {
     return entities;
   }
 
-  async findNamesByName(name: string): Promise<EntityNameModel[]> {
+  async findNamesByName(name: string) {
     const guidelines = await this.guidelinesService.get();
 
     const res = await this.neo4jService.read<{ name: string, id: string }>(

@@ -1,36 +1,18 @@
 import {inject, Injectable} from '@angular/core';
-import {Apollo, gql} from 'apollo-angular';
 import {firstValueFrom, lastValueFrom, map} from 'rxjs';
+import {HttpClient} from '@angular/common/http';
 
-const GET_SUGGESTIONS = gql`
-  query Query($name: String!) {
-    entityNamesByName(name: $name) {
-      name,
-      id
-    }
-  }
-`;
 
 @Injectable({
   providedIn: 'root'
 })
 export class SearchService {
-  private apollo = inject(Apollo);
+  private http = inject(HttpClient);
 
   async getSuggestions(search: string) {
-    const temp = this.apollo.watchQuery<{entityNamesByName: { name: string; id: string }[]}>({
-      query: GET_SUGGESTIONS,
-      variables: {
-        name: search,
-      },
-    }).valueChanges
-      .pipe(
-        map(res => {
-          return res.data.entityNamesByName;
-        }),
-      );
-
-
+    const temp = this.http.get<{ name: string; id: string; }[]>('/entity', {
+      params: {}
+    });
     return firstValueFrom(temp);
   }
 

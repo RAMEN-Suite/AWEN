@@ -4,30 +4,12 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { Neo4jModule } from './neo4j/neo4j.module';
 import { GuidelinesModule } from './guidelines/guidelines.module';
-import { GraphQLModule } from '@nestjs/graphql';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from "path";
-import { GraphQLDirective } from "graphql/type";
-import { DirectiveLocation } from "graphql/language";
 import { EntityModule } from './entity/entity.module';
 
 
 @Module({
   imports: [
-    GraphQLModule.forRoot<ApolloDriverConfig>({
-      driver: ApolloDriver,
-      graphiql: true,
-      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-      sortSchema: true,
-      buildSchemaOptions: {
-        directives: [
-          new GraphQLDirective({
-            name: 'upper',
-            locations: [DirectiveLocation.FIELD_DEFINITION],
-          }),
-        ],
-      },
-    }),
     ConfigModule.forRoot({
       isGlobal: true,
     }),
