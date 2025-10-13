@@ -7,7 +7,8 @@
         [invalid]="form.controls.search.invalid && form.controls.search.touched"
         (completeMethod)="autocompleteChanges($event)"
         fluid
-        optionLabel="name"
+        [showEmptyMessage]="showEmptyMessage()"
+        optionLabel="label"
       />
       @if (form.controls.search.invalid && form.controls.search.touched) {
         <p-message severity="error" size="small" variant="simple" >Value is required to be longer then three characters.</p-message>

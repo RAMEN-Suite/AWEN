@@ -27,6 +27,7 @@ export class FilterPane {
   });
 
   suggestions= signal<EntityNames[] >([]);
+  showEmptyMessage = signal<boolean>(false);
 
   async autocompleteChanges(e: AutoCompleteCompleteEvent) {
     if (this.form.valid) {
@@ -35,6 +36,7 @@ export class FilterPane {
     } else {
       this.suggestions.set([]);
     }
+    this.showEmptyMessage.set(this.calcShowEmptyMessage());
   }
 
   onSubmit() {
@@ -44,5 +46,9 @@ export class FilterPane {
         value.markAsTouched()
       })
     }
+  }
+
+  calcShowEmptyMessage() {
+    return (this.form.controls.search.valid && this.suggestions().length === 0);
   }
 }

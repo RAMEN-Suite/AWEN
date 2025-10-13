@@ -4,6 +4,9 @@ import { ValidationPipe } from "@nestjs/common";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.setGlobalPrefix(process.env.PREFIX ?? '')
+
   app.enableCors({
     origin: true,
     methods: ['GET', 'PUT', 'POST', 'DELETE'],
