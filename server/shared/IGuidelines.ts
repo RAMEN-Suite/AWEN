@@ -9,7 +9,7 @@ export interface IGuidelines {
 }
 
 export type IEntity = {
-    nodeLabel: string;
+    metaType: string;
     types: string[];
     idLabel: string;
     nameLabel: string;

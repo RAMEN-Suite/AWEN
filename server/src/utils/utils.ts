@@ -8,8 +8,13 @@ const parseStringToSearchArray = (string: string): string[] => {
     .filter((f) => f.length > 1);
 }
 
+const parseStringToSearchQueryString = (string: string): string => {
+  return parseStringToSearchArray(string).join('* ') + '*';
+}
+
 
 
 export {
-  parseStringToSearchArray
+  parseStringToSearchArray,
+  parseStringToSearchQueryString
 }

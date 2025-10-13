@@ -1,4 +1,4 @@
-import { IsObject, IsString, IsUUID } from "class-validator";
+import { IsArray, IsObject, IsString, IsUUID } from "class-validator";
 
 
 export class EntityDto {
@@ -15,6 +15,7 @@ export class EntityDto {
    * @example ['Person']
    */
   @IsString({each: true})
+  @IsArray()
   types: string[];
 
   /**
@@ -23,6 +24,9 @@ export class EntityDto {
    */
   @IsUUID()
   id: string;
+
+  @IsString()
+  label: string;
 
   /**
    * Beliebige Key/Value-Properties der Entität.
