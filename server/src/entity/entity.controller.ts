@@ -37,4 +37,13 @@ export class EntityController {
     return entities;
   }
 
+  @Get('auto-complete/full/:label')
+  async getAutoCompleteF(@Param() params: LabelDto): Promise<EntityNamesDto[]> {
+    const { label } = params;
+    const searchQuery = parseStringToSearchQueryString(label);
+    const entities = await this.entityService.findByName(searchQuery);
+
+    return entities;
+  }
+
 }
