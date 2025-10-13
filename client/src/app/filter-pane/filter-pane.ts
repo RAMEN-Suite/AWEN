@@ -4,6 +4,7 @@ import {AutoCompleteCompleteEvent, AutoCompleteModule} from 'primeng/autocomplet
 import {Message} from 'primeng/message';
 import {SearchService} from '../views/search/search.service';
 import {Button} from 'primeng/button';
+import {EntityNames} from '../../interfaces';
 
 @Component({
   selector: 'app-filter-pane',
@@ -25,7 +26,7 @@ export class FilterPane {
     search: new FormControl('', [Validators.required, Validators.minLength(3)]),
   });
 
-  suggestions= signal<{ name: string; id: string }[] >([]);
+  suggestions= signal<EntityNames[] >([]);
 
   async autocompleteChanges(e: AutoCompleteCompleteEvent) {
     if (this.form.valid) {
