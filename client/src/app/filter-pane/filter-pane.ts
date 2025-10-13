@@ -48,7 +48,7 @@ export class FilterPane {
     }
   }
 
-  calcShowEmptyMessage() {
+  private calcShowEmptyMessage() {
     return (this.form.controls.search.valid && this.suggestions().length === 0);
   }
 }

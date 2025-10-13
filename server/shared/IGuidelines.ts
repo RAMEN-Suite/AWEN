@@ -6,6 +6,13 @@ export interface IGuidelines {
       // A neo4j fulltext index, that queries the Entity-Node-Property `nameLabel`
       search: string;
     }
+
+    scenarios: {
+      findByCollection: {
+        collectionChain: string[];
+        filterable: string[];
+      }
+    }
 }
 
 export type IEntity = {

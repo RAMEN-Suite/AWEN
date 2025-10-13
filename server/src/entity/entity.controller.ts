@@ -1,4 +1,10 @@
-import { Controller, Get, NotFoundException, Param } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  Query,
+} from "@nestjs/common";
 import { EntityService } from "./entity.service";
 import { IdDto } from "./dto/id.dto";
 import { LabelDto } from "./dto/label.dto";
@@ -7,12 +13,28 @@ import { EntityNamesDto } from "./dto/entity-names.dto";
 import {
   parseStringToSearchQueryString,
 } from "../utils/utils";
+import { EntitySearchDto } from "./dto/entity-search.dto";
 
 @Controller('entity')
 export class EntityController {
 
   constructor(private readonly entityService: EntityService) {}
 
+  @Get('')
+  async getAutoCompleteF(@Query() params: EntitySearchDto): Promise<EntityDto[]> {
+    const { label, collectionFilter } = params;
+
+    const a = collectionFilter?.["Department"]
+
+    console.log(label, collectionFilter);
+    console.log(label, a);
+
+
+    const searchQuery = parseStringToSearchQueryString(label);
+    const entities = await this.entityService.findByName(searchQuery);
+
+    return entities;
+  }
 
   @Get(':id')
   async getById(@Param() params: IdDto): Promise<EntityDto> {
@@ -37,13 +59,6 @@ export class EntityController {
     return entities;
   }
 
-  @Get('auto-complete/full/:label')
-  async getAutoCompleteF(@Param() params: LabelDto): Promise<EntityNamesDto[]> {
-    const { label } = params;
-    const searchQuery = parseStringToSearchQueryString(label);
-    const entities = await this.entityService.findByName(searchQuery);
 
-    return entities;
-  }
 
 }
