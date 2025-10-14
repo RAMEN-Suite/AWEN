@@ -14,12 +14,15 @@ import {
   parseStringToSearchQueryString,
 } from "../utils/utils";
 import { EntitySearchDto } from "./dto/entity-search.dto";
+import { ApiResponse } from "@nestjs/swagger";
 
 @Controller('entity')
 export class EntityController {
 
   constructor(private readonly entityService: EntityService) {}
 
+
+  @ApiResponse({ type: [EntityDto] })
   @Get('')
   async getAutoCompleteF(@Query() params: EntitySearchDto): Promise<EntityDto[]> {
     const { label, collectionFilter } = params;
@@ -36,6 +39,8 @@ export class EntityController {
     return entities;
   }
 
+
+  @ApiResponse({ type: EntityDto })
   @Get(':id')
   async getById(@Param() params: IdDto): Promise<EntityDto> {
     const { id } = params;
@@ -49,7 +54,7 @@ export class EntityController {
     return entity;
   }
 
-
+  @ApiResponse({ type: [EntityNamesDto] })
   @Get('auto-complete/:label')
   async getAutoComplete(@Param() params: LabelDto): Promise<EntityNamesDto[]> {
     const { label } = params;
