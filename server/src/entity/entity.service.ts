@@ -4,6 +4,7 @@ import { GuidelinesService } from "../guidelines/guidelines.service";
 import { EntityDto } from "./dto/entity.dto";
 import { EntityNamesDto } from "./dto/entity-names.dto";
 import Cypher from "@neo4j/cypher-builder";
+import { EntitySearchDto } from "./dto/entity-search.dto";
 
 @Injectable()
 export class EntityService {
@@ -57,9 +58,7 @@ export class EntityService {
     const returnMap = await this.entityReturnMap(eNode);
 
     const searchPattern = await this.runSearch(eNode, score, name);
-    const subQuery = searchPattern
-      .orderBy([score, 'DESC'])
-      .return(returnMap);
+    const subQuery = searchPattern.orderBy([score, "DESC"]).return(returnMap);
 
     const collectReturnMap = new Cypher.Collect(subQuery);
 
@@ -67,7 +66,10 @@ export class EntityService {
 
     const { cypher, params } = clause.build();
 
-    const res = await this.neo4jService.read<{ entities: EntityDto[] }>(cypher, params);
+    const res = await this.neo4jService.read<{ entities: EntityDto[] }>(
+      cypher,
+      params,
+    );
 
     const entities = res.records[0].get("entities");
 
@@ -83,12 +85,18 @@ export class EntityService {
     const searchPattern = await this.runSearch(eNode, score, name);
 
     const clause = searchPattern
-      .return([eNode.property(guidelines.entity.nameLabel), 'label'], [eNode.property(guidelines.entity.idLabel), 'id'])
-      .orderBy([score, 'ASC'], [eNode.property('pathLength'), 'ASC']);
+      .return(
+        [eNode.property(guidelines.entity.nameLabel), "label"],
+        [eNode.property(guidelines.entity.idLabel), "id"],
+      )
+      .orderBy([score, "ASC"], [eNode.property("pathLength"), "ASC"]);
 
     const { cypher, params } = clause.build();
 
-    const res = await this.neo4jService.read<{ label: string; id: string }>(cypher, params);
+    const res = await this.neo4jService.read<{ label: string; id: string }>(
+      cypher,
+      params,
+    );
 
     const entities = res.records.map((record) => ({
       label: record.get("label"),
@@ -98,13 +106,22 @@ export class EntityService {
     return entities;
   }
 
-
-
-  private async runSearch(eNode: Cypher.Node, score: Cypher.Variable, query: string) {
+  private async runSearch(
+    eNode: Cypher.Node,
+    score: Cypher.Variable,
+    query: string,
+  ) {
     const guidelines = await this.guidelinesService.get();
 
     return new Cypher.With("*")
-      .callProcedure(Cypher.db.index.fulltext.queryNodes(guidelines.fulltextIndexes.search, new Cypher.Literal(query))).yield(['node', eNode], ['score', score]).with(eNode, score);
+      .callProcedure(
+        Cypher.db.index.fulltext.queryNodes(
+          guidelines.fulltextIndexes.search,
+          new Cypher.Literal(query),
+        ),
+      )
+      .yield(["node", eNode], ["score", score])
+      .with(eNode, score);
   }
 
   private async entityReturnMap(eNode: Cypher.Node) {
@@ -131,5 +148,83 @@ export class EntityService {
       id: eNode.property(guidelines.entity.idLabel),
       properties: cleanedProps,
     });
+  }
+
+  async find(queryParams: EntitySearchDto) {
+    const guidelines = await this.guidelinesService.get();
+
+    const eNode: Cypher.Node = new Cypher.Node();
+
+    let pattern: Cypher.Pattern = new Cypher.Pattern(eNode, {
+      labels: guidelines.entity.metaType,
+    });
+
+    if (queryParams.collectionFilter && Object.keys(queryParams.collectionFilter).length > 0) {
+      pattern = await this.addFilterByCollection(pattern, queryParams.collectionFilter);
+    }
+
+    const returnMap = await this.entityReturnMap(eNode);
+    const subQuery = new Cypher.Match(pattern).return(returnMap);
+    const collectReturnMap = new Cypher.Collect(subQuery);
+
+    const clause = new Cypher.With("*").return([collectReturnMap, "entities"]);
+
+    const { cypher, params } = clause.build();
+
+    const res = await this.neo4jService.read<{ entities: EntityDto[] }>(
+      cypher,
+      params,
+    );
+
+    const entities = res.records[0].get("entities");
+
+    return entities;
+
+  }
+
+  private async addFilterByCollection(pattern: Cypher.Pattern, collectionFilters: Record<string, string[]>) {
+    const guidelines = await this.guidelinesService.get();
+    const collectionChain =
+      guidelines.scenarios.findByCollection.collectionChain;
+    const filterableCollections =
+      guidelines.scenarios.findByCollection.filterable;
+    const colIdLabel = guidelines.collection.idLabel;
+
+    const aNode = new Cypher.Node();
+
+    const eToA = new Cypher.Relationship();
+    const aToC = new Cypher.Relationship();
+
+    const newPattern = pattern
+      .related(eToA, { type: "REFERS_TO", direction: "left" })
+      .to(aNode)
+      .related(aToC, { type: "HAS_ANNOTATION", direction: "left" });
+
+    const collections: Map<string, Cypher.Node> = new Map<string, Cypher.Node>()
+
+    collectionChain.forEach((col, index) => {
+      const collection = new Cypher.Node();
+      const partOf = new Cypher.Relationship();
+
+      if (index !== collectionChain.length - 1) {
+        ((newPattern as unknown) as Cypher.Pattern).related(partOf, { type: "PART_OF", direction: "left" });
+      } else {
+        newPattern
+          .to(collection, { labels: col })
+          .related(partOf, { type: "PART_OF", direction: "left" });
+      }
+
+      collections.set(col, collection);
+    });
+
+    filterableCollections.forEach((collection, index) => {
+      const col = collections.get(collection)!;
+      const colIDs = collectionFilters[collection];
+
+      newPattern.where(Cypher.in(col.property(colIdLabel), new Cypher.Literal(colIDs)))
+    });
+
+    return ((newPattern as unknown) as Cypher.Pattern);
+
   }
 }

@@ -4,8 +4,8 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { Neo4jModule } from './neo4j/neo4j.module';
 import { GuidelinesModule } from './guidelines/guidelines.module';
-import { join } from "path";
 import { EntityModule } from './entity/entity.module';
+import { CollectionModule } from './collection/collection.module';
 
 
 @Module({
@@ -23,6 +23,7 @@ import { EntityModule } from './entity/entity.module';
     }),
     GuidelinesModule,
     EntityModule,
+    CollectionModule,
   ],
   controllers: [AppController],
   providers: [AppService],

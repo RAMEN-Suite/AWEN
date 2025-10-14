@@ -1,20 +1,16 @@
 import {inject, Injectable} from '@angular/core';
-import {firstValueFrom} from 'rxjs';
-import {HttpClient} from '@angular/common/http';
-import {EntityNames} from '../../../interfaces';
-import {DefaultUrlSerializer} from '@angular/router';
+import {EntityService} from '../../api/entity.service';
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class SearchService {
-  private http = inject(HttpClient);
+
+  entityService = inject(EntityService);
 
   async getSuggestions(search: string) {
-    const parsedQuery = encodeURIComponent(search);
-    const temp = this.http.get<EntityNames[]>('/api/entity/auto-complete/' + parsedQuery);
-    return firstValueFrom(temp);
+    return await this.entityService.getAutocomplete(search);
   }
 
 
