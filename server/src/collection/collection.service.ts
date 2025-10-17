@@ -27,13 +27,21 @@ export class CollectionService {
   }
 
 
-  private async getCollectionNamesOfType(collectionType: string): Promise<CollectionName[]> {
+  async getCollectionNamesOfType(collectionType: string, parentId?: string): Promise<CollectionName[]> {
     const guidelines = await this.guidelinesService.get();
     const colIdLabel = guidelines.collection.idLabel;
     const colNameLabel = guidelines.collection.nameLabel;
 
     const col = new Cypher.Node();
-    const pattern = new Cypher.Pattern(col, { labels: collectionType });
+    let pattern = new Cypher.Pattern(col, { labels: [guidelines.collection.metaType, new Cypher.Param(collectionType)] });
+
+    if (parentId) {
+      const parentCol = new Cypher.Node();
+      pattern = pattern
+        .related(new Cypher.Variable(), { type: 'PART_OF' })
+        .to(parentCol)
+        .where(Cypher.eq(parentCol.property(colIdLabel), new Cypher.Param(parentId)));
+    }
 
     const clause = new Cypher.Match(pattern).return([col.property(colIdLabel), 'id'], [col.property(colNameLabel), 'label']);
     const { cypher, params } = clause.build();

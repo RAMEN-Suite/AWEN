@@ -18,7 +18,10 @@ export interface EntitySearchQuery {
   collectionFilter: Record<string, unknown>;
 }
 
-
+export interface CollectionName {
+  label: string;
+  id: string;
+}
 
 
 

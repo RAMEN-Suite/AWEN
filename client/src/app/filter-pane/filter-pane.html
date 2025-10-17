@@ -1,6 +1,5 @@
-<div class="flex justify-content-center w-full">
-  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex justify-center flex-col gap-4 w-full">
-    <div class="w-full">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="formgrid grid">
+    <div class="field col-12">
       <p-auto-complete
         formControlName="search"
         [suggestions]="suggestions()"
@@ -14,6 +13,19 @@
         <p-message severity="error" size="small" variant="simple" >Value is required to be longer then three characters.</p-message>
       }
     </div>
-    <p-button type="submitt" label="Search"/>
+    <form [formGroup]="form.controls.collectionFilter" class="formgrid grid col-12 gap-2">
+      @for (input of collectionFilterOptions(); track $index) {
+        <div class="field col-5">
+          <p-select
+            [options]="input.values"
+            [formControlName]="input.type"
+            optionLabel="label"
+            [placeholder]="'Select a ' + input.type"
+            class="w-full" />
+        </div>
+      }
+    </form>
+    <div class="field col-12 flex justify-content-end">
+      <p-button type="submitt" label="Search"/>
+    </div>
   </form>
-</div>
