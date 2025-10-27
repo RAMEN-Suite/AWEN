@@ -3,7 +3,13 @@ import { Neo4jService } from "../neo4j/neo4j.service";
 import { GuidelinesService } from "../guidelines/guidelines.service";
 import { EntityDto } from "./dto/entity.dto";
 import { EntityNamesDto } from "./dto/entity-names.dto";
-import Cypher from "@neo4j/cypher-builder";
+import Cypher, {
+  Clause,
+  Match,
+  PartialPattern,
+  Pattern,
+  With,
+} from "@neo4j/cypher-builder";
 import { EntitySearchDto } from "./dto/entity-search.dto";
 
 @Injectable()
@@ -145,29 +151,40 @@ export class EntityService {
     return new Cypher.Map({
       nodeLabel: new Cypher.Literal(guidelines.entity.metaType),
       types: typesExpr,
+      label: eNode.property(guidelines.entity.nameLabel),
       id: eNode.property(guidelines.entity.idLabel),
       properties: cleanedProps,
     });
   }
 
   async find(queryParams: EntitySearchDto) {
-    const guidelines = await this.guidelinesService.get();
+    const eNode = new Cypher.Node();
+    const score = new Cypher.Variable();
 
-    const eNode: Cypher.Node = new Cypher.Node();
-
-    let pattern: Cypher.Pattern = new Cypher.Pattern(eNode, {
-      labels: guidelines.entity.metaType,
-    });
+    let searchPattern = await this.runSearch(eNode, score, queryParams.label);
+    let collPattern;
 
     if (queryParams.collectionFilter && Object.keys(queryParams.collectionFilter).length > 0) {
-      pattern = await this.addFilterByCollection(pattern, queryParams.collectionFilter);
+      collPattern = await this.addFilterByCollection(eNode, queryParams.collectionFilter);
     }
 
     const returnMap = await this.entityReturnMap(eNode);
-    const subQuery = new Cypher.Match(pattern).return(returnMap);
-    const collectReturnMap = new Cypher.Collect(subQuery);
+    let query = searchPattern;
 
-    const clause = new Cypher.With("*").return([collectReturnMap, "entities"]);
+    // Wenn ein Collection-Filter existiert, erweitern wir den Query mit MATCH
+    if (collPattern) {
+      query = searchPattern
+        .with(eNode, score)
+        .match(collPattern)
+        .with(eNode, score).distinct();
+    }
+
+    // Rückgabe als Liste
+    const collectReturnMap = Cypher.collect(returnMap);
+    const returnClause = new Cypher.Return([collectReturnMap, "entities"]);
+
+    // Finaler Query
+    const clause = query.return(returnClause)
 
     const { cypher, params } = clause.build();
 
@@ -182,7 +199,7 @@ export class EntityService {
 
   }
 
-  private async addFilterByCollection(pattern: Cypher.Pattern, collectionFilters: Record<string, string[]>) {
+  private async addFilterByCollection(eNode: Cypher.Node, collectionFilters: Record<string, string[]>) {
     const guidelines = await this.guidelinesService.get();
     const collectionChain =
       guidelines.scenarios.findByCollection.collectionChain;
@@ -195,9 +212,10 @@ export class EntityService {
     const eToA = new Cypher.Relationship();
     const aToC = new Cypher.Relationship();
 
-    const newPattern = pattern
+
+    let newPattern: Pattern | PartialPattern = new Cypher.Pattern(eNode)
       .related(eToA, { type: "REFERS_TO", direction: "left" })
-      .to(aNode)
+      .to(aNode, {labels: 'Annotation'})
       .related(aToC, { type: "HAS_ANNOTATION", direction: "left" });
 
     const collections: Map<string, Cypher.Node> = new Map<string, Cypher.Node>()
@@ -206,12 +224,15 @@ export class EntityService {
       const collection = new Cypher.Node();
       const partOf = new Cypher.Relationship();
 
+
+      if ("to" in newPattern) {
+        newPattern = newPattern
+          .to(collection, { labels: col });
+      }
+
+
       if (index !== collectionChain.length - 1) {
-        ((newPattern as unknown) as Cypher.Pattern).related(partOf, { type: "PART_OF", direction: "left" });
-      } else {
-        newPattern
-          .to(collection, { labels: col })
-          .related(partOf, { type: "PART_OF", direction: "left" });
+        newPattern = newPattern.related(partOf, { type: "PART_OF", direction: "right" });
       }
 
       collections.set(col, collection);
@@ -221,10 +242,12 @@ export class EntityService {
       const col = collections.get(collection)!;
       const colIDs = collectionFilters[collection];
 
-      newPattern.where(Cypher.in(col.property(colIdLabel), new Cypher.Literal(colIDs)))
+      if (colIDs !== undefined) {
+        newPattern = newPattern.where(Cypher.in(col.property(colIdLabel), new Cypher.Literal(colIDs)))
+      }
     });
 
-    return ((newPattern as unknown) as Cypher.Pattern);
+    return ((newPattern as unknown) as Pattern);
 
   }
 }

@@ -9,13 +9,18 @@ import {HttpClient, HttpParams} from '@angular/common/http';
 export class EntityService {
   private http = inject(HttpClient);
 
-  async searchEntities(query:EntitySearchQuery) {
-    const httpParams = new HttpParams();
+  searchEntities(query:EntitySearchQuery) {
+    let httpParams = new HttpParams();
 
     (Object.keys(query) as (keyof EntitySearchQuery)[]).forEach((key) => {
-      const value = JSON.stringify(query[key]);
-      const encodedValue = encodeURIComponent(value);
-      httpParams.set(key, encodedValue);
+      if (key === 'collectionFilter') {
+        const value = JSON.stringify(query[key]);
+        const encodedValue = encodeURIComponent(value);
+        httpParams = httpParams.set(key, encodedValue);
+      } else {
+        httpParams = httpParams.set(key, query[key]);
+      }
+
     });
 
     return this.http.get<Entity[]>('/api/entity/', {

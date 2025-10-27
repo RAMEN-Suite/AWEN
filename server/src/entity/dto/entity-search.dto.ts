@@ -17,7 +17,11 @@ export class EntitySearchDto extends PickType(EntityDto, ['label'] as const) {
   @Transform(({ value }) => {
     if (value === undefined || value === null || value === '') return undefined;
     if (typeof value === 'object') return value;
-    try { return JSON.parse(value); } catch { return undefined; }
+    try {
+      const dec = decodeURIComponent(value);
+      const json = JSON.parse(dec);
+      return json
+    } catch { return undefined; }
   }, { toClassOnly: true })
   collectionFilter?: Record<string, string[]>;
 

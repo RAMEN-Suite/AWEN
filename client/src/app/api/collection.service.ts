@@ -19,11 +19,15 @@ export class CollectionService {
       ? new HttpParams({ fromObject: { parentId } })
       : new HttpParams();
 
+    const collator = new Intl.Collator('en', { numeric: true, sensitivity: 'base' });
+
     return this.http.get<CollectionName[]>('api/collection/filterable/' + type, {
       params: params
     }).pipe(
       map(value => {
-        return value.sort((a, b) => a.label.localeCompare(b.label));
+        return value.sort((a, b) => {
+          return collator.compare(a.label, b.label);
+        });
       })
     );
   }

@@ -160,7 +160,7 @@ export class FulltextIndexes {
 export class FindByCollectionScenario {
   @ApiProperty({
     description:
-      'Kettenfolge von Collection-Labels/Beziehungen, um Entities über Collections zu finden. Es wird davon ausgegangen, das der letzte Array Eintrag der generischste Collection Typ ist.',
+      'Kettenfolge von Collection-Labels/Beziehungen, um Entities über Collections zu finden. Es wird davon ausgegangen, das der letzte Array Eintrag der generischste Collection Typ ist. Die Filterung wird immer vom generischsten Typ aus gestartet.',
     example: ["Regesta", "Volume", "Department"],
   })
   collectionChain: string[];

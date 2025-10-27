@@ -1,80 +1,79 @@
-import {Component, DestroyRef, effect, inject, OnInit, signal} from '@angular/core';
-import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {AutoCompleteCompleteEvent, AutoCompleteModule} from 'primeng/autocomplete';
-import {Message} from 'primeng/message';
-import {SearchService} from '../views/search/search.service';
-import {Button} from 'primeng/button';
-import {CollectionName, EntityNames} from '../../interfaces';
-import {GuidelinesService} from '../api/guidelines.service';
-import {CollectionService} from '../api/collection.service';
-import {Select} from 'primeng/select';
-import {distinctUntilChanged, firstValueFrom} from 'rxjs';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-
+import { Component, DestroyRef, effect, inject, OnInit, signal } from '@angular/core';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AutoCompleteCompleteEvent, AutoCompleteModule } from 'primeng/autocomplete';
+import { Message } from 'primeng/message';
+import { SearchService } from '../views/search/search.service';
+import { Button } from 'primeng/button';
+import {CollectionName, Entity, EntityNames, EntitySearchQuery} from '../../interfaces';
+import { GuidelinesService } from '../api/guidelines.service';
+import { CollectionService } from '../api/collection.service';
+import { Select } from 'primeng/select';
+import { distinctUntilChanged, firstValueFrom, map } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { EntityService } from '../api/entity.service';
 
 type CFOption = { type: string; values: CollectionName[] };
 
 @Component({
   selector: 'app-filter-pane',
-  imports: [
-    ReactiveFormsModule,
-    AutoCompleteModule,
-    Message,
-    Button,
-    Select
-  ],
+  imports: [ReactiveFormsModule, AutoCompleteModule, Message, Button, Select],
   templateUrl: './filter-pane.html',
 })
 export class FilterPane implements OnInit {
   private destroyRef = inject(DestroyRef);
+
   searchService = inject(SearchService);
   collectionService = inject(CollectionService);
+  entityService = inject(EntityService);
   guidelines = inject(GuidelinesService);
 
+  /** gesamte Kette aus Guidelines (vom spezifischsten → generischsten) */
   private collectionChain: string[] = [];
+  /** nur filterbare Typen, in UI-Reihenfolge (generisch → spezifisch) */
+  private activeChain: string[] = [];
 
   constructor() {
+    // Enable Controls, sobald Options vorhanden sind
     effect(() => {
-      const o = this.collectionFilterOptions();
-      o.forEach(filter => {
-        if (filter.values.length > 0) {
-          this.form.controls.collectionFilter.get(filter.type)?.enable();
+      const opts = this.collectionFilterOptions();
+      opts.forEach(opt => {
+        if (opt.values.length > 0) {
+          this.form.controls.collectionFilter.get(opt.type)?.enable({ emitEvent: false });
         }
-      })
+      });
     });
   }
 
   form: FormGroup<{
     search: FormControl<string>;
-    collectionFilter: FormGroup<Record<string, FormControl<CollectionName | null>>>
+    collectionFilter: FormGroup<Record<string, FormControl<CollectionName | null>>>;
   }> = new FormGroup({
     search: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required, Validators.minLength(3)],
     }),
-    collectionFilter: new FormGroup<Record<string, FormControl<CollectionName | null>>>({})
+    collectionFilter: new FormGroup<Record<string, FormControl<CollectionName | null>>>({}),
   });
 
+  entities = signal<Entity[]>([]);
   collectionFilterOptions = signal<CFOption[]>([]);
-
-  suggestions= signal<EntityNames[] >([]);
+  suggestions = signal<EntityNames[]>([]);
   showEmptyMessage = signal<boolean>(false);
 
   async ngOnInit() {
     const g = await this.guidelines.get();
 
-    /**
-     * TODO: Das kannste so nicht machen. Also das szenario ding ist nicht gut...
-     */
-
-    const filtCollectionTypes: string[] = g.scenarios.findByCollection.filterable;
+    // Guidelines: letzter Eintrag ist generischster → UI startet dort
+    // Also Kette umdrehen, damit Index 0 = generischster Typ ist.
     this.collectionChain = [...g.scenarios.findByCollection.collectionChain].reverse();
 
-    // 1. create ALL inputs
+    // Nur die filterbaren Typen zeigen
+    const filterable: string[] = g.scenarios.findByCollection.filterable;
+    this.activeChain = this.collectionChain.filter(t => filterable.includes(t));
 
+    // 1) Controls & Options nur für activeChain anlegen
     const optionsInit: CFOption[] = [];
-    for (const type of this.collectionChain) {
-      if (!filtCollectionTypes.includes(type)) continue;
+    for (const type of this.activeChain) {
       this.form.controls.collectionFilter.addControl(
         type,
         new FormControl<CollectionName | null>({ value: null, disabled: true })
@@ -83,24 +82,29 @@ export class FilterPane implements OnInit {
     }
     this.collectionFilterOptions.set(optionsInit);
 
-
-
-    // 2. Fill first Input
-
-    if (this.collectionChain.length > 0) {
-      await this.loadAndSetOptionsAt(0);
+    // 2) Erstes (generischstes) Select befüllen & enablen
+    if (this.activeChain.length > 0) {
+      await this.loadAndSetOptionsAt(0 /* generischstes Level */);
       this.enableAt(0, true);
     }
 
-
-    // 3. other inputs react on parent input change
-
-    this.collectionChain.forEach((type, idx) => {
-      this.form.controls.collectionFilter.get(type)?.valueChanges
-        .pipe(takeUntilDestroyed(this.destroyRef), distinctUntilChanged())
-        .subscribe(value => this.onLevelChanged(idx, value));
+    // 3) Änderungen kaskadieren – nur für vorhandene Controls
+    this.activeChain.forEach((type, idx) => {
+      const ctrl = this.form.controls.collectionFilter.get(type);
+      if (!ctrl) return;
+      ctrl.valueChanges
+        .pipe(
+          takeUntilDestroyed(this.destroyRef),
+          map((v: CollectionName | null) => v?.id ?? null), // nur id betrachten
+          distinctUntilChanged()
+        )
+        .subscribe(async (idOrNull) => {
+          const value = idOrNull
+            ? (this.form.controls.collectionFilter.get(type)?.value as CollectionName)
+            : null;
+          await this.onLevelChanged(idx, value);
+        });
     });
-
   }
 
   async autocompleteChanges(e: AutoCompleteCompleteEvent) {
@@ -114,37 +118,56 @@ export class FilterPane implements OnInit {
   }
 
   onSubmit() {
-    if (this.form.valid) {
-    } else {
-      Object.entries(this.form.controls).forEach(([_, value]) => {
-        value.markAsTouched()
-      })
+    if (!this.form.valid) {
+      Object.values(this.form.controls).forEach(ctrl => ctrl.markAsTouched());
+      return;
     }
+
+    const search = this.form.controls.search.value;
+    const collectionFilter = this.form.controls.collectionFilter.value;
+    const formatted: Record<string, string[]> = {};
+
+    for (const key of Object.keys(collectionFilter)) {
+      const id = collectionFilter[key as keyof typeof collectionFilter]?.id;
+      if (id) formatted[key] = [id];
+    }
+
+    const query: EntitySearchQuery = { label: search };
+
+    if (Object.keys(formatted).length > 0) {
+      query.collectionFilter = formatted;
+    }
+
+    this.entityService.searchEntities(query).subscribe(entities => {
+      console.log(entities);
+      this.entities.set(entities)
+    });
   }
 
   private calcShowEmptyMessage() {
-    return (this.form.controls.search.valid && this.suggestions().length === 0);
+    return this.form.controls.search.valid && this.suggestions().length === 0;
   }
 
-  /** Reaktion auf eine Änderung an Ebene `idx` */
+  /** Änderung an Ebene `idx` in der activeChain */
   private async onLevelChanged(idx: number, value: CollectionName | null) {
     if (value) {
-      // Elternwert gewählt -> alle tieferen zurücksetzen
+      // Elternwert gesetzt → alle tieferen Ebenen leeren
       this.clearFromIndex(idx + 1);
-      // direktes Kind befüllen & aktivieren (falls vorhanden)
-      if (idx + 1 < this.collectionChain.length) {
+      // Nächstes (filterbares) Level befüllen & enablen
+      if (idx + 1 < this.activeChain.length) {
         await this.loadAndSetOptionsAt(idx + 1, value.id);
         this.enableAt(idx + 1, true);
       }
     } else {
-      // Elternwert gelöscht -> alles darunter löschen & disablen
+      // Wert entfernt → alles darunter leeren & disablen
       this.clearFromIndex(idx + 1);
     }
   }
 
-  /** Lädt Options für Ebene `idx` (optional mit parentId) und schreibt sie ins Signal */
+  /** Options für Ebene `idx` laden (optional mit parentId) und ins Signal schreiben */
   private async loadAndSetOptionsAt(idx: number, parentId?: string) {
-    const type = this.collectionChain[idx];
+    const type = this.activeChain[idx];
+    if (!type) return;
     const values = await firstValueFrom(
       this.collectionService.getFilterableByType(type, parentId)
     );
@@ -158,30 +181,32 @@ export class FilterPane implements OnInit {
     this.collectionFilterOptions.set(next);
   }
 
-  /** Ab `startIdx` alle Controls: value=null, disable, options leeren */
+  /** Ab startIdx: value=null, disable, options leeren */
   private clearFromIndex(startIdx: number) {
     const cfGroup = this.form.controls.collectionFilter;
 
-    const nextOptions = this.collectionFilterOptions().map((o, i) => {
-      if (i >= startIdx) return { ...o, values: [] };
-      return o;
-    });
+    // Options leeren
+    const nextOptions = this.collectionFilterOptions().map((o, i) =>
+      i >= startIdx ? { ...o, values: [] } : o
+    );
     this.collectionFilterOptions.set(nextOptions);
 
-    for (let i = startIdx; i < this.collectionChain.length; i++) {
-      const type = this.collectionChain[i];
+    // Controls zurücksetzen & disablen
+    for (let i = startIdx; i < this.activeChain.length; i++) {
+      const type = this.activeChain[i];
       const ctrl = cfGroup.get(type);
-      ctrl?.setValue(null, { emitEvent: false }); // wichtig: keine Kaskaden-Schleife
-      ctrl?.disable({ emitEvent: false });
+      if (!ctrl) continue;
+      ctrl.setValue(null, { emitEvent: false });
+      ctrl.disable({ emitEvent: false });
     }
   }
 
   /** Enable/Disable Control an Index */
   private enableAt(idx: number, enable: boolean) {
-    const type = this.collectionChain[idx];
-    const ctrl = this.form.controls.collectionFilter.controls[type]!;
-    if (enable) ctrl.enable({ emitEvent: false });
-    else ctrl.disable({ emitEvent: false });
+    const type = this.activeChain[idx];
+    if (!type) return;
+    const ctrl = this.form.controls.collectionFilter.get(type);
+    if (!ctrl) return;
+    enable ? ctrl.enable({ emitEvent: false }) : ctrl.disable({ emitEvent: false });
   }
-
 }

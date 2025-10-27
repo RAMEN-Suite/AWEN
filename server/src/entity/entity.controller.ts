@@ -25,7 +25,8 @@ export class EntityController {
   @ApiResponse({ type: [EntityDto] })
   @Get('')
   async getAutoCompleteF(@Query() params: EntitySearchDto): Promise<EntityDto[]> {
-    const { label } = params;
+    const { label, collectionFilter } = params;
+
 
     const searchQuery = parseStringToSearchQueryString(label);
     const entities = await this.entityService.find({

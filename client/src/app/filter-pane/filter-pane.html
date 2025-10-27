@@ -15,12 +15,13 @@
     </div>
     <form [formGroup]="form.controls.collectionFilter" class="formgrid grid col-12 gap-2">
       @for (input of collectionFilterOptions(); track $index) {
-        <div class="field col-5">
+        <div class="field col-12 md:col">
           <p-select
             [options]="input.values"
             [formControlName]="input.type"
             optionLabel="label"
             [placeholder]="'Select a ' + input.type"
+            showClear
             class="w-full" />
         </div>
       }
@@ -29,3 +30,9 @@
       <p-button type="submitt" label="Search"/>
     </div>
   </form>
+
+  @for (entity of entities();track $index) {
+    <p>
+      {{entity.id}} {{entity.label}}
+    </p>
+  }
