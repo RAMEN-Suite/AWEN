@@ -11,12 +11,13 @@ import { Select } from 'primeng/select';
 import { distinctUntilChanged, firstValueFrom, map } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { EntityService } from '../api/entity.service';
+import {TypeFilter} from './type-filter/type-filter';
 
 type CFOption = { type: string; values: CollectionName[] };
 
 @Component({
   selector: 'app-filter-pane',
-  imports: [ReactiveFormsModule, AutoCompleteModule, Message, Button, Select],
+  imports: [ReactiveFormsModule, AutoCompleteModule, Message, Button, Select, TypeFilter],
   templateUrl: './filter-pane.html',
 })
 export class FilterPane implements OnInit {
