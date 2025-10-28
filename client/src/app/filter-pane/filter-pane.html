@@ -27,7 +27,7 @@
     </form>
   }
   <div class="field col-12">
-    <app-type-filter/>
+    <app-type-filter [(form)]="form.controls.types"/>
   </div>
   <div class="field col-12 flex justify-content-end">
     <p-button type="submitt" label="Search"/>

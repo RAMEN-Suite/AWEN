@@ -1,6 +1,6 @@
-import {Component, inject, OnInit, signal} from '@angular/core';
+import {Component, effect, inject, model, OnInit, signal} from '@angular/core';
 import {GuidelinesService} from '../../api/guidelines.service';
-import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {Checkbox} from 'primeng/checkbox';
 import {TitleCasePipe} from '@angular/common';
 
@@ -9,7 +9,8 @@ import {TitleCasePipe} from '@angular/common';
   imports: [
     Checkbox,
     ReactiveFormsModule,
-    TitleCasePipe
+    TitleCasePipe,
+    FormsModule
   ],
   templateUrl: './type-filter.html',
 })
@@ -17,17 +18,21 @@ export class TypeFilter implements OnInit {
 
   guidelines = inject(GuidelinesService);
 
+  form = model.required<FormControl<string[]>>()
+
+  protected activeTypes = signal<string[]>([]);
   protected types = signal<string[]>([]);
 
-  form = new FormGroup({});
-
+  constructor() {
+    effect(() => {
+      const opts = this.activeTypes();
+      this.form().setValue(opts);
+    });
+  }
 
   async ngOnInit(): Promise<void> {
     const g = await this.guidelines.get();
-    this.types.set(g.entity.types)
-
-    this.types().forEach(type => {
-      this.form.addControl(type, new FormControl<boolean>(false, {nonNullable: true}));
-    })
+    this.types.set(g.entity.types);
   }
+
 }

@@ -2,7 +2,7 @@ import { Component, DestroyRef, effect, inject, OnInit, signal } from '@angular/
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AutoCompleteCompleteEvent, AutoCompleteModule } from 'primeng/autocomplete';
 import { Message } from 'primeng/message';
-import { SearchService } from '../views/search/search.service';
+import { FilterPaneService } from './filter-pane.service';
 import { Button } from 'primeng/button';
 import {CollectionName, Entity, EntityNames, EntitySearchQuery} from '../../interfaces';
 import { GuidelinesService } from '../api/guidelines.service';
@@ -23,7 +23,7 @@ type CFOption = { type: string; values: CollectionName[] };
 export class FilterPane implements OnInit {
   private destroyRef = inject(DestroyRef);
 
-  searchService = inject(SearchService);
+  filterPaneService = inject(FilterPaneService);
   collectionService = inject(CollectionService);
   entityService = inject(EntityService);
   guidelines = inject(GuidelinesService);
@@ -48,12 +48,14 @@ export class FilterPane implements OnInit {
   form: FormGroup<{
     search: FormControl<string>;
     collectionFilter: FormGroup<Record<string, FormControl<CollectionName | null>>>;
+    types: FormControl<string[]>
   }> = new FormGroup({
     search: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required, Validators.minLength(3)],
     }),
     collectionFilter: new FormGroup<Record<string, FormControl<CollectionName | null>>>({}),
+    types: new FormControl<string[]>([], {nonNullable: true}),
   });
 
   entities = signal<Entity[]>([]);
@@ -110,7 +112,7 @@ export class FilterPane implements OnInit {
 
   async autocompleteChanges(e: AutoCompleteCompleteEvent) {
     if (this.form.valid) {
-      const suggestions = await this.searchService.getSuggestions(e.query);
+      const suggestions = await this.filterPaneService.getSuggestions(e.query);
       this.suggestions.set(suggestions);
     } else {
       this.suggestions.set([]);
@@ -118,13 +120,14 @@ export class FilterPane implements OnInit {
     this.showEmptyMessage.set(this.calcShowEmptyMessage());
   }
 
-  onSubmit() {
+  async onSubmit() {
     if (!this.form.valid) {
       Object.values(this.form.controls).forEach(ctrl => ctrl.markAsTouched());
       return;
     }
 
     const search = this.form.controls.search.value;
+    const types = this.form.controls.types.value;
     const collectionFilter = this.form.controls.collectionFilter.value;
     const formatted: Record<string, string[]> = {};
 
@@ -133,16 +136,15 @@ export class FilterPane implements OnInit {
       if (id) formatted[key] = [id];
     }
 
-    const query: EntitySearchQuery = { label: search };
+    const query: EntitySearchQuery = { label: search, types: types };
 
     if (Object.keys(formatted).length > 0) {
       query.collectionFilter = formatted;
     }
 
-    this.entityService.searchEntities(query).subscribe(entities => {
-      console.log(entities);
-      this.entities.set(entities)
-    });
+    const entities = await this.filterPaneService.searchEntities(query);
+    console.log(entities);
+    this.entities.set(entities)
   }
 
   private calcShowEmptyMessage() {

@@ -17,8 +17,12 @@ export class EntityService {
         const value = JSON.stringify(query[key]);
         const encodedValue = encodeURIComponent(value);
         httpParams = httpParams.set(key, encodedValue);
-      } else {
-        httpParams = httpParams.set(key, query[key]);
+      } else if (Array.isArray(query[key])) {
+        const value = JSON.stringify(query[key]);
+        const encodedValue = encodeURIComponent(value);
+        httpParams = httpParams.set(key, encodedValue);
+      } else if (['string', 'number', 'boolean'].includes(typeof query[key])) {
+        httpParams = httpParams.set(key, String(query[key]));
       }
 
     });

@@ -4,11 +4,8 @@ import { GuidelinesService } from "../guidelines/guidelines.service";
 import { EntityDto } from "./dto/entity.dto";
 import { EntityNamesDto } from "./dto/entity-names.dto";
 import Cypher, {
-  Clause,
-  Match,
   PartialPattern,
   Pattern,
-  With,
 } from "@neo4j/cypher-builder";
 import { EntitySearchDto } from "./dto/entity-search.dto";
 
@@ -168,12 +165,27 @@ export class EntityService {
       collPattern = await this.addFilterByCollection(eNode, queryParams.collectionFilter);
     }
 
+    let typePatten;
+
+    if (queryParams.types) {
+      typePatten = await this.addFilterByTypes(eNode, queryParams.types);
+    }
+
     const returnMap = await this.entityReturnMap(eNode);
     let query = searchPattern;
 
+
+    if (typePatten) {
+      query = query
+        .with(eNode, score)
+        .match(typePatten)
+        .with(eNode, score).distinct();
+    }
+
+
     // Wenn ein Collection-Filter existiert, erweitern wir den Query mit MATCH
     if (collPattern) {
-      query = searchPattern
+      query = query
         .with(eNode, score)
         .match(collPattern)
         .with(eNode, score).distinct();
@@ -250,4 +262,14 @@ export class EntityService {
     return ((newPattern as unknown) as Pattern);
 
   }
+
+  private async addFilterByTypes(eNode: Cypher.Node, types: string[]) {
+    const labelConditions = types.map((type) => eNode.hasLabel(type));
+    const orCondition = Cypher.or(...labelConditions);
+
+    const pattern = new Cypher.Pattern(eNode).where(orCondition);
+
+    return pattern;
+  }
+
 }

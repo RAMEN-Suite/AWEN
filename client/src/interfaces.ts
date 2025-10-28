@@ -16,6 +16,7 @@ export interface EntityNames {
 export interface EntitySearchQuery {
   label: string;
   collectionFilter?: Record<string, string[]>;
+  types?: string[];
 }
 
 export interface CollectionName {

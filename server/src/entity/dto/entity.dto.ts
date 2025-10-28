@@ -6,6 +6,8 @@ import {
   MinLength,
 } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
+import { Transform } from "class-transformer";
+import { BadRequestException } from "@nestjs/common";
 
 
 export class EntityDto {
@@ -33,6 +35,29 @@ export class EntityDto {
   })
   @IsString({each: true})
   @IsArray()
+  @Transform(({ value }) => {
+    if (value === undefined || value === null || value === '') {
+      throw new BadRequestException(['value must be an array of strings!']);
+    }
+    if (Array.isArray(value)) {
+      let isString = true;
+      for (const item of value) {
+        isString = typeof item === 'string'
+        if (!isString) {
+          break;
+        }
+      }
+      if (isString) {
+        return isString;
+      }
+      throw new BadRequestException(['value must be an array of strings!']);
+    }
+    try {
+      const dec = decodeURIComponent(value);
+      const json = JSON.parse(dec);
+      return json
+    } catch { throw new BadRequestException(['value must be an array of strings!']); }
+  }, { toClassOnly: true })
   types: string[];
 
   /**

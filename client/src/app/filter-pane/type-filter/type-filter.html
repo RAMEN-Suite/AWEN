@@ -1,8 +1,8 @@
-<form [formGroup]="form" class="formgrid grid">
+<div class="formgrid grid">
 @for (type of types(); track $index) {
   <div class="field col flex align-items-center align-content-center items-center gap-2">
-    <p-checkbox [formControlName]="type" [binary]="true" [inputId]="type" />
+    <p-checkbox [value]="type" [(ngModel)]="activeTypes" [inputId]="type" />
     <label [for]="type" class="p-0 m-0"> {{ type | titlecase }} </label>
   </div>
 }
-</form>
+</div>
