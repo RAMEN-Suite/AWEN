@@ -27,13 +27,15 @@ export class EntityService {
 
     });
 
-    return this.http.get<Entity[]>('/api/entity/', {
+    const res = this.http.get<Entity[]>('/api/entity/', {
       params: httpParams
     });
+    return firstValueFrom(res);
   }
 
   async getById(id:string) {
-    return this.http.get<Entity>('/api/entity/' + id);
+    const res = this.http.get<Entity>('/api/entity/' + id);
+    return firstValueFrom(res);
   }
 
 

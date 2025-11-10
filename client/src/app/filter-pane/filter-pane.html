@@ -9,7 +9,13 @@
       [showEmptyMessage]="showEmptyMessage()"
       optionLabel="label"
       panelStyleClass="w-30rem"
-    />
+    >
+      <ng-template let-entity #item>
+        <div class="flex items-center gap-2">
+          <div>{{ entity.label }}</div>
+        </div>
+      </ng-template>
+    </p-auto-complete>
     @if (form.controls.search.invalid && form.controls.search.touched) {
       <p-message severity="error" size="small" variant="simple">Value is required to be longer then three characters.
       </p-message>
@@ -33,9 +39,3 @@
     <p-button type="submitt" label="Search"/>
   </div>
 </form>
-
-@for (entity of entities(); track $index) {
-  <p>
-    {{ entity.id }} {{ entity.label }}
-  </p>
-}

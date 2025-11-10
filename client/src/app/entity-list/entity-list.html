@@ -1,0 +1,32 @@
+@if (entitiesLoading()) {
+  <p-virtualscroller [items]="entities()" [itemSize]="50" [scrollHeight]="height()" styleClass="border border-surface" [style]="{ width: width(), height: height() }">
+    <ng-template pTemplate="content">
+      <div class="flex items-center align-items-center p-2">
+        <p-progress-spinner ariaLabel="loading" />
+      </div>
+    </ng-template>
+  </p-virtualscroller>
+} @else {
+  <p-virtualscroller [items]="entities()" [itemSize]="50" [scrollHeight]="height()" styleClass="border border-surface" [style]="{ width: width(), height: height() }">
+    <ng-template #item let-item let-options="options">
+      <div class="flex flex-row items-center p-2 justify-content-between" [ngClass]="{ 'bg-surface-100 dark:bg-surface-700': options.odd }">
+        <div class="flex flex-column">
+          <div class="flex align-items-center gap-2 flex-wrap">
+            @for (type of item.types; track $index) {
+              <p-chip icon="pi pi-tag" class="text-sm" [label]="type" />
+            }
+          </div>
+          <a [routerLink]="['entity', item.id ]" class="text-lg font-medium text-900 mt-2 cursor-pointer no-underline hover:underline focus:underline">
+            {{ item.label }}
+          </a>
+        </div>
+        <div class="flex flex-row align-items-end gap-5">
+            <p-button icon="pi pi-clipboard" rounded text size="large" pTooltip="Copy UUID to Clipboard"
+              tooltipPosition="bottom"
+              (onClick)="copyToClipboard(item.id)"/>
+        </div>
+      </div>
+    </ng-template>
+  </p-virtualscroller>
+}
+

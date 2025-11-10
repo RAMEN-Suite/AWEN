@@ -1,0 +1,33 @@
+{
+  "entity": {
+    "metaType": "Entity",
+    "types": ["Person", "Place", "Thing", "Event", "Role", "Xref", "Institution"],
+    "idLabel": "uuid",
+    "nameLabel": "label",
+    "properties": [
+      {
+        "name": "label",
+        "type": "string",
+        "required": true,
+        "editable": true,
+        "visible": true
+      }
+    ]
+  },
+  "collection": {
+    "metaType": "Collection",
+    "types": ["Department", "Volume", "Regesta"],
+    "idLabel": "uuid",
+    "nameLabel": "label",
+    "properties": []
+  },
+  "fulltextIndexes": {
+    "search": "search"
+  },
+  "scenarios": {
+    "findByCollection": {
+      "collectionChain": ["Regesta", "Volume", "Department"],
+      "filterable": ["Volume", "Department"]
+    }
+  }
+}

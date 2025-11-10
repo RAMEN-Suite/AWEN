@@ -2,15 +2,14 @@ import { Component, DestroyRef, effect, inject, OnInit, signal } from '@angular/
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AutoCompleteCompleteEvent, AutoCompleteModule } from 'primeng/autocomplete';
 import { Message } from 'primeng/message';
-import { FilterPaneService } from './filter-pane.service';
+import { SearchService } from '../views/search/search.service';
 import { Button } from 'primeng/button';
-import {CollectionName, Entity, EntityNames, EntitySearchQuery} from '../../interfaces';
+import {CollectionName, EntityNames, EntitySearchQuery} from '../../interfaces';
 import { GuidelinesService } from '../api/guidelines.service';
 import { CollectionService } from '../api/collection.service';
 import { Select } from 'primeng/select';
 import { distinctUntilChanged, firstValueFrom, map } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { EntityService } from '../api/entity.service';
 import {TypeFilter} from './type-filter/type-filter';
 
 type CFOption = { type: string; values: CollectionName[] };
@@ -23,9 +22,8 @@ type CFOption = { type: string; values: CollectionName[] };
 export class FilterPane implements OnInit {
   private destroyRef = inject(DestroyRef);
 
-  filterPaneService = inject(FilterPaneService);
+  searchService = inject(SearchService);
   collectionService = inject(CollectionService);
-  entityService = inject(EntityService);
   guidelines = inject(GuidelinesService);
 
   /** gesamte Kette aus Guidelines (vom spezifischsten → generischsten) */
@@ -58,7 +56,6 @@ export class FilterPane implements OnInit {
     types: new FormControl<string[]>([], {nonNullable: true}),
   });
 
-  entities = signal<Entity[]>([]);
   collectionFilterOptions = signal<CFOption[]>([]);
   suggestions = signal<EntityNames[]>([]);
   showEmptyMessage = signal<boolean>(false);
@@ -112,7 +109,7 @@ export class FilterPane implements OnInit {
 
   async autocompleteChanges(e: AutoCompleteCompleteEvent) {
     if (this.form.valid) {
-      const suggestions = await this.filterPaneService.getSuggestions(e.query);
+      const suggestions = await this.searchService.getSuggestions(e.query);
       this.suggestions.set(suggestions);
     } else {
       this.suggestions.set([]);
@@ -142,9 +139,7 @@ export class FilterPane implements OnInit {
       query.collectionFilter = formatted;
     }
 
-    const entities = await this.filterPaneService.searchEntities(query);
-    console.log(entities);
-    this.entities.set(entities)
+    await this.searchService.searchEntities(query);
   }
 
   private calcShowEmptyMessage() {
