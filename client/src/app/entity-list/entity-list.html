@@ -6,6 +6,10 @@
       </div>
     </ng-template>
   </p-virtualscroller>
+} @else if (entities().length === 0) {
+  <div class="w-full flex justify-content-center">
+    <span>List Empty</span>
+  </div>
 } @else {
   <p-virtualscroller [items]="entities()" [itemSize]="50" [scrollHeight]="height()" styleClass="border border-surface" [style]="{ width: width(), height: height() }">
     <ng-template #item let-item let-options="options">
