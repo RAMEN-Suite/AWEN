@@ -1,31 +1,18 @@
 import {inject, Injectable} from '@angular/core';
 import {Entity, EntityNames, EntitySearchQuery} from '../../interfaces';
 import {firstValueFrom} from 'rxjs';
-import {HttpClient, HttpParams} from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
+import {QueryParamsService} from '../utils/query-params.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EntityService {
   private http = inject(HttpClient);
+  private queryParamService = inject(QueryParamsService);
 
   searchEntities(query:EntitySearchQuery) {
-    let httpParams = new HttpParams();
-
-    (Object.keys(query) as (keyof EntitySearchQuery)[]).forEach((key) => {
-      if (key === 'collectionFilter') {
-        const value = JSON.stringify(query[key]);
-        const encodedValue = encodeURIComponent(value);
-        httpParams = httpParams.set(key, encodedValue);
-      } else if (Array.isArray(query[key])) {
-        const value = JSON.stringify(query[key]);
-        const encodedValue = encodeURIComponent(value);
-        httpParams = httpParams.set(key, encodedValue);
-      } else if (['string', 'number', 'boolean'].includes(typeof query[key])) {
-        httpParams = httpParams.set(key, String(query[key]));
-      }
-
-    });
+    const httpParams = this.queryParamService.transformQueryParams(query)
 
     const res = this.http.get<Entity[]>('/api/entity/', {
       params: httpParams

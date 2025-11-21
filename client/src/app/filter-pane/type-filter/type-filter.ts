@@ -33,6 +33,17 @@ export class TypeFilter implements OnInit {
   async ngOnInit(): Promise<void> {
     const g = await this.guidelines.get();
     this.types.set(g.entity.types);
+    this.form().valueChanges.subscribe(value => {
+      if (value !== this.activeTypes()) {
+        for (let val of value) {
+          if (this.types().includes(val)) {
+            this.activeTypes.update(old => {
+              return [...old, val];
+            })
+          }
+        }
+      }
+    });
   }
 
 }

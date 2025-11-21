@@ -1,6 +1,6 @@
 import { Component, DestroyRef, effect, inject, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AutoCompleteCompleteEvent, AutoCompleteModule } from 'primeng/autocomplete';
+import {AutoCompleteCompleteEvent, AutoCompleteModule, AutoCompleteSelectEvent} from 'primeng/autocomplete';
 import { Message } from 'primeng/message';
 import { SearchService } from '../views/search/search.service';
 import { Button } from 'primeng/button';
@@ -11,12 +11,14 @@ import { Select } from 'primeng/select';
 import { distinctUntilChanged, firstValueFrom, map } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {TypeFilter} from './type-filter/type-filter';
+import {RouterLink} from '@angular/router';
+import {QueryParamsService} from '../utils/query-params.service';
 
 type CFOption = { type: string; values: CollectionName[] };
 
 @Component({
   selector: 'app-filter-pane',
-  imports: [ReactiveFormsModule, AutoCompleteModule, Message, Button, Select, TypeFilter],
+  imports: [ReactiveFormsModule, AutoCompleteModule, Message, Button, Select, TypeFilter, RouterLink],
   templateUrl: './filter-pane.html',
 })
 export class FilterPane implements OnInit {
@@ -25,6 +27,7 @@ export class FilterPane implements OnInit {
   searchService = inject(SearchService);
   collectionService = inject(CollectionService);
   guidelines = inject(GuidelinesService);
+  private queryParamService = inject(QueryParamsService);
 
   /** gesamte Kette aus Guidelines (vom spezifischsten → generischsten) */
   private collectionChain: string[] = [];
@@ -44,11 +47,11 @@ export class FilterPane implements OnInit {
   }
 
   form: FormGroup<{
-    search: FormControl<string>;
+    label: FormControl<string>;
     collectionFilter: FormGroup<Record<string, FormControl<CollectionName | null>>>;
     types: FormControl<string[]>
   }> = new FormGroup({
-    search: new FormControl('', {
+    label: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required, Validators.minLength(3)],
     }),
@@ -61,6 +64,7 @@ export class FilterPane implements OnInit {
   showEmptyMessage = signal<boolean>(false);
 
   async ngOnInit() {
+
     const g = await this.guidelines.get();
 
     // Guidelines: letzter Eintrag ist generischster → UI startet dort
@@ -105,6 +109,13 @@ export class FilterPane implements OnInit {
           await this.onLevelChanged(idx, value);
         });
     });
+
+    // Fill form
+    const queryParamValues = await this.queryParamService.readDecodedQueryParams();
+    this.fillForm(this.form, queryParamValues);
+    if (Object.keys(queryParamValues).length > 0) {
+      await this.onSubmit();
+    }
   }
 
   async autocompleteChanges(e: AutoCompleteCompleteEvent) {
@@ -123,7 +134,7 @@ export class FilterPane implements OnInit {
       return;
     }
 
-    const search = this.form.controls.search.value;
+    const label = this.form.controls.label.value;
     const types = this.form.controls.types.value;
     const collectionFilter = this.form.controls.collectionFilter.value;
     const formatted: Record<string, string[]> = {};
@@ -133,17 +144,19 @@ export class FilterPane implements OnInit {
       if (id) formatted[key] = [id];
     }
 
-    const query: EntitySearchQuery = { label: search, types: types };
+    const query: EntitySearchQuery = { label: label, types: types };
 
     if (Object.keys(formatted).length > 0) {
       query.collectionFilter = formatted;
     }
 
     await this.searchService.searchEntities(query);
+    const queryParams = this.queryParamService.transformQueryParams(this.form.value);
+    await this.queryParamService.setQueryParams(queryParams);
   }
 
   private calcShowEmptyMessage() {
-    return this.form.controls.search.valid && this.suggestions().length === 0;
+    return this.form.controls.label.valid && this.suggestions().length === 0;
   }
 
   /** Änderung an Ebene `idx` in der activeChain */
@@ -207,4 +220,27 @@ export class FilterPane implements OnInit {
     if (!ctrl) return;
     enable ? ctrl.enable({ emitEvent: false }) : ctrl.disable({ emitEvent: false });
   }
+
+  protected onItemSelect(e: AutoCompleteSelectEvent) {
+    this.form.controls['label'].setValue(e.value.label);
+  }
+
+  private fillForm(form: FormGroup, values: Record<string, any>) {
+
+    for (const key of Object.keys(form.controls)) {
+
+      if (form.controls[key] instanceof FormGroup) {
+        this.fillForm(form.controls[key], values[key]);
+        continue;
+      }
+
+      const val = values[key];
+      if (val) {
+        form.controls[key].setValue(val);
+      }
+    }
+
+    return form;
+  }
+
 }

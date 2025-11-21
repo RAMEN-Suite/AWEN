@@ -1,22 +1,23 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()" class="formgrid grid">
   <div class="field col-12">
     <p-auto-complete
-      formControlName="search"
+      formControlName="label"
       [suggestions]="suggestions()"
-      [invalid]="form.controls.search.invalid && form.controls.search.touched"
+      [invalid]="form.controls.label.invalid && form.controls.label.touched"
       (completeMethod)="autocompleteChanges($event)"
+      (onSelect)="onItemSelect($event)"
       fluid
       [showEmptyMessage]="showEmptyMessage()"
       optionLabel="label"
       panelStyleClass="w-30rem"
     >
       <ng-template let-entity #item>
-        <div class="flex items-center gap-2">
-          <div>{{ entity.label }}</div>
-        </div>
+        <a [routerLink]="['entity', entity.id]" class="flex items-center gap-2">
+          <span class="text-black-alpha-90">{{ entity.label }}</span>
+        </a>
       </ng-template>
     </p-auto-complete>
-    @if (form.controls.search.invalid && form.controls.search.touched) {
+    @if (form.controls.label.invalid && form.controls.label.touched) {
       <p-message severity="error" size="small" variant="simple">Value is required to be longer then three characters.
       </p-message>
     }
