@@ -234,13 +234,29 @@ export class FilterPane implements OnInit {
         continue;
       }
 
-      const val = values[key];
+      let val = undefined;
+      try {
+        val = values[key];
+      } catch (e) {
+        val = undefined;
+      }
+
       if (val) {
         form.controls[key].setValue(val);
       }
     }
 
     return form;
+  }
+
+  private resetForm(): void {
+    this.form.reset();
+  }
+
+  async resetFilterClicked(): Promise<void> {
+    this.resetForm();
+    this.searchService.resetEntityList();
+    await this.queryParamService.setQueryParams({});
   }
 
 }

@@ -9,7 +9,7 @@ const parseStringToSearchArray = (string: string): string[] => {
 }
 
 const parseStringToSearchQueryString = (string: string): string => {
-  return parseStringToSearchArray(string).join('* ') + '*';
+  return parseStringToSearchArray(string).join('* AND ') + '*';
 }
 
 

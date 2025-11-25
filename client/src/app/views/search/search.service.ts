@@ -25,6 +25,10 @@ export class SearchService {
     return this.entities.asReadonly();
   }
 
+  resetEntityList() {
+    this.entities.set(new Array<Entity>());
+  }
+
   async searchEntities(query:EntitySearchQuery) {
     this.entitiesLoading.set(true);
     const entities = await this.entityService.searchEntities(query);
