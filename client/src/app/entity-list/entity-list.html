@@ -16,9 +16,14 @@
       <div class="flex flex-row items-center p-2 justify-content-between" [ngClass]="{ 'bg-surface-100 dark:bg-surface-700': options.odd }">
         <div class="flex flex-column">
           <div class="flex align-items-center gap-2 flex-wrap">
-            @for (type of item.types; track $index) {
-              <p-chip icon="pi pi-tag" class="text-sm" [label]="type" />
+            @if (item.types.length !== 0) {
+              @for (type of item.types; track $index) {
+                <p-chip icon="pi pi-tag" class="text-sm" [label]="type" />
+              }
+            } @else {
+              <p-chip icon="pi pi-tag" class="text-sm" label="Unknown" />
             }
+
           </div>
           <a [routerLink]="['entity', item.id ]" class="text-lg font-medium text-900 mt-2 cursor-pointer no-underline hover:underline focus:underline">
             {{ item.label }}
