@@ -40,6 +40,9 @@ export interface IGuidelines {
       collectionChain: string[];
       filterable: string[];
     }
+    searchEntities: {
+      orderBy: {property: string, order: 'DESC'|'ASC'}[]
+    }
   }
 }
 

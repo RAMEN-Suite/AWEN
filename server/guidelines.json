@@ -28,6 +28,18 @@
     "findByCollection": {
       "collectionChain": ["Regesta", "Volume", "Department"],
       "filterable": ["Volume", "Department"]
+    },
+    "searchEntities": {
+      "orderBy": [
+        {
+          "property": "pathLength",
+          "order": "ASC"
+        },
+        {
+          "property": "numberOfChilds",
+          "order": "DESC"
+        }
+      ]
     }
   }
 }

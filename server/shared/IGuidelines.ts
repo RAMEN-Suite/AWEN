@@ -157,6 +157,34 @@ export class FulltextIndexes {
   search: string;
 }
 
+export class SearchEntitiesOrderBy {
+  @ApiProperty({
+    description: 'Property-Name, nach der sortiert werden soll.',
+    example: 'numberOfChilds',
+  })
+  property: string;
+
+  @ApiProperty({
+    description: 'Sortierreihenfolge: ASC oder DESC.',
+    example: 'DESC',
+  })
+  order: 'ASC' | 'DESC';
+}
+
+export class SearchEntitiesScenario {
+  @ApiProperty({
+    description: 'Liste der Sortierkriterien für Suchanfragen.',
+    type: () => [SearchEntitiesOrderBy],
+    example: [
+      {
+        property: 'numberOfChilds',
+        order: 'DESC',
+      },
+    ],
+  })
+  orderBy: SearchEntitiesOrderBy[];
+}
+
 export class FindByCollectionScenario {
   @ApiProperty({
     description:
@@ -181,6 +209,12 @@ export class Scenarios {
     type: () => FindByCollectionScenario,
   })
   findByCollection: FindByCollectionScenario;
+
+  @ApiProperty({
+    description: 'Szenario: Entities suchen und sortieren.',
+    type: () => SearchEntitiesScenario,
+  })
+  searchEntities: SearchEntitiesScenario;
 }
 
 @ApiExtraModels(IEntity, PropertyConfig, FulltextIndexes, Scenarios, FindByCollectionScenario)

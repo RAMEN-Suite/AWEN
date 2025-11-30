@@ -155,6 +155,9 @@ export class EntityService {
   }
 
   async find(queryParams: EntitySearchDto) {
+    const guidelines = await this.guidelinesService.get();
+    const orderBy = guidelines.scenarios.searchEntities.orderBy;
+
     const eNode = new Cypher.Node();
     const score = new Cypher.Variable();
 
@@ -171,8 +174,13 @@ export class EntityService {
       typePatten = await this.addFilterByTypes(eNode, queryParams.types);
     }
 
+    const orderByArr: [Cypher.Expr, Cypher.Order][] = orderBy.map(value => {
+      return [eNode.property(value.property), value.order]
+    })
+
     const returnMap = await this.entityReturnMap(eNode);
-    let query = searchPattern;
+    let query = searchPattern
+      .orderBy([score], ...orderByArr);
 
 
     if (typePatten) {
@@ -196,7 +204,9 @@ export class EntityService {
     const returnClause = new Cypher.Return([collectReturnMap, "entities"]);
 
     // Finaler Query
-    const clause = query.return(returnClause)
+    const clause = query
+      .return(returnClause)
+
 
     const { cypher, params } = clause.build();
 
