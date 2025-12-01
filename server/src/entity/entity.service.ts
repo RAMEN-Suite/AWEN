@@ -87,12 +87,13 @@ export class EntityService {
 
     const searchPattern = await this.runSearch(eNode, score, name);
 
-    const clause = searchPattern
+    let clause = searchPattern
       .return(
         [eNode.property(guidelines.entity.nameLabel), "label"],
         [eNode.property(guidelines.entity.idLabel), "id"],
-      )
-      .orderBy([score, "ASC"], [eNode.property("pathLength"), "ASC"]);
+      );
+
+      clause = await this.addOrderByProperty(clause, eNode, [[score, "ASC"]]);
 
     const { cypher, params } = clause.build();
 
@@ -155,17 +156,20 @@ export class EntityService {
   }
 
   async find(queryParams: EntitySearchDto) {
-    const guidelines = await this.guidelinesService.get();
-    const orderBy = guidelines.scenarios.searchEntities.orderBy;
-
     const eNode = new Cypher.Node();
     const score = new Cypher.Variable();
 
     let searchPattern = await this.runSearch(eNode, score, queryParams.label);
     let collPattern;
 
-    if (queryParams.collectionFilter && Object.keys(queryParams.collectionFilter).length > 0) {
-      collPattern = await this.addFilterByCollection(eNode, queryParams.collectionFilter);
+    if (
+      queryParams.collectionFilter &&
+      Object.keys(queryParams.collectionFilter).length > 0
+    ) {
+      collPattern = await this.addFilterByCollection(
+        eNode,
+        queryParams.collectionFilter,
+      );
     }
 
     let typePatten;
@@ -174,29 +178,26 @@ export class EntityService {
       typePatten = await this.addFilterByTypes(eNode, queryParams.types);
     }
 
-    const orderByArr: [Cypher.Expr, Cypher.Order][] = orderBy.map(value => {
-      return [eNode.property(value.property), value.order]
-    })
-
     const returnMap = await this.entityReturnMap(eNode);
-    let query = searchPattern
-      .orderBy([score], ...orderByArr);
+    let query = searchPattern;
 
+    query = await this.addOrderByProperty(query, eNode, [[score, 'ASC']]);
 
     if (typePatten) {
       query = query
         .with(eNode, score)
         .match(typePatten)
-        .with(eNode, score).distinct();
+        .with(eNode, score)
+        .distinct();
     }
-
 
     // Wenn ein Collection-Filter existiert, erweitern wir den Query mit MATCH
     if (collPattern) {
       query = query
         .with(eNode, score)
         .match(collPattern)
-        .with(eNode, score).distinct();
+        .with(eNode, score)
+        .distinct();
     }
 
     // Rückgabe als Liste
@@ -204,9 +205,7 @@ export class EntityService {
     const returnClause = new Cypher.Return([collectReturnMap, "entities"]);
 
     // Finaler Query
-    const clause = query
-      .return(returnClause)
-
+    const clause = query.return(returnClause);
 
     const { cypher, params } = clause.build();
 
@@ -218,10 +217,12 @@ export class EntityService {
     const entities = res.records[0].get("entities");
 
     return entities;
-
   }
 
-  private async addFilterByCollection(eNode: Cypher.Node, collectionFilters: Record<string, string[]>) {
+  private async addFilterByCollection(
+    eNode: Cypher.Node,
+    collectionFilters: Record<string, string[]>,
+  ) {
     const guidelines = await this.guidelinesService.get();
     const collectionChain =
       guidelines.scenarios.findByCollection.collectionChain;
@@ -234,27 +235,29 @@ export class EntityService {
     const eToA = new Cypher.Relationship();
     const aToC = new Cypher.Relationship();
 
-
     let newPattern: Pattern | PartialPattern = new Cypher.Pattern(eNode)
       .related(eToA, { type: "REFERS_TO", direction: "left" })
-      .to(aNode, {labels: 'Annotation'})
+      .to(aNode, { labels: "Annotation" })
       .related(aToC, { type: "HAS_ANNOTATION", direction: "left" });
 
-    const collections: Map<string, Cypher.Node> = new Map<string, Cypher.Node>()
+    const collections: Map<string, Cypher.Node> = new Map<
+      string,
+      Cypher.Node
+    >();
 
     collectionChain.forEach((col, index) => {
       const collection = new Cypher.Node();
       const partOf = new Cypher.Relationship();
 
-
       if ("to" in newPattern) {
-        newPattern = newPattern
-          .to(collection, { labels: col });
+        newPattern = newPattern.to(collection, { labels: col });
       }
 
-
       if (index !== collectionChain.length - 1) {
-        newPattern = newPattern.related(partOf, { type: "PART_OF", direction: "right" });
+        newPattern = newPattern.related(partOf, {
+          type: "PART_OF",
+          direction: "right",
+        });
       }
 
       collections.set(col, collection);
@@ -265,12 +268,13 @@ export class EntityService {
       const colIDs = collectionFilters[collection];
 
       if (colIDs !== undefined) {
-        newPattern = newPattern.where(Cypher.in(col.property(colIdLabel), new Cypher.Literal(colIDs)))
+        newPattern = newPattern.where(
+          Cypher.in(col.property(colIdLabel), new Cypher.Literal(colIDs)),
+        );
       }
     });
 
-    return ((newPattern as unknown) as Pattern);
-
+    return newPattern as unknown as Pattern;
   }
 
   private async addFilterByTypes(eNode: Cypher.Node, types: string[]) {
@@ -282,4 +286,20 @@ export class EntityService {
     return pattern;
   }
 
+  private async addOrderByProperty<
+    T extends Cypher.With | Cypher.Return
+  >(
+    pattern: T,
+    eNode: Cypher.Node,
+    variables: [Cypher.Variable, "DESC" | "ASC"][],
+  ): Promise<T> {
+    const guidelines = await this.guidelinesService.get();
+    const orderBy = guidelines.scenarios.searchEntities.orderBy;
+    const orderByArr: [Cypher.Expr, Cypher.Order][] = orderBy
+      .map((value) => {
+        return [eNode.property(value.property), value.order];
+      })
+
+    return pattern.orderBy(...variables, ...orderByArr) as T;
+  }
 }
