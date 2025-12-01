@@ -1,9 +1,13 @@
 import {Component, input, OnInit} from '@angular/core';
 import {Entity} from '../../../interfaces';
+import {TableModule} from 'primeng/table';
+
 
 @Component({
   selector: 'app-detail-page',
-  imports: [],
+  imports: [
+    TableModule
+  ],
   templateUrl: './detail-page.html',
 })
 export class DetailPage implements OnInit {
@@ -14,6 +18,10 @@ export class DetailPage implements OnInit {
 
   }
 
+  // TODO: aus den Guidelines extrahieren
+  entityPropertiesTableFormat() {
 
+    return []
+  }
 
 }
