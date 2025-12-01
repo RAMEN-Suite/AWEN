@@ -4,7 +4,7 @@ import {SearchService} from './search.service';
 import {EntityList} from '../../entity-list/entity-list';
 
 @Component({
-  selector: 'app-search',
+  selector: 'app-searchPage-page',
   imports: [
     FilterPane,
     EntityList
@@ -12,9 +12,9 @@ import {EntityList} from '../../entity-list/entity-list';
   providers: [
     SearchService
   ],
-  templateUrl: './search.html',
+  templateUrl: './search-page.component.html',
 })
-export class Search {
+export class SearchPage {
 
   searchService = inject(SearchService);
 

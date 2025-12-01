@@ -2,7 +2,7 @@ import { Component, DestroyRef, effect, inject, OnInit, signal } from '@angular/
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import {AutoCompleteCompleteEvent, AutoCompleteModule, AutoCompleteSelectEvent} from 'primeng/autocomplete';
 import { Message } from 'primeng/message';
-import { SearchService } from '../views/search/search.service';
+import { SearchService } from '../views/searchPage/search.service';
 import { Button } from 'primeng/button';
 import {CollectionName, EntityNames, EntitySearchQuery} from '../../interfaces';
 import { GuidelinesService } from '../api/guidelines.service';

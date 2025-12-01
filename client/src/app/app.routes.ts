@@ -1,9 +1,18 @@
 import { Routes } from '@angular/router';
-import {Search} from './views/search/search';
+import {SearchPage} from './views/searchPage/search-page.component';
+import {DetailPage} from './views/detail-page/detail-page';
+import {entityByIdResolver} from './utils/entity-by-id-resolver';
 
 export const routes: Routes = [
   {
     path: '',
-    component: Search
+    component: SearchPage
+  },
+  {
+    path: 'entity/:entityId',
+    component: DetailPage,
+    resolve: {
+      entity: entityByIdResolver,
+    }
   }
 ];
