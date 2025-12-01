@@ -11,7 +11,9 @@ export class DetailPage implements OnInit {
   entity = input.required<Entity>()
 
   ngOnInit(): void {
-    console.log(this.entity);
+
   }
+
+
 
 }
