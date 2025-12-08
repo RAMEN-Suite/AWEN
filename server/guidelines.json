@@ -6,11 +6,66 @@
     "nameLabel": "label",
     "properties": [
       {
-        "name": "label",
-        "type": "string",
-        "required": true,
+        "name": "alias",
+        "type": "array",
+        "required": false,
         "editable": true,
-        "visible": true
+        "visible": true,
+        "propertyNode": false,
+        "items": {
+          "type": "string",
+          "required": false,
+          "editable": true,
+          "visible": true
+        }
+      },
+      {
+        "name": "htmlLabel",
+        "type": "string",
+        "required": false,
+        "editable": true,
+        "visible": true,
+        "propertyNode": false
+      },
+      {
+        "name": "origLabel",
+        "type": "string",
+        "required": false,
+        "editable": true,
+        "visible": true,
+        "propertyNode": false
+      },
+      {
+        "name": "latLong",
+        "type": "string",
+        "required": false,
+        "editable": true,
+        "visible": true,
+        "propertyNode": false
+      },
+      {
+        "name": "wikidataId",
+        "type": "string",
+        "required": false,
+        "editable": true,
+        "visible": true,
+        "propertyNode": false
+      },
+      {
+        "name": "gsNummer",
+        "type": "string",
+        "required": false,
+        "editable": true,
+        "visible": true,
+        "propertyNode": false
+      },
+      {
+        "name": "xmlId",
+        "type": "string",
+        "required": false,
+        "editable": true,
+        "visible": true,
+        "propertyNode": false
       }
     ]
   },

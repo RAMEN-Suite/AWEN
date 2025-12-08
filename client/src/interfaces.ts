@@ -60,6 +60,7 @@ export type PropertyConfig = {
   required: boolean /* required or optional */;
   editable: boolean /* Editable by user */;
   visible: boolean /* Visible by user */;
+  propertyNode: boolean;
   /* Only relevant if type is "array" */
   items?: Partial<PropertyConfig>;
   minItems?: number;

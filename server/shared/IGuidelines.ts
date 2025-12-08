@@ -51,6 +51,12 @@ export class PropertyConfig {
   })
   visible: boolean;
 
+  @ApiProperty({
+    description: 'Ob die Property als eigene Node abgespeichert wird. Erlaubt detailliertere bearbeitung.',
+    example: true,
+  })
+  propertyNode: boolean;
+
   @ApiPropertyOptional({
     description:
       'Nur relevant bei "array": Schema für die einzelnen Items. Teilspezifikation erlaubt.',
