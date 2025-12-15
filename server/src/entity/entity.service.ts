@@ -4,11 +4,8 @@ import { GuidelinesService } from "../guidelines/guidelines.service";
 import { EntityDto } from "./dto/entity.dto";
 import { EntityNamesDto } from "./dto/entity-names.dto";
 import Cypher, {
-  ListComprehension,
-  Literal,
   PartialPattern,
   Pattern,
-  Property,
 } from "@neo4j/cypher-builder";
 import { EntitySearchDto } from "./dto/entity-search.dto";
 import { EntityCollectionNameDto } from "./dto/entity-collection-name.dto";
@@ -40,16 +37,14 @@ export class EntityService {
       },
     });
 
-    const returnMap = await this.entityReturnMap(eNode);
-
-    const clause = new Cypher.Match(pattern).return([returnMap, "entity"]);
+    let clause: Cypher.Clause = new Cypher.Match(pattern);
+    clause = await this.entityReturnMap(eNode, clause);
 
     const { cypher, params } = clause.build();
 
-    const res = await this.neo4jService.read<{ entity: EntityDto }>(
-      cypher,
-      params,
-    );
+    const res = await this.neo4jService.read<{
+      entity: EntityCollectionNameDto;
+    }>(cypher, params);
 
     if (res.records.length !== 1) {
       return null;
@@ -64,10 +59,11 @@ export class EntityService {
     const eNode = new Cypher.Node();
     const score = new Cypher.Variable();
 
-    const returnMap = await this.entityReturnMap(eNode);
-
     const searchPattern = await this.runSearch(eNode, score, name);
-    const subQuery = searchPattern.orderBy([score, "DESC"]).return(returnMap);
+    const subQuery = await this.entityReturnMap(
+      eNode,
+      searchPattern.orderBy([score, "DESC"]),
+    );
 
     const collectReturnMap = new Cypher.Collect(subQuery);
 
@@ -75,10 +71,9 @@ export class EntityService {
 
     const { cypher, params } = clause.build();
 
-    const res = await this.neo4jService.read<{ entities: EntityDto[] }>(
-      cypher,
-      params,
-    );
+    const res = await this.neo4jService.read<{
+      entities: EntityCollectionNameDto[];
+    }>(cypher, params);
 
     const entities = res.records[0].get("entities");
 
@@ -134,7 +129,7 @@ export class EntityService {
       .with(eNode, score);
   }
 
-  private async entityReturnMap(eNode: Cypher.Node) {
+  private async entityReturnMap(eNode: Cypher.Node, query) {
     const guidelines = await this.guidelinesService.get();
 
     const l = new Cypher.Variable();
@@ -152,19 +147,19 @@ export class EntityService {
       keysExpr,
     ]);
 
-    return new Cypher.Map({
+    const [clause, collections] = await this.collectionService.getCollectionsOfEntityNode(eNode, query);
+
+    const returnMap = new Cypher.Map({
       nodeLabel: new Cypher.Literal(guidelines.entity.metaType),
       types: typesExpr,
       label: eNode.property(guidelines.entity.nameLabel),
       id: eNode.property(guidelines.entity.idLabel),
       properties: cleanedProps,
+      collections: collections
     });
-  }
 
-  private async entityCollectionNames(eNode: Cypher.Node) {
-    return this.collectionService.getCollectionsOfEntityNode(
-      eNode
-    );
+    return clause.return([returnMap, "entity"]);
+
   }
 
   async find(queryParams: EntitySearchDto): Promise<EntityCollectionNameDto[]> {
@@ -190,7 +185,6 @@ export class EntityService {
       typePatten = await this.addFilterByTypes(eNode, queryParams.types);
     }
 
-    const returnMap = await this.entityReturnMap(eNode);
     let query = searchPattern;
 
     query = await this.addOrderByProperty(query, eNode, [[score, 'ASC']]);
@@ -212,21 +206,23 @@ export class EntityService {
         .distinct();
     }
 
-    // Rückgabe als Liste
-    const collectReturnMap = Cypher.collect(returnMap);
-    const returnClause = new Cypher.Return([collectReturnMap, "entities"]);
+    // // Rückgabe als Liste
+    // const collectReturnMap = Cypher.collect(returnMap);
+    // const returnClause = new Cypher.Return([collectReturnMap, "entities"]);
 
     // Finaler Query
-    const clause = query.return(returnClause);
+    const clause = await this.entityReturnMap(eNode, query);
 
     const { cypher, params } = clause.build();
 
     const res = await this.neo4jService.read<{
-      entities: EntityCollectionNameDto[];
+      entity: EntityCollectionNameDto;
     }>(cypher, params);
 
-    const entities: EntityCollectionNameDto[] =
-      res.records[0].get("entities");
+    const entities: EntityCollectionNameDto[] = res.records.map((record) => {
+      return record.get("entity");
+    })
+
 
     return entities;
   }

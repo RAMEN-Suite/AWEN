@@ -71,29 +71,30 @@ export class CollectionService {
 
   async getCollectionsOfEntityNode(
     entityNode: Cypher.Node,
-  ): Promise<[With, Cypher.Node]> {
+    query
+  ): Promise<[With, Cypher.Variable]> {
     const guidelines = await this.guidelinesService.get();
-
-    const colIdLabel = guidelines.collection.idLabel;
-    const colNameLabel = guidelines.collection.nameLabel;
 
     // Node-Variablen
     const ann = new Cypher.Node();
     const col = new Cypher.Node();
     const parentCol = new Cypher.Node();
 
-    // MATCH-Pfad:
-    // (entity {id})<-[:REFERS_TO]-(ann)<-[:HAS_ANNOTATION]-(col)
-    // OPTIONAL MATCH: (col)-[:PART_OF*]->(parentCol)
-    const matchEntity = new Cypher.Match(new Cypher.Pattern(entityNode));
 
     const matchCollections = new Cypher.Match(
       new Cypher.Pattern(entityNode)
-        .related(undefined, { direction: "left", type: "REFERS_TO" })
+        .related(new Cypher.Relationship(), {
+          direction: "left",
+          type: "REFERS_TO",
+        })
         .to(ann)
-        .related(undefined, { direction: "left", type: "HAS_ANNOTATION" })
+        .related(new Cypher.Relationship(), {
+          direction: "left",
+          type: "HAS_ANNOTATION",
+        })
         .to(col),
     );
+
 
     const optionalParents = new Cypher.OptionalMatch(
       new Cypher.Pattern(col)
@@ -105,19 +106,24 @@ export class CollectionService {
         .to(parentCol),
     );
 
-    const returnClause = new Cypher.With(
-      entityNode,
-      [col.property(colIdLabel), "id"],
-      [col.property(colNameLabel), "label"],
-    ).distinct();
+    const collections = new Cypher.Variable()
 
-    return [
-      matchEntity
-        .match(matchCollections)
-        .optionalMatch(optionalParents)
-        .with(returnClause),
-      col
-    ];
+    const withClause = new Cypher.With(entityNode, [
+      Cypher.collect(
+        new Cypher.Map({
+          id: col.property(guidelines.collection.idLabel),
+          label: col.property(guidelines.collection.nameLabel),
+        }),
+      ),
+      collections,
+    ]).distinct();
+
+    const clause = query
+      .match(matchCollections)
+      .optionalMatch(optionalParents)
+      .with(withClause);
+
+    return [clause, collections];
   }
 
   async getCollectionsOfEntity(

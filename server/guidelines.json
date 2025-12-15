@@ -39,7 +39,8 @@
           "property": "numberOfChilds",
           "order": "DESC"
         }
-      ]
+      ],
+      "shownCollections": ["Volume", "Department"]
     }
   }
 }
