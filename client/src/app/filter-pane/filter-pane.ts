@@ -4,7 +4,7 @@ import {AutoCompleteCompleteEvent, AutoCompleteModule, AutoCompleteSelectEvent} 
 import { Message } from 'primeng/message';
 import { SearchService } from '../views/search/search.service';
 import { Button } from 'primeng/button';
-import {CollectionName, EntityNames, EntitySearchQuery} from '../../interfaces';
+import {CollectionName, EntityAutocompleteQuery, EntityNames, EntitySearchQuery} from '../../interfaces';
 import { GuidelinesService } from '../api/guidelines.service';
 import { CollectionService } from '../api/collection.service';
 import { Select } from 'primeng/select';
@@ -120,7 +120,21 @@ export class FilterPane implements OnInit {
 
   async autocompleteChanges(e: AutoCompleteCompleteEvent) {
     if (this.form.valid) {
-      const suggestions = await this.searchService.getSuggestions(e.query);
+      const types = this.form.controls.types.value;
+      const collectionFilter = this.form.controls.collectionFilter.value;
+      const formatted: Record<string, string[]> = {};
+
+      for (const key of Object.keys(collectionFilter)) {
+        const id = collectionFilter[key as keyof typeof collectionFilter]?.id;
+        if (id) formatted[key] = [id];
+      }
+
+      const query: EntityAutocompleteQuery = { types: types };
+
+      if (Object.keys(formatted).length > 0) {
+        query.collectionFilter = formatted;
+      }
+      const suggestions = await this.searchService.getSuggestions(e.query, query);
       this.suggestions.set(suggestions);
     } else {
       this.suggestions.set([]);

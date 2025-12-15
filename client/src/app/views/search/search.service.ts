@@ -1,6 +1,6 @@
 import {inject, Injectable, signal} from '@angular/core';
 import {EntityService} from '../../api/entity.service';
-import {Entity, EntitySearchQuery} from '../../../interfaces';
+import {Entity, EntityAutocompleteQuery, EntitySearchQuery} from '../../../interfaces';
 
 
 @Injectable({
@@ -13,8 +13,8 @@ export class SearchService {
   private entities = signal<Entity[]>([]);
   private entitiesLoading = signal<boolean>(false);
 
-  async getSuggestions(search: string) {
-    return await this.entityService.getAutocomplete(search);
+  async getSuggestions(search: string, query: EntityAutocompleteQuery) {
+    return await this.entityService.getAutocomplete(search, query);
   }
 
   getEntitiesLoading() {
