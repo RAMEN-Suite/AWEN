@@ -223,7 +223,6 @@ export class EntityService {
       return record.get("entity");
     })
 
-
     return entities;
   }
 

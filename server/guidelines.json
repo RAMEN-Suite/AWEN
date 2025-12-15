@@ -40,7 +40,7 @@
           "order": "DESC"
         }
       ],
-      "shownCollections": ["Volume", "Department"]
+      "shownCollections": ["Department"]
     }
   }
 }

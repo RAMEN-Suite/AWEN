@@ -79,7 +79,7 @@ export class CollectionService {
     const ann = new Cypher.Node();
     const col = new Cypher.Node();
     const parentCol = new Cypher.Node();
-
+    const c = new Cypher.Variable();
 
     const matchCollections = new Cypher.Match(
       new Cypher.Pattern(entityNode)
@@ -106,22 +106,50 @@ export class CollectionService {
         .to(parentCol),
     );
 
-    const collections = new Cypher.Variable()
+    const withEntityCol = new Cypher.With(entityNode, col, parentCol);
 
-    const withClause = new Cypher.With(entityNode, [
-      Cypher.collect(
-        new Cypher.Map({
-          id: col.property(guidelines.collection.idLabel),
-          label: col.property(guidelines.collection.nameLabel),
-        }),
-      ),
+    const unwind = new Cypher.Unwind([new Cypher.List([col, parentCol]), c]);
+
+    const collections = new Cypher.Variable();
+
+    const l = new Cypher.Variable();
+    const typeExprFor = new Cypher.ListComprehension(l)
+      .in(Cypher.labels(c))
+      .where(Cypher.neq(l, new Cypher.Literal(guidelines.collection.metaType)));
+
+    const collectionMap = new Cypher.Map({
+      id: c.property(guidelines.collection.idLabel),
+      label: c.property(guidelines.collection.nameLabel),
+      types: typeExprFor,
+    });
+
+    const lx = new Cypher.Variable();
+    const withEntityC = new Cypher.With(entityNode, c)
+      .where(Cypher.isNotNull(c))
+      .where(
+        Cypher.any(
+          lx,
+          Cypher.labels(c),
+          Cypher.in(lx, new Cypher.Param(
+            guidelines.scenarios.searchEntities.shownCollections
+          )),
+        ),
+      );
+
+
+    const withDistinctC = new Cypher.With(entityNode, [
+      Cypher.collect(collectionMap).distinct(),
       collections,
     ]).distinct();
+
 
     const clause = query
       .match(matchCollections)
       .optionalMatch(optionalParents)
-      .with(withClause);
+      .with(withEntityCol)
+      .unwind(unwind)
+      .with(withEntityC)
+      .with(withDistinctC);
 
     return [clause, collections];
   }
