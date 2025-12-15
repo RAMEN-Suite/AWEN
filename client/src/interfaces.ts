@@ -6,6 +6,7 @@ export interface Entity {
   id: string;
   label: string;
   properties: Record<string, unknown>;
+  collections: CollectionNameTypeDto[];
 }
 
 export interface EntityNames {
@@ -24,7 +25,11 @@ export interface CollectionName {
   id: string;
 }
 
-
+export interface CollectionNameTypeDto {
+  label: string;
+  id: string;
+  types: string[];
+}
 
 export interface IGuidelines {
   entity: IEntity;
@@ -42,6 +47,7 @@ export interface IGuidelines {
     }
     searchEntities: {
       orderBy: {property: string, order: 'DESC'|'ASC'}[]
+      shownCollections: string[];
     }
   }
 }
@@ -51,7 +57,7 @@ export type IEntity = {
   types: string[];
   idLabel: string;
   nameLabel: string;
-  properties: PropertyConfig[]
+  properties: PropertyConfig[];
 }
 
 export type PropertyConfig = {

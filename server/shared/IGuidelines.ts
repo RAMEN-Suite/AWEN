@@ -179,16 +179,26 @@ export class SearchEntitiesOrderBy {
 
 export class SearchEntitiesScenario {
   @ApiProperty({
-    description: 'Liste der Sortierkriterien für Suchanfragen.',
+    description: "Liste der Sortierkriterien für Suchanfragen.",
     type: () => [SearchEntitiesOrderBy],
     example: [
       {
-        property: 'numberOfChilds',
-        order: 'DESC',
+        property: "numberOfChilds",
+        order: "DESC",
       },
     ],
   })
   orderBy: SearchEntitiesOrderBy[];
+
+  @ApiProperty({
+    description: `
+      Liste der Collections, die in den Suchergebnissen angezeigt werden sollen.
+      Wenn nicht angegeben, werden alle Collections berücksichtigt.
+    `,
+    example: ["Volume", "Department"],
+    type: [String],
+  })
+  shownCollections: string[];
 }
 
 export class FindByCollectionScenario {

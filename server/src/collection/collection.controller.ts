@@ -3,7 +3,7 @@ import { ApiResponse } from "@nestjs/swagger";
 import { GetFilterableCollections } from "./dto/get-filterable-collections.dto";
 import { CollectionService } from "./collection.service";
 import { GetFilterableCollectionsByTypeQueryDto } from "./dto/get-filterable-collections-by-type-query.dto";
-import { CollectionName } from "./dto/collection-name.dto";
+import { CollectionNameDto } from "./dto/collection-name.dto";
 
 @Controller('collection')
 export class CollectionController {
@@ -24,7 +24,7 @@ export class CollectionController {
     type: GetFilterableCollections
   })
   @Get('filterable/:type')
-  async getFilterableByType(@Query() queryParams: GetFilterableCollectionsByTypeQueryDto, @Param('type') type: string): Promise<CollectionName[]> {
+  async getFilterableByType(@Query() queryParams: GetFilterableCollectionsByTypeQueryDto, @Param('type') type: string): Promise<CollectionNameDto[]> {
     const { parentId } = queryParams;
     const collectionType = type;
 
