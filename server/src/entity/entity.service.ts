@@ -10,6 +10,7 @@ import Cypher, {
 import { EntitySearchDto } from "./dto/entity-search.dto";
 import { EntityCollectionNameDto } from "./dto/entity-collection-name.dto";
 import { CollectionService } from "../collection/collection.service";
+import { EntityAutocompleteQueryDto } from "./dto/entity-autocomplete-query.dto";
 
 @Injectable()
 export class EntityService {
@@ -80,7 +81,10 @@ export class EntityService {
     return entities;
   }
 
-  async findNamesByName(name: string): Promise<EntityNamesDto[]> {
+  async findNamesByName(
+    name: string,
+    queryParams: EntityAutocompleteQueryDto,
+  ): Promise<EntityNamesDto[]> {
     const guidelines = await this.guidelinesService.get();
 
     const eNode = new Cypher.Node();
@@ -88,15 +92,51 @@ export class EntityService {
 
     const searchPattern = await this.runSearch(eNode, score, name);
 
-    let clause = searchPattern
-      .return(
-        [eNode.property(guidelines.entity.nameLabel), "label"],
-        [eNode.property(guidelines.entity.idLabel), "id"],
+    let collPattern;
+
+    if (
+      queryParams.collectionFilter &&
+      Object.keys(queryParams.collectionFilter).length > 0
+    ) {
+      collPattern = await this.addFilterByCollection(
+        eNode,
+        queryParams.collectionFilter,
       );
+    }
 
-      clause = await this.addOrderByProperty(clause, eNode, [[score, "ASC"]]);
+    let typePatten;
 
-    const { cypher, params } = clause.build();
+    if (queryParams.types) {
+      typePatten = await this.addFilterByTypes(eNode, queryParams.types);
+    }
+
+    let query = searchPattern;
+
+    query = await this.addOrderByProperty(query, eNode, [[score, "ASC"]]);
+
+    if (typePatten) {
+      query = query
+        .with(eNode, score)
+        .match(typePatten)
+        .with(eNode, score)
+        .distinct();
+    }
+
+    // Wenn ein Collection-Filter existiert, erweitern wir den Query mit MATCH
+    if (collPattern) {
+      query = query
+        .with(eNode, score)
+        .match(collPattern)
+        .with(eNode, score)
+        .distinct();
+    }
+
+    query = await this.addOrderByProperty(query, eNode, [[score, "ASC"]]);
+
+    const { cypher, params } = query.return(
+      [eNode.property(guidelines.entity.nameLabel), "label"],
+      [eNode.property(guidelines.entity.idLabel), "id"],
+    ).build();
 
     const res = await this.neo4jService.read<{ label: string; id: string }>(
       cypher,
@@ -147,7 +187,8 @@ export class EntityService {
       keysExpr,
     ]);
 
-    const [clause, collections] = await this.collectionService.getCollectionsOfEntityNode(eNode, query);
+    const [clause, collections] =
+      await this.collectionService.getCollectionsOfEntityNode(eNode, query);
 
     const returnMap = new Cypher.Map({
       nodeLabel: new Cypher.Literal(guidelines.entity.metaType),
@@ -155,11 +196,10 @@ export class EntityService {
       label: eNode.property(guidelines.entity.nameLabel),
       id: eNode.property(guidelines.entity.idLabel),
       properties: cleanedProps,
-      collections: collections
+      collections: collections,
     });
 
     return clause.return([returnMap, "entity"]);
-
   }
 
   async find(queryParams: EntitySearchDto): Promise<EntityCollectionNameDto[]> {
@@ -187,7 +227,7 @@ export class EntityService {
 
     let query = searchPattern;
 
-    query = await this.addOrderByProperty(query, eNode, [[score, 'ASC']]);
+    query = await this.addOrderByProperty(query, eNode, [[score, "ASC"]]);
 
     if (typePatten) {
       query = query
@@ -221,7 +261,7 @@ export class EntityService {
 
     const entities: EntityCollectionNameDto[] = res.records.map((record) => {
       return record.get("entity");
-    })
+    });
 
     return entities;
   }
@@ -293,19 +333,16 @@ export class EntityService {
     return pattern;
   }
 
-  private async addOrderByProperty<
-    T extends Cypher.With | Cypher.Return
-  >(
+  private async addOrderByProperty<T extends Cypher.With | Cypher.Return>(
     pattern: T,
     eNode: Cypher.Node,
     variables: [Cypher.Variable, "DESC" | "ASC"][],
   ): Promise<T> {
     const guidelines = await this.guidelinesService.get();
     const orderBy = guidelines.scenarios.searchEntities.orderBy;
-    const orderByArr: [Cypher.Expr, Cypher.Order][] = orderBy
-      .map((value) => {
-        return [eNode.property(value.property), value.order];
-      })
+    const orderByArr: [Cypher.Expr, Cypher.Order][] = orderBy.map((value) => {
+      return [eNode.property(value.property), value.order];
+    });
 
     return pattern.orderBy(...variables, ...orderByArr) as T;
   }

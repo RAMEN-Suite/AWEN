@@ -20,6 +20,11 @@ export interface EntitySearchQuery {
   types?: string[];
 }
 
+export interface EntityAutocompleteQuery {
+  collectionFilter?: Record<string, string[]>;
+  types?: string[];
+}
+
 export interface CollectionName {
   label: string;
   id: string;

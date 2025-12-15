@@ -1,5 +1,5 @@
 import {inject, Injectable} from '@angular/core';
-import {Entity, EntityNames, EntitySearchQuery} from '../../interfaces';
+import {Entity, EntityAutocompleteQuery, EntityNames, EntitySearchQuery} from '../../interfaces';
 import {firstValueFrom} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {QueryParamsService} from '../utils/query-params.service';
@@ -12,7 +12,7 @@ export class EntityService {
   private queryParamService = inject(QueryParamsService);
 
   searchEntities(query:EntitySearchQuery) {
-    const httpParams = this.queryParamService.transformQueryParams(query)
+    const httpParams = this.queryParamService.transformQueryParams(query);
 
     const res = this.http.get<Entity[]>('/api/entity/', {
       params: httpParams
@@ -26,9 +26,12 @@ export class EntityService {
   }
 
 
-  async getAutocomplete(search:string): Promise<EntityNames[]> {
+  async getAutocomplete(search:string, query: EntityAutocompleteQuery): Promise<EntityNames[]> {
     const parsedQuery = encodeURIComponent(search);
-    const temp = this.http.get<EntityNames[]>('/api/entity/auto-complete/' + parsedQuery);
+    const httpParams = this.queryParamService.transformQueryParams(query);
+    const temp = this.http.get<EntityNames[]>('/api/entity/auto-complete/' + parsedQuery, {
+      params: httpParams
+    });
     return firstValueFrom(temp);
   }
 
