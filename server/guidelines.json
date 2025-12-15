@@ -20,14 +20,6 @@
         }
       },
       {
-        "name": "htmlLabel",
-        "type": "string",
-        "required": false,
-        "editable": true,
-        "visible": true,
-        "propertyNode": false
-      },
-      {
         "name": "origLabel",
         "type": "string",
         "required": false,
