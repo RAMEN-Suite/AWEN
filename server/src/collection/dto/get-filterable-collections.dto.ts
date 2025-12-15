@@ -1,8 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { CollectionName } from "./collection-name.dto";
+import { CollectionNameDto } from "./collection-name.dto";
 
 export class GetFilterableCollections {
   @ApiProperty()
-  collectionFilter: Record<string, CollectionName[]>
+  collectionFilter: Record<string, CollectionNameDto[]>
 }
 

@@ -15,6 +15,7 @@ import {
 } from "../utils/utils";
 import { EntitySearchDto } from "./dto/entity-search.dto";
 import { ApiResponse } from "@nestjs/swagger";
+import { EntityCollectionNameDto } from "./dto/entity-collection-name.dto";
 
 @Controller('entity')
 export class EntityController {
@@ -24,7 +25,7 @@ export class EntityController {
 
   @ApiResponse({ type: [EntityDto] })
   @Get('')
-  async getAutoCompleteF(@Query() params: EntitySearchDto): Promise<EntityDto[]> {
+  async getAutoCompleteF(@Query() params: EntitySearchDto): Promise<EntityCollectionNameDto[]> {
     const { label } = params;
 
 

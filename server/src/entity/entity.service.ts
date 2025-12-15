@@ -4,16 +4,22 @@ import { GuidelinesService } from "../guidelines/guidelines.service";
 import { EntityDto } from "./dto/entity.dto";
 import { EntityNamesDto } from "./dto/entity-names.dto";
 import Cypher, {
+  ListComprehension,
+  Literal,
   PartialPattern,
   Pattern,
+  Property,
 } from "@neo4j/cypher-builder";
 import { EntitySearchDto } from "./dto/entity-search.dto";
+import { EntityCollectionNameDto } from "./dto/entity-collection-name.dto";
+import { CollectionService } from "../collection/collection.service";
 
 @Injectable()
 export class EntityService {
   constructor(
     private readonly neo4jService: Neo4jService,
     private readonly guidelinesService: GuidelinesService,
+    private readonly collectionService: CollectionService,
   ) {}
 
   /**
@@ -155,7 +161,13 @@ export class EntityService {
     });
   }
 
-  async find(queryParams: EntitySearchDto) {
+  private async entityCollectionNames(eNode: Cypher.Node) {
+    return this.collectionService.getCollectionsOfEntityNode(
+      eNode
+    );
+  }
+
+  async find(queryParams: EntitySearchDto): Promise<EntityCollectionNameDto[]> {
     const eNode = new Cypher.Node();
     const score = new Cypher.Variable();
 
@@ -209,12 +221,12 @@ export class EntityService {
 
     const { cypher, params } = clause.build();
 
-    const res = await this.neo4jService.read<{ entities: EntityDto[] }>(
-      cypher,
-      params,
-    );
+    const res = await this.neo4jService.read<{
+      entities: EntityCollectionNameDto[];
+    }>(cypher, params);
 
-    const entities = res.records[0].get("entities");
+    const entities: EntityCollectionNameDto[] =
+      res.records[0].get("entities");
 
     return entities;
   }
