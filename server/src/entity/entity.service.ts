@@ -42,7 +42,6 @@ export class EntityService {
     clause = await this.entityReturnMap(eNode, clause);
 
     const { cypher, params } = clause.build();
-
     const res = await this.neo4jService.read<{
       entity: EntityCollectionNameDto;
     }>(cypher, params);

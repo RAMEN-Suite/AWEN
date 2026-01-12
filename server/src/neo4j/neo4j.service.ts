@@ -3,6 +3,7 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
 import {
   Driver,
@@ -16,6 +17,9 @@ import { RecordShape } from "neo4j-driver-core/types/record";
 
 @Injectable()
 export class Neo4jService implements BeforeApplicationShutdown {
+
+  private readonly logger = new Logger(Neo4jService.name);
+
   constructor(
     @Inject('NEO4J_OPTIONS') private readonly config: Neo4jConfig,
     @Inject('NEO4J_DRIVER') private readonly driver: Driver,
@@ -32,7 +36,7 @@ export class Neo4jService implements BeforeApplicationShutdown {
         tx.run<T>(cypher, params),
       );
     } catch (e) {
-      console.error('[Neo4j Driver]', 'Could not run a query, because:', e);
+      this.logger.error('Could not run a query, because:', e);
       throw new InternalServerErrorException('Database could not run a query.');
     } finally {
       await session.close();
@@ -50,7 +54,7 @@ export class Neo4jService implements BeforeApplicationShutdown {
         tx.run<T>(cypher, params),
       );
     } catch (e) {
-      console.error('[Neo4j Driver]', 'Could not run a query, because:', e);
+      this.logger.error('Could not run a query, because:', e);
       throw new InternalServerErrorException('Database could not run a query.');
     } finally {
       await session.close();
@@ -72,7 +76,11 @@ export class Neo4jService implements BeforeApplicationShutdown {
   }
 
   async beforeApplicationShutdown(signal?: string): Promise<void> {
-    console.info('[Neo4j Driver]', 'Neo4j-Driver Closed with signal: ', signal);
+    this.logger.log(
+      '[Neo4j Driver]',
+      'Neo4j-Driver Closed with signal: ',
+      signal,
+    );
     await this.driver.close();
   }
 }
