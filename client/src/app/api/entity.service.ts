@@ -1,8 +1,9 @@
 import {inject, Injectable} from '@angular/core';
 import {Entity, EntityAutocompleteQuery, EntityNames, EntitySearchQuery} from '../../interfaces';
-import {firstValueFrom} from 'rxjs';
+import {catchError, firstValueFrom, of} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {QueryParamsService} from '../utils/query-params.service';
+import {MessageService} from 'primeng/api';
 
 @Injectable({
   providedIn: 'root'
@@ -10,18 +11,35 @@ import {QueryParamsService} from '../utils/query-params.service';
 export class EntityService {
   private http = inject(HttpClient);
   private queryParamService = inject(QueryParamsService);
+  private readonly messageService = inject(MessageService);
 
   searchEntities(query:EntitySearchQuery) {
     const httpParams = this.queryParamService.transformQueryParams(query);
 
     const res = this.http.get<Entity[]>('/api/entity/', {
       params: httpParams
-    });
+    }).pipe(
+      catchError(()=>{
+        this.messageService.add({
+          severity: 'error',
+          detail: `Error while loading entities. Reload the page, or try again later.`,
+        });
+        return of(new Array<Entity>())
+      })
+    );
     return firstValueFrom(res);
   }
 
   async getById(id:string) {
-    const res = this.http.get<Entity>('/api/entity/' + id);
+    const res = this.http.get<Entity>('/api/entity/' + id).pipe(
+      catchError((err)=>{
+        this.messageService.add({
+          severity: 'error',
+          detail: `Error while loading entity with id ${id}. Reload the page, or try again later.`,
+        });
+        throw err;
+      })
+    );
     return firstValueFrom(res);
   }
 
@@ -31,7 +49,15 @@ export class EntityService {
     const httpParams = this.queryParamService.transformQueryParams(query);
     const temp = this.http.get<EntityNames[]>('/api/entity/auto-complete/' + parsedQuery, {
       params: httpParams
-    });
+    }).pipe(
+      catchError(()=>{
+        this.messageService.add({
+          severity: 'error',
+          detail: `Error while loading autocomplete. Reload the page, or try again later.`,
+        });
+        return of(new Array<EntityNames>())
+      })
+    );
     return firstValueFrom(temp);
   }
 

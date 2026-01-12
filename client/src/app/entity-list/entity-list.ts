@@ -39,7 +39,7 @@ export class EntityList {
     await navigator.clipboard.writeText(id);
     this.messageService.add({
       severity: 'success',
-      detail: `Copied "${id}" to clipboard."`,
+      detail: `Copied "${id}" to clipboard.`,
     })
   }
 }
