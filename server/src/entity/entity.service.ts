@@ -1,16 +1,13 @@
-import { Injectable } from "@nestjs/common";
-import { Neo4jService } from "../neo4j/neo4j.service";
-import { GuidelinesService } from "../guidelines/guidelines.service";
-import { EntityDto } from "./dto/entity.dto";
-import { EntityNamesDto } from "./dto/entity-names.dto";
-import Cypher, {
-  PartialPattern,
-  Pattern,
-} from "@neo4j/cypher-builder";
-import { EntitySearchDto } from "./dto/entity-search.dto";
-import { EntityCollectionNameDto } from "./dto/entity-collection-name.dto";
-import { CollectionService } from "../collection/collection.service";
-import { EntityAutocompleteQueryDto } from "./dto/entity-autocomplete-query.dto";
+import { Injectable } from '@nestjs/common';
+import { Neo4jService } from '../neo4j/neo4j.service';
+import { GuidelinesService } from '../guidelines/guidelines.service';
+import { EntityDto } from './dto/entity.dto';
+import { EntityNamesDto } from './dto/entity-names.dto';
+import Cypher, { PartialPattern, Pattern } from '@neo4j/cypher-builder';
+import { EntitySearchDto } from './dto/entity-search.dto';
+import { EntityCollectionNameDto } from './dto/entity-collection-name.dto';
+import { CollectionService } from '../collection/collection.service';
+import { EntityAutocompleteQueryDto } from './dto/entity-autocomplete-query.dto';
 
 @Injectable()
 export class EntityService {
@@ -38,8 +35,10 @@ export class EntityService {
       },
     });
 
-    let clause: Cypher.Clause = new Cypher.Match(pattern);
-    clause = await this.entityReturnMap(eNode, clause);
+    const clause = await this.entityReturnMap(
+      eNode,
+      new Cypher.Match(pattern).with('*'),
+    );
 
     const { cypher, params } = clause.build();
     const res = await this.neo4jService.read<{
@@ -50,9 +49,7 @@ export class EntityService {
       return null;
     }
 
-    const entityNode = res.records[0].get("entity");
-
-    return entityNode;
+    return res.records[0].get('entity');
   }
 
   async findByName(name: string): Promise<EntityDto[]> {
@@ -62,12 +59,12 @@ export class EntityService {
     const searchPattern = await this.runSearch(eNode, score, name);
     const subQuery = await this.entityReturnMap(
       eNode,
-      searchPattern.orderBy([score, "DESC"]),
+      searchPattern.orderBy([score, 'DESC']),
     );
 
     const collectReturnMap = new Cypher.Collect(subQuery);
 
-    const clause = new Cypher.With("*").return([collectReturnMap, "entities"]);
+    const clause = new Cypher.With('*').return([collectReturnMap, 'entities']);
 
     const { cypher, params } = clause.build();
 
@@ -75,9 +72,7 @@ export class EntityService {
       entities: EntityCollectionNameDto[];
     }>(cypher, params);
 
-    const entities = res.records[0].get("entities");
-
-    return entities;
+    return res.records[0].get('entities');
   }
 
   async findNamesByName(
@@ -91,7 +86,7 @@ export class EntityService {
 
     const searchPattern = await this.runSearch(eNode, score, name);
 
-    let collPattern;
+    let collPattern: undefined | Pattern = undefined;
 
     if (
       queryParams.collectionFilter &&
@@ -103,15 +98,15 @@ export class EntityService {
       );
     }
 
-    let typePatten;
+    let typePatten: undefined | Pattern = undefined;
 
     if (queryParams.types) {
-      typePatten = await this.addFilterByTypes(eNode, queryParams.types);
+      typePatten = this.addFilterByTypes(eNode, queryParams.types);
     }
 
     let query = searchPattern;
 
-    query = await this.addOrderByProperty(query, eNode, [[score, "ASC"]]);
+    query = await this.addOrderByProperty(query, eNode, [[score, 'ASC']]);
 
     if (typePatten) {
       query = query
@@ -130,12 +125,14 @@ export class EntityService {
         .distinct();
     }
 
-    query = await this.addOrderByProperty(query, eNode, [[score, "ASC"]]);
+    query = await this.addOrderByProperty(query, eNode, [[score, 'ASC']]);
 
-    const { cypher, params } = query.return(
-      [eNode.property(guidelines.entity.nameLabel), "label"],
-      [eNode.property(guidelines.entity.idLabel), "id"],
-    ).build();
+    const { cypher, params } = query
+      .return(
+        [eNode.property(guidelines.entity.nameLabel), 'label'],
+        [eNode.property(guidelines.entity.idLabel), 'id'],
+      )
+      .build();
 
     const res = await this.neo4jService.read<{ label: string; id: string }>(
       cypher,
@@ -143,8 +140,8 @@ export class EntityService {
     );
 
     const entities = res.records.map((record) => ({
-      label: record.get("label"),
-      id: record.get("id"),
+      label: record.get('label'),
+      id: record.get('id'),
     }));
 
     return entities;
@@ -157,18 +154,18 @@ export class EntityService {
   ) {
     const guidelines = await this.guidelinesService.get();
 
-    return new Cypher.With("*")
+    return new Cypher.With('*')
       .callProcedure(
         Cypher.db.index.fulltext.queryNodes(
           guidelines.fulltextIndexes.search,
           new Cypher.Literal(query),
         ),
       )
-      .yield(["node", eNode], ["score", score])
+      .yield(['node', eNode], ['score', score])
       .with(eNode, score);
   }
 
-  private async entityReturnMap(eNode: Cypher.Node, query) {
+  private async entityReturnMap(eNode: Cypher.Node, query: Cypher.With) {
     const guidelines = await this.guidelinesService.get();
 
     const l = new Cypher.Variable();
@@ -181,7 +178,7 @@ export class EntityService {
       new Cypher.Literal(guidelines.entity.idLabel),
       new Cypher.Literal(guidelines.entity.nameLabel),
     ]);
-    const cleanedProps = new Cypher.Function("apoc.map.removeKeys", [
+    const cleanedProps = new Cypher.Function('apoc.map.removeKeys', [
       propsExpr,
       keysExpr,
     ]);
@@ -198,15 +195,15 @@ export class EntityService {
       collections: collections,
     });
 
-    return clause.return([returnMap, "entity"]);
+    return clause.return([returnMap, 'entity']);
   }
 
   async find(queryParams: EntitySearchDto): Promise<EntityCollectionNameDto[]> {
     const eNode = new Cypher.Node();
     const score = new Cypher.Variable();
 
-    let searchPattern = await this.runSearch(eNode, score, queryParams.label);
-    let collPattern;
+    const searchPattern = await this.runSearch(eNode, score, queryParams.label);
+    let collPattern: undefined | Pattern = undefined;
 
     if (
       queryParams.collectionFilter &&
@@ -218,15 +215,15 @@ export class EntityService {
       );
     }
 
-    let typePatten;
+    let typePatten: undefined | Pattern = undefined;
 
     if (queryParams.types) {
-      typePatten = await this.addFilterByTypes(eNode, queryParams.types);
+      typePatten = this.addFilterByTypes(eNode, queryParams.types);
     }
 
     let query = searchPattern;
 
-    query = await this.addOrderByProperty(query, eNode, [[score, "ASC"]]);
+    query = await this.addOrderByProperty(query, eNode, [[score, 'ASC']]);
 
     if (typePatten) {
       query = query
@@ -259,7 +256,7 @@ export class EntityService {
     }>(cypher, params);
 
     const entities: EntityCollectionNameDto[] = res.records.map((record) => {
-      return record.get("entity");
+      return record.get('entity');
     });
 
     return entities;
@@ -282,9 +279,9 @@ export class EntityService {
     const aToC = new Cypher.Relationship();
 
     let newPattern: Pattern | PartialPattern = new Cypher.Pattern(eNode)
-      .related(eToA, { type: "REFERS_TO", direction: "left" })
-      .to(aNode, { labels: "Annotation" })
-      .related(aToC, { type: "HAS_ANNOTATION", direction: "left" });
+      .related(eToA, { type: 'REFERS_TO', direction: 'left' })
+      .to(aNode, { labels: 'Annotation' })
+      .related(aToC, { type: 'HAS_ANNOTATION', direction: 'left' });
 
     const collections: Map<string, Cypher.Node> = new Map<
       string,
@@ -295,21 +292,21 @@ export class EntityService {
       const collection = new Cypher.Node();
       const partOf = new Cypher.Relationship();
 
-      if ("to" in newPattern) {
+      if ('to' in newPattern) {
         newPattern = newPattern.to(collection, { labels: col });
       }
 
       if (index !== collectionChain.length - 1) {
         newPattern = newPattern.related(partOf, {
-          type: "PART_OF",
-          direction: "right",
+          type: 'PART_OF',
+          direction: 'right',
         });
       }
 
       collections.set(col, collection);
     });
 
-    filterableCollections.forEach((collection, index) => {
+    filterableCollections.forEach((collection) => {
       const col = collections.get(collection)!;
       const colIDs = collectionFilters[collection];
 
@@ -323,7 +320,7 @@ export class EntityService {
     return newPattern as unknown as Pattern;
   }
 
-  private async addFilterByTypes(eNode: Cypher.Node, types: string[]) {
+  private addFilterByTypes(eNode: Cypher.Node, types: string[]) {
     const labelConditions = types.map((type) => eNode.hasLabel(type));
     const orCondition = Cypher.or(...labelConditions);
 
@@ -335,7 +332,7 @@ export class EntityService {
   private async addOrderByProperty<T extends Cypher.With | Cypher.Return>(
     pattern: T,
     eNode: Cypher.Node,
-    variables: [Cypher.Variable, "DESC" | "ASC"][],
+    variables: [Cypher.Variable, 'DESC' | 'ASC'][],
   ): Promise<T> {
     const guidelines = await this.guidelinesService.get();
     const orderBy = guidelines.scenarios.searchEntities.orderBy;

@@ -4,21 +4,20 @@ import {
   IsString,
   IsUUID,
   MinLength,
-} from "class-validator";
-import { ApiProperty } from "@nestjs/swagger";
-import { Transform } from "class-transformer";
-import { BadRequestException } from "@nestjs/common";
-
+} from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
+import { BadRequestException } from '@nestjs/common';
 
 export class EntityDto {
-
   /**
    * The entities node label as defined by the guidelines. Normally `Entity`.
    * @example 'Entity'
    */
   @ApiProperty({
-    description: 'The entities node label as defined by the guidelines. Normally `Entity`.',
-    example: 'Entity'
+    description:
+      'The entities node label as defined by the guidelines. Normally `Entity`.',
+    example: 'Entity',
   })
   @IsString()
   nodeLabel: string;
@@ -33,31 +32,38 @@ export class EntityDto {
     isArray: true,
     type: 'string',
   })
-  @IsString({each: true})
+  @IsString({ each: true })
   @IsArray()
-  @Transform(({ value }) => {
-    if (value === undefined || value === null || value === '') {
-      throw new BadRequestException(['value must be an array of strings!']);
-    }
-    if (Array.isArray(value)) {
-      let isString = true;
-      for (const item of value) {
-        isString = typeof item === 'string'
-        if (!isString) {
-          break;
+  @Transform(
+    ({ value }) => {
+      if (value === undefined || value === null || value === '') {
+        throw new BadRequestException(['value must be an array of strings!']);
+      }
+      if (Array.isArray(value)) {
+        let isString = true;
+        for (const item of value) {
+          isString = typeof item === 'string';
+          if (!isString) {
+            break;
+          }
+        }
+        if (isString) {
+          return value as string[];
+        }
+        throw new BadRequestException(['value must be an array of strings!']);
+      }
+      if (typeof value === 'string') {
+        try {
+          const dec = decodeURIComponent(value);
+          return JSON.parse(dec) as string[];
+        } catch {
+          throw new BadRequestException(['value must be an array of strings!']);
         }
       }
-      if (isString) {
-        return isString;
-      }
       throw new BadRequestException(['value must be an array of strings!']);
-    }
-    try {
-      const dec = decodeURIComponent(value);
-      const json = JSON.parse(dec);
-      return json
-    } catch { throw new BadRequestException(['value must be an array of strings!']); }
-  }, { toClassOnly: true })
+    },
+    { toClassOnly: true },
+  )
   types: string[];
 
   /**
@@ -85,13 +91,13 @@ export class EntityDto {
    * @example {label: 'Aachen', department: ['RI05', 'RI13']}
    */
   @ApiProperty({
-    description: 'Any key/value properties of the entity. Keys are strings; values can be anything.',
+    description:
+      'Any key/value properties of the entity. Keys are strings; values can be anything.',
     example: {
       rank: 'Captain',
-      positions: ['CAG', 'Lawyer']
+      positions: ['CAG', 'Lawyer'],
     },
   })
   @IsObject()
   properties: Record<string, unknown>;
-
 }

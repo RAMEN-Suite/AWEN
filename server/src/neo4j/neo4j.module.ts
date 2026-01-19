@@ -1,4 +1,4 @@
-import { DynamicModule, Global, Module } from "@nestjs/common";
+import { DynamicModule, Global, Module } from '@nestjs/common';
 import { Neo4jService } from './neo4j.service';
 import { createDriver } from './neo4j.utils';
 import { Neo4jConfig } from './neo4j-config.interface';

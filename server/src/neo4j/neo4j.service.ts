@@ -12,12 +12,11 @@ import {
   session,
   Session,
 } from 'neo4j-driver';
-import type { Neo4jConfig } from "./neo4j-config.interface";
-import { RecordShape } from "neo4j-driver-core/types/record";
+import type { Neo4jConfig } from './neo4j-config.interface';
+import { RecordShape } from 'neo4j-driver-core/types/record';
 
 @Injectable()
 export class Neo4jService implements BeforeApplicationShutdown {
-
   private readonly logger = new Logger(Neo4jService.name);
 
   constructor(

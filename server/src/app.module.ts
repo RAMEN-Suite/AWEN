@@ -1,12 +1,9 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { Neo4jModule } from './neo4j/neo4j.module';
 import { GuidelinesModule } from './guidelines/guidelines.module';
 import { EntityModule } from './entity/entity.module';
 import { CollectionModule } from './collection/collection.module';
-
 
 @Module({
   imports: [
@@ -25,7 +22,5 @@ import { CollectionModule } from './collection/collection.module';
     EntityModule,
     CollectionModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}

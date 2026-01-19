@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { Neo4jService } from "../neo4j/neo4j.service";
-import { GuidelinesService } from "../guidelines/guidelines.service";
-import Cypher, { With } from "@neo4j/cypher-builder";
-import { CollectionNameDto } from "./dto/collection-name.dto";
+import { Neo4jService } from '../neo4j/neo4j.service';
+import { GuidelinesService } from '../guidelines/guidelines.service';
+import Cypher, { With } from '@neo4j/cypher-builder';
+import { CollectionNameDto } from './dto/collection-name.dto';
 
 @Injectable()
 export class CollectionService {
@@ -43,7 +43,7 @@ export class CollectionService {
     if (parentId) {
       const parentCol = new Cypher.Node();
       pattern = pattern
-        .related(new Cypher.Variable(), { type: "PART_OF" })
+        .related(new Cypher.Variable(), { type: 'PART_OF' })
         .to(parentCol)
         .where(
           Cypher.eq(parentCol.property(colIdLabel), new Cypher.Param(parentId)),
@@ -51,8 +51,8 @@ export class CollectionService {
     }
 
     const clause = new Cypher.Match(pattern).return(
-      [col.property(colIdLabel), "id"],
-      [col.property(colNameLabel), "label"],
+      [col.property(colIdLabel), 'id'],
+      [col.property(colNameLabel), 'label'],
     );
     const { cypher, params } = clause.build();
 
@@ -62,8 +62,8 @@ export class CollectionService {
     );
 
     const collections = res.records.map((record) => ({
-      id: record.get("id"),
-      label: record.get("label"),
+      id: record.get('id'),
+      label: record.get('label'),
     }));
 
     return collections;
@@ -71,7 +71,7 @@ export class CollectionService {
 
   async getCollectionsOfEntityNode(
     entityNode: Cypher.Node,
-    query
+    query: Cypher.With,
   ): Promise<[With, Cypher.Variable]> {
     const guidelines = await this.guidelinesService.get();
 
@@ -84,24 +84,23 @@ export class CollectionService {
     const matchCollections = new Cypher.Match(
       new Cypher.Pattern(entityNode)
         .related(new Cypher.Relationship(), {
-          direction: "left",
-          type: "REFERS_TO",
+          direction: 'left',
+          type: 'REFERS_TO',
         })
         .to(ann)
         .related(new Cypher.Relationship(), {
-          direction: "left",
-          type: "HAS_ANNOTATION",
+          direction: 'left',
+          type: 'HAS_ANNOTATION',
         })
         .to(col),
     );
 
-
     const optionalParents = new Cypher.OptionalMatch(
       new Cypher.Pattern(col)
         .related(undefined, {
-          direction: "right",
-          type: "PART_OF",
-          length: "*",
+          direction: 'right',
+          type: 'PART_OF',
+          length: '*',
         })
         .to(parentCol),
     );
@@ -130,18 +129,19 @@ export class CollectionService {
         Cypher.any(
           lx,
           Cypher.labels(c),
-          Cypher.in(lx, new Cypher.Param(
-            guidelines.scenarios.searchEntities.shownCollections
-          )),
+          Cypher.in(
+            lx,
+            new Cypher.Param(
+              guidelines.scenarios.searchEntities.shownCollections,
+            ),
+          ),
         ),
       );
-
 
     const withDistinctC = new Cypher.With(entityNode, [
       Cypher.collect(collectionMap).distinct(),
       collections,
     ]).distinct();
-
 
     const clause = query
       .match(matchCollections)
@@ -154,9 +154,7 @@ export class CollectionService {
     return [clause, collections];
   }
 
-  async getCollectionsOfEntity(
-    entityId: string,
-  ): Promise<CollectionNameDto[]> {
+  async getCollectionsOfEntity(entityId: string): Promise<CollectionNameDto[]> {
     const guidelines = await this.guidelinesService.get();
 
     const eIdLabel = guidelines.entity.idLabel;
@@ -180,25 +178,25 @@ export class CollectionService {
 
     const matchCollections = new Cypher.Match(
       new Cypher.Pattern(entity)
-        .related(undefined, { direction: "left", type: "REFERS_TO" })
+        .related(undefined, { direction: 'left', type: 'REFERS_TO' })
         .to(ann)
-        .related(undefined, { direction: "left", type: "HAS_ANNOTATION" })
+        .related(undefined, { direction: 'left', type: 'HAS_ANNOTATION' })
         .to(col),
     );
 
     const optionalParents = new Cypher.OptionalMatch(
       new Cypher.Pattern(col)
         .related(undefined, {
-          direction: "right",
-          type: "PART_OF",
-          length: "*",
+          direction: 'right',
+          type: 'PART_OF',
+          length: '*',
         })
         .to(parentCol),
     );
 
     const returnClause = new Cypher.Return(
-      [col.property(colIdLabel), "id"],
-      [col.property(colNameLabel), "label"],
+      [col.property(colIdLabel), 'id'],
+      [col.property(colNameLabel), 'label'],
     ).distinct();
 
     const clause = matchEntity
@@ -214,9 +212,8 @@ export class CollectionService {
     );
 
     return res.records.map((record) => ({
-      id: record.get("id"),
-      label: record.get("label"),
+      id: record.get('id'),
+      label: record.get('label'),
     }));
   }
-
 }

@@ -1,8 +1,7 @@
-import { IsNotEmpty, IsString, MinLength } from "class-validator";
-import { ApiProperty } from "@nestjs/swagger";
+import { IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class LabelDto {
-
   @ApiProperty({
     description: 'The name/label of the entity.',
     example: 'Lee "Apollo" Adama',
@@ -13,5 +12,4 @@ export class LabelDto {
   @MinLength(3)
   @IsNotEmpty()
   label: string;
-
 }

@@ -14,6 +14,10 @@ export const createDriver = async (config: Neo4jConfig): Promise<Driver> => {
     try {
       await driver.getServerInfo();
     } catch (e) {
+      logger.error(
+        'Neo4j Driver could not connect to the neo4j server',
+        e instanceof Error ? e.stack : undefined,
+      );
       logger.log(`Attempt Nr. ${j}`);
       for (let i = 5; i > 0; i--) {
         logger.warn(

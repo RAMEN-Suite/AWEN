@@ -13,5 +13,4 @@ export type Neo4jScheme =
   | 'neo4j+scc'
   | 'bolt'
   | 'bolt+s'
-  | 'bolt+scc'
-  | string;
+  | 'bolt+scc';

@@ -1,4 +1,4 @@
-import { Global, Module } from "@nestjs/common";
+import { Global, Module } from '@nestjs/common';
 import { GuidelinesController } from './guidelines.controller';
 import { GuidelinesService } from './guidelines.service';
 
@@ -6,6 +6,6 @@ import { GuidelinesService } from './guidelines.service';
 @Module({
   controllers: [GuidelinesController],
   providers: [GuidelinesService],
-  exports: [GuidelinesService]
+  exports: [GuidelinesService],
 })
 export class GuidelinesModule {}
