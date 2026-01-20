@@ -1,13 +1,11 @@
-import {inject, Injectable, signal} from '@angular/core';
-import {EntityService} from '../../api/entity.service';
-import {Entity, EntityAutocompleteQuery, EntitySearchQuery} from '../../../interfaces';
-
+import { inject, Injectable, signal } from '@angular/core';
+import { EntityService } from '../../api/entity.service';
+import { Entity, EntityAutocompleteQuery, EntitySearchQuery } from '../../../interfaces';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SearchService {
-
   entityService = inject(EntityService);
 
   private entities = signal<Entity[]>([]);
@@ -29,27 +27,15 @@ export class SearchService {
     this.entities.set(new Array<Entity>());
   }
 
-  async searchEntities(query:EntitySearchQuery) {
+  async searchEntities(query: EntitySearchQuery) {
     this.entitiesLoading.set(true);
     const entities = await this.entityService.searchEntities(query);
     if (Array.isArray(entities)) {
       this.entities.set(entities);
     } else {
-      this.entities.set(new Array<Entity>())
+      this.entities.set(new Array<Entity>());
     }
     this.entitiesLoading.set(false);
     return this;
   }
-
-
-  private transformSuggestions(entities: any[]): { name: string; id: string }[] {
-    return entities.map((entity) => {
-      // TODO: guidelines
-      return {
-        name: entity.properties.label,
-        id: entity.properties.id,
-      }
-    })
-  }
-
 }

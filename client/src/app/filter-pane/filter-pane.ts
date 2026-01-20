@@ -1,24 +1,44 @@
 import { Component, DestroyRef, effect, inject, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import {AutoCompleteCompleteEvent, AutoCompleteModule, AutoCompleteSelectEvent} from 'primeng/autocomplete';
+import {
+  AutoCompleteCompleteEvent,
+  AutoCompleteModule,
+  AutoCompleteSelectEvent,
+} from 'primeng/autocomplete';
 import { Message } from 'primeng/message';
 import { SearchService } from '../views/searchPage/search.service';
 import { Button } from 'primeng/button';
-import {CollectionName, EntityAutocompleteQuery, EntityNames, EntitySearchQuery} from '../../interfaces';
+import {
+  CollectionName,
+  EntityAutocompleteQuery,
+  EntityNames,
+  EntitySearchQuery,
+} from '../../interfaces';
 import { GuidelinesService } from '../api/guidelines.service';
 import { CollectionService } from '../api/collection.service';
 import { Select } from 'primeng/select';
 import { distinctUntilChanged, firstValueFrom, map } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import {TypeFilter} from './type-filter/type-filter';
-import {RouterLink} from '@angular/router';
-import {QueryParamsService} from '../utils/query-params.service';
+import { TypeFilter } from './type-filter/type-filter';
+import { RouterLink } from '@angular/router';
+import { QueryParamsService } from '../utils/query-params.service';
 
-type CFOption = { type: string; values: CollectionName[] };
+interface CFOption {
+  type: string;
+  values: CollectionName[];
+}
 
 @Component({
   selector: 'app-filter-pane',
-  imports: [ReactiveFormsModule, AutoCompleteModule, Message, Button, Select, TypeFilter, RouterLink],
+  imports: [
+    ReactiveFormsModule,
+    AutoCompleteModule,
+    Message,
+    Button,
+    Select,
+    TypeFilter,
+    RouterLink,
+  ],
   templateUrl: './filter-pane.html',
 })
 export class FilterPane implements OnInit {
@@ -38,7 +58,7 @@ export class FilterPane implements OnInit {
     // Enable Controls, sobald Options vorhanden sind
     effect(() => {
       const opts = this.collectionFilterOptions();
-      opts.forEach(opt => {
+      opts.forEach((opt) => {
         if (opt.values.length > 0) {
           this.form.controls.collectionFilter.get(opt.type)?.enable({ emitEvent: false });
         }
@@ -46,17 +66,17 @@ export class FilterPane implements OnInit {
     });
   }
 
-  form: FormGroup<{
+  form = new FormGroup<{
     label: FormControl<string>;
     collectionFilter: FormGroup<Record<string, FormControl<CollectionName | null>>>;
-    types: FormControl<string[]>
-  }> = new FormGroup({
+    types: FormControl<string[]>;
+  }>({
     label: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required, Validators.minLength(3)],
     }),
     collectionFilter: new FormGroup<Record<string, FormControl<CollectionName | null>>>({}),
-    types: new FormControl<string[]>([], {nonNullable: true}),
+    types: new FormControl<string[]>([], { nonNullable: true }),
   });
 
   collectionFilterOptions = signal<CFOption[]>([]);
@@ -64,7 +84,6 @@ export class FilterPane implements OnInit {
   showEmptyMessage = signal<boolean>(false);
 
   async ngOnInit() {
-
     const g = await this.guidelines.get();
 
     // Guidelines: letzter Eintrag ist generischster → UI startet dort
@@ -73,14 +92,14 @@ export class FilterPane implements OnInit {
 
     // Nur die filterbaren Typen zeigen
     const filterable: string[] = g.scenarios.findByCollection.filterable;
-    this.activeChain = this.collectionChain.filter(t => filterable.includes(t));
+    this.activeChain = this.collectionChain.filter((t) => filterable.includes(t));
 
     // 1) Controls & Options nur für activeChain anlegen
     const optionsInit: CFOption[] = [];
     for (const type of this.activeChain) {
       this.form.controls.collectionFilter.addControl(
         type,
-        new FormControl<CollectionName | null>({ value: null, disabled: true })
+        new FormControl<CollectionName | null>({ value: null, disabled: true }),
       );
       optionsInit.push({ type, values: [] });
     }
@@ -100,7 +119,7 @@ export class FilterPane implements OnInit {
         .pipe(
           takeUntilDestroyed(this.destroyRef),
           map((v: CollectionName | null) => v?.id ?? null), // nur id betrachten
-          distinctUntilChanged()
+          distinctUntilChanged(),
         )
         .subscribe(async (idOrNull) => {
           const value = idOrNull
@@ -111,7 +130,8 @@ export class FilterPane implements OnInit {
     });
 
     // Fill form
-    const queryParamValues = await this.queryParamService.readDecodedQueryParams();
+    const queryParamValues: Record<string, never> =
+      await this.queryParamService.readDecodedQueryParams();
     this.fillForm(this.form, queryParamValues);
     if (Object.keys(queryParamValues).length > 0) {
       await this.onSubmit();
@@ -144,7 +164,7 @@ export class FilterPane implements OnInit {
 
   async onSubmit() {
     if (!this.form.valid) {
-      Object.values(this.form.controls).forEach(ctrl => ctrl.markAsTouched());
+      Object.values(this.form.controls).forEach((ctrl) => ctrl.markAsTouched());
       return;
     }
 
@@ -193,9 +213,7 @@ export class FilterPane implements OnInit {
   private async loadAndSetOptionsAt(idx: number, parentId?: string) {
     const type = this.activeChain[idx];
     if (!type) return;
-    const values = await firstValueFrom(
-      this.collectionService.getFilterableByType(type, parentId)
-    );
+    const values = await firstValueFrom(this.collectionService.getFilterableByType(type, parentId));
     this.setOptions(idx, values);
   }
 
@@ -212,7 +230,7 @@ export class FilterPane implements OnInit {
 
     // Options leeren
     const nextOptions = this.collectionFilterOptions().map((o, i) =>
-      i >= startIdx ? { ...o, values: [] } : o
+      i >= startIdx ? { ...o, values: [] } : o,
     );
     this.collectionFilterOptions.set(nextOptions);
 
@@ -232,17 +250,20 @@ export class FilterPane implements OnInit {
     if (!type) return;
     const ctrl = this.form.controls.collectionFilter.get(type);
     if (!ctrl) return;
-    enable ? ctrl.enable({ emitEvent: false }) : ctrl.disable({ emitEvent: false });
+
+    if (enable) {
+      ctrl.enable({ emitEvent: false });
+    } else {
+      ctrl.disable({ emitEvent: false });
+    }
   }
 
   protected onItemSelect(e: AutoCompleteSelectEvent) {
     this.form.controls['label'].setValue(e.value.label);
   }
 
-  private fillForm(form: FormGroup, values: Record<string, any>) {
-
+  private fillForm(form: FormGroup, values: Record<string, never>) {
     for (const key of Object.keys(form.controls)) {
-
       if (form.controls[key] instanceof FormGroup) {
         this.fillForm(form.controls[key], values[key]);
         continue;
@@ -251,7 +272,7 @@ export class FilterPane implements OnInit {
       let val = undefined;
       try {
         val = values[key];
-      } catch (e) {
+      } catch {
         val = undefined;
       }
 
@@ -272,5 +293,4 @@ export class FilterPane implements OnInit {
     this.searchService.resetEntityList();
     await this.queryParamService.setQueryParams({});
   }
-
 }

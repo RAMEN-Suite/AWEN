@@ -1,9 +1,11 @@
-import {inject, Injectable} from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
-import {firstValueFrom} from 'rxjs';
+import { inject, Injectable } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
+
+export type QueryParamValue = string | number | boolean | null | undefined | QueryParamValue[] | Record<string, unknown>;
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class QueryParamsService {
   private route = inject(ActivatedRoute);
@@ -11,15 +13,15 @@ export class QueryParamsService {
 
   async setQueryParams(params: Record<string, string | number | boolean | readonly (string | number | boolean)[]>) {
     await this.router.navigate([], {
-      queryParams: params
+      queryParams: params,
     });
   }
 
   async readDecodedQueryParams() {
-    const queryParams = await firstValueFrom(this.route.queryParams);
-    const transformed: Record<string, any> = {};
+    const queryParams: Record<string, never> = (await firstValueFrom(this.route.queryParams)) as Record<string, never>;
+    const transformed: Record<string, never> = {};
 
-    Object.keys(queryParams).forEach(key => {
+    Object.keys(queryParams).forEach((key) => {
       if (queryParams[key] === undefined || queryParams[key] === null || queryParams[key] === '') return undefined;
       if (typeof queryParams[key] === 'object') {
         transformed[key] = queryParams[key];
@@ -27,11 +29,11 @@ export class QueryParamsService {
       try {
         const dec = decodeURIComponent(queryParams[key]);
         try {
-          transformed[key] = JSON.parse(dec);
-        } catch (e) {
-          transformed[key] = dec;
+          transformed[key] = JSON.parse(dec) as never;
+        } catch {
+          transformed[key] = dec as never;
         }
-      } catch (e) {
+      } catch {
         transformed[key] = queryParams[key];
       }
     });
@@ -39,8 +41,8 @@ export class QueryParamsService {
     return transformed;
   }
 
-  transformQueryParams(params: {[key: string]: any}) {
-    let httpParams: Record<string, string | number | boolean | readonly (string | number | boolean)[]> = {};
+  transformQueryParams<T extends Record<string, QueryParamValue>>(params: T) {
+    const httpParams: Record<string, string | number | boolean | readonly (string | number | boolean)[]> = {};
 
     Object.keys(params).forEach((key) => {
       if (key === 'collectionFilter') {
@@ -56,5 +58,4 @@ export class QueryParamsService {
 
     return httpParams;
   }
-
 }

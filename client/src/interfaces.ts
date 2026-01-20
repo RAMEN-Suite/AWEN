@@ -1,5 +1,3 @@
-
-
 export interface Entity {
   nodeLabel: string;
   types: string[];
@@ -43,21 +41,21 @@ export interface IGuidelines {
   fulltextIndexes: {
     // A neo4j fulltext index, that queries the Entity-Node-Property `nameLabel`
     search: string;
-  }
+  };
 
   scenarios: {
     findByCollection: {
       collectionChain: string[];
       filterable: string[];
-    }
+    };
     searchEntities: {
-      orderBy: {property: string, order: 'DESC'|'ASC'}[]
+      orderBy: { property: string; order: 'DESC' | 'ASC' }[];
       shownCollections: string[];
-    }
-  }
+    };
+  };
 }
 
-export type IEntity = {
+export interface IEntity {
   metaType: string;
   types: string[];
   idLabel: string;
@@ -65,7 +63,7 @@ export type IEntity = {
   properties: PropertyConfig[];
 }
 
-export type PropertyConfig = {
+export interface PropertyConfig {
   name: string /* folioEnd, label, websiteUrl */;
   type: PropertyConfigDataType /* raw string, multiple options */;
   required: boolean /* required or optional */;
@@ -84,14 +82,6 @@ export type PropertyConfig = {
   /* Only relevant if type is "string" */
   minLength?: number;
   maxLength?: number;
-};
+}
 
-export type PropertyConfigDataType =
-  | 'array'
-  | 'boolean'
-  | 'date'
-  | 'date-time'
-  | 'integer'
-  | 'number'
-  | 'string'
-  | 'time';
+export type PropertyConfigDataType = 'array' | 'boolean' | 'date' | 'date-time' | 'integer' | 'number' | 'string' | 'time';
