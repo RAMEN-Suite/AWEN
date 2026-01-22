@@ -1,2 +1,5 @@
 .idea
 .DS_Store
+/neo4j/backups/
+/neo4j/data/
+/neo4j/import/

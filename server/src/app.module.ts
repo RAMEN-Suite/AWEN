@@ -1,22 +1,27 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Neo4jModule } from './neo4j/neo4j.module';
 import { GuidelinesModule } from './guidelines/guidelines.module';
 import { EntityModule } from './entity/entity.module';
 import { CollectionModule } from './collection/collection.module';
+import { Neo4jScheme } from './neo4j/neo4j-config.interface';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    Neo4jModule.forRoot({
-      host: process.env.DB_HOST ?? '',
-      password: process.env.DB_PASSWORD ?? '',
-      port: process.env.DB_PORT ?? '',
-      scheme: process.env.DB_SCHEME ?? '',
-      username: process.env.DB_USER ?? '',
-      database: process.env.DB_NAME ?? undefined,
+
+    Neo4jModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        host: config.getOrThrow<string>('DB_HOST'),
+        password: config.getOrThrow<string>('DB_PASSWORD'),
+        port: config.getOrThrow<number>('DB_PORT'),
+        scheme: config.getOrThrow<Neo4jScheme>('DB_SCHEME'),
+        username: config.getOrThrow<string>('DB_USER'),
+        database: config.get<string>('DB_NAME'),
+      }),
     }),
     GuidelinesModule,
     EntityModule,

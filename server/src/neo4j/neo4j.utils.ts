@@ -5,9 +5,12 @@ import { Logger } from '@nestjs/common';
 export const createDriver = async (config: Neo4jConfig): Promise<Driver> => {
   const logger = new Logger('Neo4j Driver');
   for (let j = 1; j <= 5; j++) {
+    logger.log(
+      `${config.scheme}://${config.host}:${config.port}/${config.database}`,
+    );
     const driver = neo4j.driver(
       `${config.scheme}://${config.host}:${config.port}`,
-      neo4j.auth.basic(config.username, config.password),
+      neo4j.auth.basic(config.username, config.password, config.database),
       { disableLosslessIntegers: true },
     );
 

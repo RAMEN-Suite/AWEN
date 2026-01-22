@@ -41,18 +41,16 @@ export class QueryParamsService {
     return transformed;
   }
 
-  transformQueryParams<T extends Record<string, QueryParamValue>>(params: T) {
+  transformQueryParams<T extends object>(params: T) {
     const httpParams: Record<string, string | number | boolean | readonly (string | number | boolean)[]> = {};
 
-    Object.keys(params).forEach((key) => {
+    Object.entries(params).forEach(([key, value]) => {
       if (key === 'collectionFilter') {
-        const value = JSON.stringify(params[key]);
-        httpParams[key] = encodeURIComponent(value);
-      } else if (Array.isArray(params[key])) {
-        const value = JSON.stringify(params[key]);
-        httpParams[key] = encodeURIComponent(value);
-      } else if (['string', 'number', 'boolean'].includes(typeof params[key])) {
-        httpParams[key] = String(params[key]);
+        httpParams[key] = encodeURIComponent(JSON.stringify(value));
+      } else if (Array.isArray(value)) {
+        httpParams[key] = encodeURIComponent(JSON.stringify(value));
+      } else if (['string', 'number', 'boolean'].includes(typeof value)) {
+        httpParams[key] = String(value);
       }
     });
 
