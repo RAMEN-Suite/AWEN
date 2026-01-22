@@ -8,6 +8,9 @@ services:
       dockerfile: Dockerfile
     image: em-backend
     restart: unless-stopped
+    depends_on:
+      neo4j:
+        condition: service_healthy
     ports:
       - "8090:3000"
     environment:
