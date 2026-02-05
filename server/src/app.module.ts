@@ -5,6 +5,8 @@ import { GuidelinesModule } from './guidelines/guidelines.module';
 import { EntityModule } from './entity/entity.module';
 import { CollectionModule } from './collection/collection.module';
 import { Neo4jScheme } from './neo4j/neo4j-config.interface';
+import { SchemaModule } from './schema/schema.module';
+import { GraphModule } from './graph/graph.module';
 
 @Module({
   imports: [
@@ -26,6 +28,8 @@ import { Neo4jScheme } from './neo4j/neo4j-config.interface';
     GuidelinesModule,
     EntityModule,
     CollectionModule,
+    SchemaModule,
+    GraphModule,
   ],
 })
 export class AppModule {}

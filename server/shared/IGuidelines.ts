@@ -1,4 +1,8 @@
-import { ApiProperty, ApiPropertyOptional, ApiExtraModels } from '@nestjs/swagger';
+import {
+  ApiProperty,
+  ApiPropertyOptional,
+  ApiExtraModels,
+} from '@nestjs/swagger';
 
 /**
  * Für Swagger/OpenAPI taugen String-Unions alleine nicht.
@@ -14,7 +18,7 @@ export const PropertyConfigDataTypes = [
   'string',
   'time',
 ] as const;
-export type PropertyConfigDataType = typeof PropertyConfigDataTypes[number];
+export type PropertyConfigDataType = (typeof PropertyConfigDataTypes)[number];
 
 @ApiExtraModels() // Platzhalter – keeping for potential ext.
 export class PropertyConfig {
@@ -52,7 +56,8 @@ export class PropertyConfig {
   visible: boolean;
 
   @ApiProperty({
-    description: 'Ob die Property als eigene Node abgespeichert wird. Erlaubt detailliertere bearbeitung.',
+    description:
+      'Ob die Property als eigene Node abgespeichert wird. Erlaubt detailliertere bearbeitung.',
     example: true,
   })
   propertyNode: boolean;
@@ -78,13 +83,15 @@ export class PropertyConfig {
   maxItems?: number;
 
   @ApiPropertyOptional({
-    description: 'Nur relevant bei "number"/"integer": Minimalwert (inklusive).',
+    description:
+      'Nur relevant bei "number"/"integer": Minimalwert (inklusive).',
     example: 0,
   })
   minimum?: number;
 
   @ApiPropertyOptional({
-    description: 'Nur relevant bei "number"/"integer": Maximalwert (inklusive).',
+    description:
+      'Nur relevant bei "number"/"integer": Maximalwert (inklusive).',
     example: 100,
   })
   maximum?: number;
@@ -126,16 +133,14 @@ export class IEntity {
   metaType: string;
 
   @ApiProperty({
-    description:
-      'Spezifische Typen/Labels des Entity (z. B. Graph-Labels).',
+    description: 'Spezifische Typen/Labels des Entity (z. B. Graph-Labels).',
     type: [String],
     example: ['Entity', 'Organization'],
   })
   types: string[];
 
   @ApiProperty({
-    description:
-      'Property-Name, der die eindeutige ID enthält (z. B. "id").',
+    description: 'Property-Name, der die eindeutige ID enthält (z. B. "id").',
     example: 'id',
   })
   idLabel: string;
@@ -179,12 +184,12 @@ export class SearchEntitiesOrderBy {
 
 export class SearchEntitiesScenario {
   @ApiProperty({
-    description: "Liste der Sortierkriterien für Suchanfragen.",
+    description: 'Liste der Sortierkriterien für Suchanfragen.',
     type: () => [SearchEntitiesOrderBy],
     example: [
       {
-        property: "numberOfChilds",
-        order: "DESC",
+        property: 'numberOfChilds',
+        order: 'DESC',
       },
     ],
   })
@@ -195,7 +200,7 @@ export class SearchEntitiesScenario {
       Liste der Collections, die in den Suchergebnissen angezeigt werden sollen.
       Wenn nicht angegeben, werden alle Collections berücksichtigt.
     `,
-    example: ["Volume", "Department"],
+    example: ['Volume', 'Department'],
     type: [String],
   })
   shownCollections: string[];
@@ -205,14 +210,14 @@ export class FindByCollectionScenario {
   @ApiProperty({
     description:
       'Kettenfolge von Collection-Labels/Beziehungen, um Entities über Collections zu finden. Es wird davon ausgegangen, das der letzte Array Eintrag der generischste Collection Typ ist. Die Filterung wird immer vom generischsten Typ aus gestartet.',
-    example: ["Regesta", "Volume", "Department"],
+    example: ['Regesta', 'Volume', 'Department'],
   })
   collectionChain: string[];
 
   @ApiProperty({
     description:
       'Liste von Property-Namen, die vom Client als Filter verwendet werden dürfen.',
-    example: ["Volume", "Department"],
+    example: ['Volume', 'Department'],
     type: [String],
   })
   filterable: string[];
@@ -220,8 +225,7 @@ export class FindByCollectionScenario {
 
 export class Scenarios {
   @ApiProperty({
-    description:
-      'Szenario: Entities anhand einer Collection ableiten/filtern.',
+    description: 'Szenario: Entities anhand einer Collection ableiten/filtern.',
     type: () => FindByCollectionScenario,
   })
   findByCollection: FindByCollectionScenario;
@@ -233,7 +237,13 @@ export class Scenarios {
   searchEntities: SearchEntitiesScenario;
 }
 
-@ApiExtraModels(IEntity, PropertyConfig, FulltextIndexes, Scenarios, FindByCollectionScenario)
+@ApiExtraModels(
+  IEntity,
+  PropertyConfig,
+  FulltextIndexes,
+  Scenarios,
+  FindByCollectionScenario,
+)
 export class IGuidelines {
   @ApiProperty({
     description:
