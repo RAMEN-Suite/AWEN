@@ -5,4 +5,5 @@ export interface GetNodeByIdOptions {
    * Do not pass user input.
    */
   labels?: string | string[];
+  keyName?: string;
 }

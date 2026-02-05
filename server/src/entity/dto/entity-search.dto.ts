@@ -1,9 +1,9 @@
 import { IsOptional } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { ApiProperty, PickType } from '@nestjs/swagger';
-import { EntityDto } from './entity.dto';
+import { OldEntityDto } from './old-entity.dto';
 
-export class EntitySearchDto extends PickType(EntityDto, [
+export class EntitySearchDto extends PickType(OldEntityDto, [
   'label',
   'types',
 ] as const) {

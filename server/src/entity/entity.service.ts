@@ -1,21 +1,40 @@
 import { Injectable } from '@nestjs/common';
 import { Neo4jService } from '../neo4j/neo4j.service';
 import { GuidelinesService } from '../guidelines/guidelines.service';
-import { EntityDto } from './dto/entity.dto';
+import { OldEntityDto } from './dto/old-entity.dto';
 import { EntityNamesDto } from './dto/entity-names.dto';
 import Cypher, { PartialPattern, Pattern } from '@neo4j/cypher-builder';
 import { EntitySearchDto } from './dto/entity-search.dto';
 import { EntityCollectionNameDto } from './dto/entity-collection-name.dto';
 import { CollectionService } from '../collection/collection.service';
 import { EntityAutocompleteQueryDto } from './dto/entity-autocomplete-query.dto';
+import { RamenModelService } from '../schema/ramen-model.service';
+import { NodeRepository } from '../graph/node-repository.service';
+import { EntityDto } from './dto/entity.dto';
+import { transformNodeToEntityDTO } from '../utils/node-transformers';
 
 @Injectable()
 export class EntityService {
+  private readonly entityName: string = 'Entity';
+
   constructor(
     private readonly neo4jService: Neo4jService,
     private readonly guidelinesService: GuidelinesService,
     private readonly collectionService: CollectionService,
+    private readonly model: RamenModelService,
+    private readonly nodes: NodeRepository,
   ) {}
+
+  async getById(id: string): Promise<EntityDto | undefined> {
+    const entityNode = await this.nodes.getById(id, {
+      labels: this.entityName,
+      keyName: this.model.getNodeKeyField(this.entityName),
+    });
+
+    if (!entityNode) return undefined;
+
+    return transformNodeToEntityDTO(entityNode);
+  }
 
   /**
    * Finds a single Entity node by its {@link idLabel}
@@ -23,7 +42,7 @@ export class EntityService {
    * @param id The {@link idLabel} of the Entity node.
    * @returns A promise that resolves to the found Entity node (IEntity) or `null` if no Entity matches the given id.
    */
-  async findOneById(id: string): Promise<EntityDto | null> {
+  async findOneById(id: string): Promise<OldEntityDto | null> {
     const guidelines = await this.guidelinesService.get();
 
     const eNode = new Cypher.Node();
@@ -52,7 +71,7 @@ export class EntityService {
     return res.records[0].get('entity');
   }
 
-  async findByName(name: string): Promise<EntityDto[]> {
+  async findByName(name: string): Promise<OldEntityDto[]> {
     const eNode = new Cypher.Node();
     const score = new Cypher.Variable();
 

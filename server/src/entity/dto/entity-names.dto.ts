@@ -1,7 +1,7 @@
 import { PickType } from '@nestjs/swagger';
-import { EntityDto } from './entity.dto';
+import { OldEntityDto } from './old-entity.dto';
 
-export class EntityNamesDto extends PickType(EntityDto, [
+export class EntityNamesDto extends PickType(OldEntityDto, [
   'label',
   'id',
 ] as const) {}

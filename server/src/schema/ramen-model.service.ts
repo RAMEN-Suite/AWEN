@@ -9,6 +9,10 @@ export class RamenModelService {
     return this.schema.getRegistry().getNodeType(name);
   }
 
+  getSuperNodes(name: string) {
+    return this.schema.getRegistry().getSuperNodes(name);
+  }
+
   isEntityType(type: string): boolean {
     const node = this.getNodeType(type);
     return !!node;

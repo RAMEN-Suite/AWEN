@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Neo4jService } from '../neo4j/neo4j.service';
 import Cypher, { Expr, LabelExpr } from '@neo4j/cypher-builder';
 import { GetNodeByIdOptions } from './interfaces/get-node-by-id-options.interface';
+import { Integer, Node } from 'neo4j-driver';
 
 type NodePatternOptions = {
   labels?: string | Array<string | Expr> | LabelExpr | Expr;
@@ -27,6 +28,7 @@ export class NodeRepository {
 
   async getById(uuid: string, options?: GetNodeByIdOptions) {
     const NODE_NAME = 'node';
+    const KEY_NAME = options?.keyName ?? 'uuid';
 
     const patternOptions: NodePatternOptions = {};
 
@@ -37,17 +39,16 @@ export class NodeRepository {
     const pattern = new Cypher.Pattern(node, patternOptions);
 
     const { cypher, params } = new Cypher.Match(pattern)
-      .where(Cypher.eq(node.property('uuid'), new Cypher.Param(uuid)))
+      .where(Cypher.eq(node.property(KEY_NAME), new Cypher.Param(uuid)))
       .return(node)
       .build();
 
-    const result = await this.neo4j.read<{ [NODE_NAME]: object }>(
-      cypher,
-      params,
-    );
+    const result = await this.neo4j.read<{
+      [NODE_NAME]: Node<Integer, Record<string, any>>;
+    }>(cypher, params);
 
     if (result.records.length === 0) {
-      return null;
+      return undefined;
     }
 
     return result.records[0].get(NODE_NAME);

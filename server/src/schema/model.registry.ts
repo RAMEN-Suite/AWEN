@@ -17,14 +17,14 @@ export class ModelRegistry {
     model.classifiers.forEach((c) => {
       if (c.kind === 'GNode') {
         this.nodes.set(c.name, {
-          id: c.id,
+          id: this.formatId(c.id, model.id),
           name: c.name,
           superTypes: c.superTypes || [],
           attributes: c.attributes || [],
         });
       } else if (c.kind === 'GDataType') {
         this.dataTypes.set(c.name, {
-          id: c.id,
+          id: this.formatId(c.id, model.id),
           name: c.name,
         });
       }
@@ -32,13 +32,22 @@ export class ModelRegistry {
 
     model.relations.forEach((r) => {
       this.relations.set(r.name, {
-        id: r.id,
+        id: this.formatId(r.id, model.id),
         superTypes: r.superTypes || [],
         name: r.name,
         from: r.from,
         to: r.to,
       });
     });
+  }
+
+  getSuperNodes(name: string) {
+    const node = this.getNodeType(name);
+    if (!node) return undefined;
+
+    return Array.from(this.nodes.values()).filter((n) =>
+      node.superTypes.includes(n.id),
+    );
   }
 
   getNodeType(name: string) {
@@ -49,5 +58,9 @@ export class ModelRegistry {
     const node = this.getNodeType(name);
     if (!node) return undefined;
     return node.attributes.find((a) => a.isKey)?.name;
+  }
+
+  private formatId(id: string, modelId: string) {
+    return `${modelId}:${id}`;
   }
 }

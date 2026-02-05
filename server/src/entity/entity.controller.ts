@@ -8,19 +8,20 @@ import {
 import { EntityService } from './entity.service';
 import { IdDto } from './dto/id.dto';
 import { LabelDto } from './dto/label.dto';
-import { EntityDto } from './dto/entity.dto';
+import { OldEntityDto } from './dto/old-entity.dto';
 import { EntityNamesDto } from './dto/entity-names.dto';
 import { parseStringToSearchQueryString } from '../utils/utils';
 import { EntitySearchDto } from './dto/entity-search.dto';
 import { ApiResponse } from '@nestjs/swagger';
 import { EntityCollectionNameDto } from './dto/entity-collection-name.dto';
 import { EntityAutocompleteQueryDto } from './dto/entity-autocomplete-query.dto';
+import { EntityDto } from './dto/entity.dto';
 
 @Controller('entity')
 export class EntityController {
   constructor(private readonly entityService: EntityService) {}
 
-  @ApiResponse({ type: [EntityDto] })
+  @ApiResponse({ type: [OldEntityDto] })
   @Get('')
   async getAutoCompleteF(
     @Query() params: EntitySearchDto,
@@ -41,7 +42,7 @@ export class EntityController {
   async getById(@Param() params: IdDto): Promise<EntityDto> {
     const { id } = params;
 
-    const entity = await this.entityService.findOneById(id);
+    const entity = await this.entityService.getById(id);
 
     if (!entity) {
       throw new NotFoundException('Entity was not found!');
