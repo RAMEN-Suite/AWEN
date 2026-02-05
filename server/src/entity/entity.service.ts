@@ -12,11 +12,11 @@ import { RamenModelService } from '../schema/ramen-model.service';
 import { NodeRepository } from '../graph/node-repository.service';
 import { EntityDto } from './dto/entity.dto';
 import { transformNodeToEntityDTO } from '../utils/node-transformers';
+import { Integer, Node } from 'neo4j-driver';
+import { ENTITY_LABEL_NAME } from '../constants';
 
 @Injectable()
 export class EntityService {
-  private readonly entityName: string = 'Entity';
-
   constructor(
     private readonly neo4jService: Neo4jService,
     private readonly guidelinesService: GuidelinesService,
@@ -26,10 +26,11 @@ export class EntityService {
   ) {}
 
   async getById(id: string): Promise<EntityDto | undefined> {
-    const entityNode = await this.nodes.getById(id, {
-      labels: this.entityName,
-      keyName: this.model.getNodeKeyField(this.entityName),
-    });
+    const entityNode: Node<Integer, Record<string, any>> | undefined =
+      await this.nodes.getById(id, {
+        labels: ENTITY_LABEL_NAME,
+        keyName: this.model.getNodeKeyField(ENTITY_LABEL_NAME),
+      });
 
     if (!entityNode) return undefined;
 

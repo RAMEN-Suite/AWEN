@@ -27,7 +27,7 @@ COPY . .
 # Expose the port Angular uses for the dev server (default is 4200)
 EXPOSE 4200
 
-# Start the Angular dev server and bind it to all network interfaces
+# Start the Angular dev server and bind it to all network dto
 CMD ["npm", "start", "--", "--proxy-config", "proxy.conf.docker.json", "--host=0.0.0.0"]
 
 
