@@ -13,8 +13,8 @@ export class RamenModelService {
     return this.schema.getRegistry().getSuperNodes(name);
   }
 
-  isEntityType(type: string): boolean {
-    const node = this.getNodeType(type);
+  isNodeType(name: string): boolean {
+    const node = this.getNodeType(name);
     return !!node;
   }
 

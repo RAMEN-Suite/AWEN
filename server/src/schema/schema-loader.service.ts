@@ -16,7 +16,7 @@ export class SchemaLoaderService {
     this.loadSchemas();
   }
 
-  loadSchemas() {
+  private loadSchemas() {
     this.logger.log('Loading schemas...');
     const ramen: GModel = JSON.parse(
       fs.readFileSync(this.ramenPath(), 'utf8'),
