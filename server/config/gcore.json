@@ -4,7 +4,17 @@
   "title": "GCore Light",
 
   "type": "object",
-  "required": ["$schema", "$id", "id", "version", "kind", "name", "imports", "classifiers", "relations"],
+  "required": [
+    "$schema",
+    "$id",
+    "id",
+    "version",
+    "kind",
+    "name",
+    "imports",
+    "classifiers",
+    "relations"
+  ],
   "additionalProperties": false,
 
   "properties": {
@@ -18,7 +28,11 @@
     "version": { "$ref": "#/$defs/Version" },
 
     "kind": { "const": "GModel" },
-    "name": { "type": "string", "minLength": 1, "$comment": "Human-readable name of the model." },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "$comment": "Human-readable name of the model."
+    },
 
     "imports": {
       "type": "array",
@@ -79,7 +93,10 @@
     },
 
     "Ref": {
-      "oneOf": [{ "$ref": "#/$defs/LocalRef" }, { "$ref": "#/$defs/QualifiedRef" }],
+      "oneOf": [
+        { "$ref": "#/$defs/LocalRef" },
+        { "$ref": "#/$defs/QualifiedRef" }
+      ],
       "$comment": "Reference to a local or imported element."
     },
 

@@ -24,6 +24,7 @@
     "@nestjs/swagger": "^11.2.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
+    "json-schema-library": "^10.5.2",
     "neo4j-driver": "^6.0.0",
     "neo4j-driver-core": "^6.0.0",
     "reflect-metadata": "^0.2.2",
