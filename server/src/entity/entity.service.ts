@@ -1,7 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Neo4jService } from '../neo4j/neo4j.service';
 import { GuidelinesService } from '../guidelines/guidelines.service';
-import { OldEntityDto } from './dto/old-entity.dto';
 import { EntityNamesDto } from './dto/entity-names.dto';
 import Cypher, { PartialPattern, Pattern } from '@neo4j/cypher-builder';
 import { EntitySearchDto } from './dto/entity-search.dto';
@@ -11,12 +10,18 @@ import { EntityAutocompleteQueryDto } from './dto/entity-autocomplete-query.dto'
 import { RamenModelService } from '../schema/ramen-model.service';
 import { NodeRepository } from '../graph/node-repository.service';
 import { EntityDto } from './dto/entity.dto';
-import { transformNodeToEntityDTO } from '../utils/node-transformers';
+import {
+  transformNodesToEntityDTOs,
+  transformNodesToNameEntityDTOs,
+  transformNodeToEntityDTO,
+} from '../utils/node-transformers';
 import { Integer, Node } from 'neo4j-driver';
 import { ENTITY_LABEL_NAME } from '../constants';
 
 @Injectable()
 export class EntityService {
+  logger = new Logger(EntityService.name);
+
   constructor(
     private readonly neo4jService: Neo4jService,
     private readonly guidelinesService: GuidelinesService,
@@ -37,62 +42,36 @@ export class EntityService {
     return transformNodeToEntityDTO(entityNode);
   }
 
-  /**
-   * Finds a single Entity node by its {@link idLabel}
-   *
-   * @param id The {@link idLabel} of the Entity node.
-   * @returns A promise that resolves to the found Entity node (IEntity) or `null` if no Entity matches the given id.
-   */
-  async findOneById(id: string): Promise<OldEntityDto | null> {
-    const guidelines = await this.guidelinesService.get();
+  async getByProperty(key: string, value: string): Promise<EntityDto[]> {
+    const entityNodes: Node<Integer, Record<string, any>>[] =
+      await this.nodes.getByProperty(key, value, {
+        labels: ENTITY_LABEL_NAME,
+      });
 
-    const eNode = new Cypher.Node();
-
-    const pattern = new Cypher.Pattern(eNode, {
-      labels: guidelines.entity.metaType,
-      properties: {
-        [guidelines.entity.idLabel]: new Cypher.Param(id),
-      },
-    });
-
-    const clause = await this.entityReturnMap(
-      eNode,
-      new Cypher.Match(pattern).with('*'),
-    );
-
-    const { cypher, params } = clause.build();
-    const res = await this.neo4jService.read<{
-      entity: EntityCollectionNameDto;
-    }>(cypher, params);
-
-    if (res.records.length !== 1) {
-      return null;
-    }
-
-    return res.records[0].get('entity');
+    return transformNodesToEntityDTOs(entityNodes);
   }
 
-  async findByName(name: string): Promise<OldEntityDto[]> {
-    const eNode = new Cypher.Node();
-    const score = new Cypher.Variable();
-
-    const searchPattern = await this.runSearch(eNode, score, name);
-    const subQuery = await this.entityReturnMap(
-      eNode,
-      searchPattern.orderBy([score, 'DESC']),
+  async findNamesByNameNew(
+    name: string,
+    queryParams: EntityAutocompleteQueryDto,
+  ): Promise<EntityNamesDto[]> {
+    const { fulltextIndexes } = await this.guidelinesService.get();
+    const nodes = await this.nodes.indexFulltextQueryNodes(
+      fulltextIndexes.search,
+      name,
     );
+    const id = this.model.getNodeKeyField(ENTITY_LABEL_NAME);
+    const label = this.model.getAttribute(ENTITY_LABEL_NAME, 'label');
 
-    const collectReturnMap = new Cypher.Collect(subQuery);
-
-    const clause = new Cypher.With('*').return([collectReturnMap, 'entities']);
-
-    const { cypher, params } = clause.build();
-
-    const res = await this.neo4jService.read<{
-      entities: EntityCollectionNameDto[];
-    }>(cypher, params);
-
-    return res.records[0].get('entities');
+    if (!id) {
+      this.logger.error('There is no id field for entity nodes.');
+      throw new Error('There is no id field for entity nodes.');
+    }
+    if (!label) {
+      this.logger.error('There is no param named "Label" for entity nodes."');
+      throw new Error('There is no param named "Label" for entity nodes."');
+    }
+    return transformNodesToNameEntityDTOs(nodes, label.name, id);
   }
 
   async findNamesByName(
@@ -287,8 +266,21 @@ export class EntityService {
     collectionFilters: Record<string, string[]>,
   ) {
     const guidelines = await this.guidelinesService.get();
-    const collectionChain =
-      guidelines.scenarios.findByCollection.collectionChain;
+    const collectionChains = this.model.getCollectionChains();
+    this.logger.debug(collectionChains);
+    const collectionChain = collectionChains.find((chain) => {
+      let match = false;
+      Object.keys(collectionFilters).forEach((key) => {
+        match = chain.includes(key);
+      });
+      return match;
+    });
+
+    if (!collectionChain) {
+      this.logger.error("CollectionChain doesn't exist");
+      throw new Error("CollectionChain doesn't exist");
+    }
+
     const filterableCollections =
       guidelines.scenarios.findByCollection.filterable;
     const colIdLabel = guidelines.collection.idLabel;

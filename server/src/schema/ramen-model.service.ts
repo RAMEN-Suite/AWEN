@@ -13,12 +13,20 @@ export class RamenModelService {
     return this.schema.getRegistry().getSuperNodes(name);
   }
 
-  isNodeType(name: string): boolean {
-    const node = this.getNodeType(name);
-    return !!node;
+  hasNodeType(name: string): boolean {
+    return this.schema.getRegistry().hasNodeType(name);
+  }
+
+  getAttribute(nodeName: string, paramName: string) {
+    const node = this.getNodeType(nodeName);
+    return node?.attributes.find((attribute) => attribute.name === paramName);
   }
 
   getNodeKeyField(name: string) {
     return this.schema.getRegistry().getNodeKeyField(name);
+  }
+
+  getCollectionChains() {
+    return this.schema.getRegistry().getCollectionChains();
   }
 }
