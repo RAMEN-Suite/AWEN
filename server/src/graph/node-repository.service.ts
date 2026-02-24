@@ -114,6 +114,9 @@ export class NodeRepository {
       score: Integer;
     }>(cypher, params);
 
-    return result.records.map((record) => record.get('node'));
+    return result.records.map((record) => ({
+      node: record.get('node'),
+      score: record.get('score'),
+    }));
   }
 }

@@ -24,8 +24,8 @@ export const transformNodeToNameEntityDTO = (
   idKey: string,
 ): EntityNamesDto => {
   return new EntityNamesDto(
-    node.properties[labelKey] as string,
     node.properties[idKey] as string,
+    node.properties[labelKey] as string,
   );
 };
 

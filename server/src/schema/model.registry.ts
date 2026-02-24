@@ -2,18 +2,26 @@ import { GModel } from './interfaces/g-model.interface';
 import { NodeType } from './interfaces/node-type.interface';
 import { RelationType } from './interfaces/relation-type.interface';
 import { DataType } from './interfaces/data-type.interface';
-import { Logger } from '@nestjs/common';
+import { Logger, NotFoundException } from '@nestjs/common';
 
 export class ModelRegistry {
   logger = new Logger(ModelRegistry.name);
 
-  //TODO: Problem, da der name (z. B. PART_OF) nicht einmalig ist... what have I done
-  dataTypes = new Map<string, DataType>();
-  nodes = new Map<string, NodeType>();
-  relations = new Map<string, RelationType>();
+  private dataTypes = new Map<string, DataType>();
+  private nodes = new Map<string, NodeType>();
+  private relations = new Map<string, RelationType>();
 
-  private nodeNameById = new Map<string, string>(); // id -> name
-  private nodeNameByQualifiedId = new Map<string, string>(); // "modelId:id" -> name
+  private get allDataTypes(): Array<DataType> {
+    return Array.from(this.dataTypes.values());
+  }
+
+  private get allNodes(): Array<NodeType> {
+    return Array.from(this.nodes.values());
+  }
+
+  private get allRelations(): Array<RelationType> {
+    return Array.from(this.relations.values());
+  }
 
   constructor(ramen: GModel, profile: GModel) {
     this.register(ramen);
@@ -21,32 +29,38 @@ export class ModelRegistry {
   }
 
   private register(model: GModel) {
-    this.logger.debug(model);
     model.classifiers.forEach((c) => {
       if (c.kind === 'GNode') {
-        this.nodes.set(c.name, {
-          id: this.formatId(c.id, model.id),
+        const formatedId = this.formatId(c.id, model.id);
+        this.nodes.set(formatedId, {
+          id: formatedId,
           name: c.name,
           superTypes: c.superTypes || [],
           attributes: c.attributes || [],
         });
-        this.nodeNameById.set(c.id, c.name);
-        this.nodeNameByQualifiedId.set(this.formatId(c.id, model.id), c.name);
       } else if (c.kind === 'GDataType') {
-        this.dataTypes.set(c.name, {
-          id: this.formatId(c.id, model.id),
+        const formatedId = this.formatId(c.id, model.id);
+        this.dataTypes.set(formatedId, {
+          id: formatedId,
           name: c.name,
         });
       }
     });
 
     model.relations.forEach((r) => {
-      this.relations.set(r.name, {
-        id: this.formatId(r.id, model.id),
+      const formatedId = this.formatId(r.id, model.id);
+      this.relations.set(formatedId, {
+        id: formatedId,
         superTypes: r.superTypes || [],
         name: r.name,
-        from: r.from,
-        to: r.to,
+        from: {
+          ...r.from,
+          nodeId: this.formatId(r.from.nodeId, model.id),
+        },
+        to: {
+          ...r.to,
+          nodeId: this.formatId(r.to.nodeId, model.id),
+        },
       });
     });
   }
@@ -61,23 +75,22 @@ export class ModelRegistry {
   }
 
   getNodeType(name: string) {
-    return this.nodes.get(name);
+    return this.allNodes.find((node) => node.name === name);
   }
 
   hasNodeType(name: string) {
-    return this.nodes.has(name);
+    return !!this.getNodeType(name);
   }
 
   getRelationTypesByName(name: string): RelationType[] {
-    this.logger.debug(Array.from(this.relations.values()));
-    return Array.from(this.relations.values()).filter((r) => r.name === name);
+    return this.allRelations.filter((r) => r.name === name);
   }
 
   resolveNodeNameFromRef(ref: string): string | undefined {
-    if (ref.includes(':')) {
-      return this.nodeNameByQualifiedId.get(ref);
+    const node = this.nodes.get(ref);
+    if (node) {
+      return node.name;
     }
-    return this.nodeNameById.get(ref) ?? undefined;
   }
 
   /** Transitive subtype-Prüfung via superTypes */
@@ -92,7 +105,7 @@ export class ModelRegistry {
       if (visited.has(cur)) continue;
       visited.add(cur);
 
-      const node = this.nodes.get(cur);
+      const node = this.getNodeType(cur);
       if (!node) continue;
 
       for (const stRef of node.superTypes ?? []) {
@@ -105,7 +118,7 @@ export class ModelRegistry {
     return false;
   }
 
-  getNodeKeyField(typeName: string): string | undefined {
+  getNodeKeyField(typeName: string): string {
     const visited = new Set<string>();
     const stack = [typeName];
 
@@ -114,7 +127,7 @@ export class ModelRegistry {
       if (visited.has(cur)) continue;
       visited.add(cur);
 
-      const node = this.nodes.get(cur);
+      const node = this.getNodeType(cur);
       if (!node) continue;
 
       const key = node.attributes.find((a) => a.isKey)?.name;
@@ -125,14 +138,14 @@ export class ModelRegistry {
         if (stName) stack.push(stName);
       }
     }
-    return undefined;
+    throw new NotFoundException(`Could not find a key field for "${typeName}"`);
   }
 
   /** Alle Subtypen (z.B. Collection o. Entity */
   getTypes(name: string): string[] {
-    return Array.from(this.nodes.keys()).filter((n) =>
-      this.isSubtypeOf(n, name),
-    );
+    return this.allNodes
+      .map((n) => n.name)
+      .filter((n) => this.isSubtypeOf(n, name));
   }
 
   /**

@@ -16,7 +16,11 @@ import {
   transformNodeToEntityDTO,
 } from '../utils/node-transformers';
 import { Integer, Node } from 'neo4j-driver';
-import { ENTITY_LABEL_NAME } from '../constants';
+import {
+  ANNOTATION_LABEL_NAME,
+  COLLECTION_LABEL_NAME,
+  ENTITY_LABEL_NAME,
+} from '../constants';
 
 @Injectable()
 export class EntityService {
@@ -51,12 +55,9 @@ export class EntityService {
     return transformNodesToEntityDTOs(entityNodes);
   }
 
-  async findNamesByNameNew(
-    name: string,
-    queryParams: EntityAutocompleteQueryDto,
-  ): Promise<EntityNamesDto[]> {
+  async findNamesByNameNew(name: string): Promise<EntityNamesDto[]> {
     const { fulltextIndexes } = await this.guidelinesService.get();
-    const nodes = await this.nodes.indexFulltextQueryNodes(
+    const results = await this.nodes.indexFulltextQueryNodes(
       fulltextIndexes.search,
       name,
     );
@@ -71,7 +72,11 @@ export class EntityService {
       this.logger.error('There is no param named "Label" for entity nodes."');
       throw new Error('There is no param named "Label" for entity nodes."');
     }
-    return transformNodesToNameEntityDTOs(nodes, label.name, id);
+    return transformNodesToNameEntityDTOs(
+      results.map((r) => r.node),
+      label.name,
+      id,
+    );
   }
 
   async findNamesByName(
@@ -249,11 +254,13 @@ export class EntityService {
     const clause = await this.entityReturnMap(eNode, query);
 
     const { cypher, params } = clause.build();
+    this.logger.debug(cypher);
+    this.logger.debug(params);
 
     const res = await this.neo4jService.read<{
       entity: EntityCollectionNameDto;
     }>(cypher, params);
-
+    this.logger.debug(res);
     const entities: EntityCollectionNameDto[] = res.records.map((record) => {
       return record.get('entity');
     });
@@ -267,7 +274,7 @@ export class EntityService {
   ) {
     const guidelines = await this.guidelinesService.get();
     const collectionChains = this.model.getCollectionChains();
-    this.logger.debug(collectionChains);
+
     const collectionChain = collectionChains.find((chain) => {
       let match = false;
       Object.keys(collectionFilters).forEach((key) => {
@@ -283,7 +290,7 @@ export class EntityService {
 
     const filterableCollections =
       guidelines.scenarios.findByCollection.filterable;
-    const colIdLabel = guidelines.collection.idLabel;
+    const colIdLabel = this.model.getNodeKeyField(COLLECTION_LABEL_NAME);
 
     const aNode = new Cypher.Node();
 
@@ -292,7 +299,7 @@ export class EntityService {
 
     let newPattern: Pattern | PartialPattern = new Cypher.Pattern(eNode)
       .related(eToA, { type: 'REFERS_TO', direction: 'left' })
-      .to(aNode, { labels: 'Annotation' })
+      .to(aNode, { labels: ANNOTATION_LABEL_NAME })
       .related(aToC, { type: 'HAS_ANNOTATION', direction: 'left' });
 
     const collections: Map<string, Cypher.Node> = new Map<
