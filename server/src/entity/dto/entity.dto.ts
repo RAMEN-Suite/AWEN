@@ -1,17 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { NodeDto } from '../../dto/node.dto';
-import { IsString } from 'class-validator';
+import { EntityPropertyDto } from './entity-property.dto';
 
-export class EntityDto extends NodeDto {
-  @ApiProperty({
-    description: 'The RAMEN type of the Node.',
-    example: 'Entity',
-    type: 'string',
-  })
-  @IsString()
-  ramenType: string = 'Entity';
+export class EntityDto {
+  @ApiProperty()
+  label: string;
 
-  constructor(properties: Record<string, any>, types?: string[]) {
-    super(properties, types);
+  @ApiProperty()
+  types: string[];
+
+  @ApiProperty()
+  properties: EntityPropertyDto[];
+
+  constructor(value: EntityDto) {
+    Object.assign(this, value);
   }
 }

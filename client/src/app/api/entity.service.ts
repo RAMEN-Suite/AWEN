@@ -1,64 +1,66 @@
-import {inject, Injectable} from '@angular/core';
-import {Entity, EntityAutocompleteQuery, EntityNames, EntitySearchQuery} from '../../interfaces';
-import {catchError, firstValueFrom, of} from 'rxjs';
-import {HttpClient} from '@angular/common/http';
-import {QueryParamsService} from '../utils/query-params.service';
-import {MessageService} from 'primeng/api';
+import { inject, Injectable } from '@angular/core';
+import { OldEntity, EntityAutocompleteQuery, EntityNames, EntitySearchQuery, Entity } from '../../interfaces';
+import { catchError, firstValueFrom, of } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { QueryParamsService } from '../utils/query-params.service';
+import { MessageService } from 'primeng/api';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class EntityService {
   private http = inject(HttpClient);
   private queryParamService = inject(QueryParamsService);
   private readonly messageService = inject(MessageService);
 
-  searchEntities(query:EntitySearchQuery) {
+  searchEntities(query: EntitySearchQuery) {
     const httpParams = this.queryParamService.transformQueryParams(query);
 
-    const res = this.http.get<Entity[]>('/api/entity/', {
-      params: httpParams
-    }).pipe(
-      catchError(()=>{
-        this.messageService.add({
-          severity: 'error',
-          detail: `Error while loading entities. Reload the page, or try again later.`,
-        });
-        return of(new Array<Entity>())
+    const res = this.http
+      .get<OldEntity[]>('/api/entity/', {
+        params: httpParams,
       })
-    );
+      .pipe(
+        catchError(() => {
+          this.messageService.add({
+            severity: 'error',
+            detail: `Error while loading entities. Reload the page, or try again later.`,
+          });
+          return of(new Array<OldEntity>());
+        }),
+      );
     return firstValueFrom(res);
   }
 
-  async getById(id:string) {
+  async getById(id: string) {
     const res = this.http.get<Entity>('/api/entity/' + id).pipe(
-      catchError((err)=>{
+      catchError((err) => {
         this.messageService.add({
           severity: 'error',
           detail: `Error while loading entity with id ${id}. Reload the page, or try again later.`,
         });
         throw err;
-      })
+      }),
     );
     return firstValueFrom(res);
   }
 
-
-  async getAutocomplete(search:string, query: EntityAutocompleteQuery): Promise<EntityNames[]> {
+  async getAutocomplete(search: string, query: EntityAutocompleteQuery): Promise<EntityNames[]> {
     const parsedQuery = encodeURIComponent(search);
     const httpParams = this.queryParamService.transformQueryParams(query);
-    const temp = this.http.get<EntityNames[]>('/api/entity/auto-complete/' + parsedQuery, {
-      params: httpParams
-    }).pipe(
-      catchError(()=>{
-        this.messageService.add({
-          severity: 'error',
-          detail: `Error while loading autocomplete. Reload the page, or try again later.`,
-        });
-        return of(new Array<EntityNames>())
+    const temp = this.http
+      .get<EntityNames[]>('/api/entity/auto-complete/' + parsedQuery, {
+        params: httpParams,
       })
-    );
+      .pipe(
+        catchError(() => {
+          this.messageService.add({
+            severity: 'error',
+            detail: `Error while loading autocomplete. Reload the page, or try again later.`,
+          });
+          return of(new Array<EntityNames>());
+        }),
+      );
     return firstValueFrom(temp);
   }
-
 }

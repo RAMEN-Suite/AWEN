@@ -1,4 +1,22 @@
 export interface Entity {
+  label: string;
+  types: string[];
+  properties: EntityPropertyDto[];
+}
+
+export interface EntityPropertyDto {
+  value: string;
+  bounds: {
+    lowerBound: number;
+    upperBound: number;
+  };
+  isKey: boolean;
+  isReadOnly: boolean;
+  name: string;
+  typeId: string;
+}
+
+export interface OldEntity {
   nodeLabel: string;
   types: string[];
   id: string;

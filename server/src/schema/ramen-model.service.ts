@@ -17,6 +17,10 @@ export class RamenModelService {
     return this.schema.getRegistry().hasNodeType(name);
   }
 
+  getMostSpecificType(names: string[]) {
+    return this.schema.getRegistry().getMostSpecificType(names);
+  }
+
   getAttribute(nodeName: string, paramName: string) {
     const node = this.getNodeType(nodeName);
     return node?.attributes.find((attribute) => attribute.name === paramName);

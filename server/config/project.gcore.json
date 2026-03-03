@@ -98,7 +98,13 @@
       "id": "uC6m0AKeWrw7PhYN",
       "name": "Place",
       "superTypes": ["lW611f30a2ky4276g3l8N:n7Vb2Qx0Lm9P3sT6yK1h"],
-      "attributes": [],
+      "attributes": [
+        {
+          "name": "test",
+          "typeId": "String",
+          "bounds": { "lowerBound": 1, "upperBound": 1 }
+        }
+      ],
       "constraints": [],
       "ext": {}
     },

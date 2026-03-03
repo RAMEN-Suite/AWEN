@@ -3,18 +3,25 @@
     <div class="w-full">
       <span class="text-4xl font-bold"> {{entity().label}} </span>
     </div>
+    <div class="w-full">
+      <div class="flex gap-2">
+        @for (type of entity().types; track $index) {
+        <p-chip class="py-1" [label]="type" />
+        }
+      </div>
+    </div>
 
     <div class="w-full my-4">
       <span class="text-3xl font-bold"> Statements </span>
     </div>
     <div class="w-full flex flex-column gap-4">
-      @for (property of entityPropertiesTableFormat(); track $index) {
+      @for (property of entity().properties; track $index) {
       <div class="w-full flex grid border-gray-300 border-1">
         <div class="col-3 p-3 bg-gray-100">
           <span class="sticky" style="top: 10px">{{property.name}}</span>
         </div>
         <div class="col p-3 flex flex-column gap-3">
-          @if (property.type === 'array' && Array.isArray(property.value)) { @for (value of property.value; track $index) {
+          @if (property.typeId === 'Array' && Array.isArray(property.value)) { @for (value of property.value; track $index) {
           <div class="flex-row w-full">
             <span>{{value}}</span>
           </div>

@@ -9,9 +9,9 @@ import { CollectionService } from '../collection/collection.service';
 import { EntityAutocompleteQueryDto } from './dto/entity-autocomplete-query.dto';
 import { RamenModelService } from '../schema/ramen-model.service';
 import { NodeRepository } from '../graph/node-repository.service';
-import { EntityDto } from './dto/entity.dto';
+import { EntityNodeDto } from './dto/entity-node.dto';
 import {
-  transformNodesToEntityDTOs,
+  transformNodesToEntityNodeDTOs,
   transformNodesToNameEntityDTOs,
   transformNodeToEntityDTO,
 } from '../utils/node-transformers';
@@ -21,6 +21,7 @@ import {
   COLLECTION_LABEL_NAME,
   ENTITY_LABEL_NAME,
 } from '../constants';
+import { EntityDto } from './dto/entity.dto';
 
 @Injectable()
 export class EntityService {
@@ -40,19 +41,22 @@ export class EntityService {
         labels: ENTITY_LABEL_NAME,
         keyName: this.model.getNodeKeyField(ENTITY_LABEL_NAME),
       });
-
     if (!entityNode) return undefined;
 
-    return transformNodeToEntityDTO(entityNode);
+    const gNode = this.model.getMostSpecificType(entityNode.labels);
+    if (!gNode) return undefined;
+
+    return transformNodeToEntityDTO(entityNode, gNode);
   }
 
-  async getByProperty(key: string, value: string): Promise<EntityDto[]> {
+  async getByProperty(key: string, value: string): Promise<EntityNodeDto[]> {
     const entityNodes: Node<Integer, Record<string, any>>[] =
       await this.nodes.getByProperty(key, value, {
         labels: ENTITY_LABEL_NAME,
       });
 
-    return transformNodesToEntityDTOs(entityNodes);
+    // TODO: zum normalen DTO
+    return transformNodesToEntityNodeDTOs(entityNodes);
   }
 
   async findNamesByNameNew(name: string): Promise<EntityNamesDto[]> {
@@ -254,13 +258,10 @@ export class EntityService {
     const clause = await this.entityReturnMap(eNode, query);
 
     const { cypher, params } = clause.build();
-    this.logger.debug(cypher);
-    this.logger.debug(params);
 
     const res = await this.neo4jService.read<{
       entity: EntityCollectionNameDto;
     }>(cypher, params);
-    this.logger.debug(res);
     const entities: EntityCollectionNameDto[] = res.records.map((record) => {
       return record.get('entity');
     });

@@ -3,6 +3,7 @@ import { NodeType } from './interfaces/node-type.interface';
 import { RelationType } from './interfaces/relation-type.interface';
 import { DataType } from './interfaces/data-type.interface';
 import { Logger, NotFoundException } from '@nestjs/common';
+import { GAttribute } from './interfaces/g-attribute.interface';
 
 export class ModelRegistry {
   logger = new Logger(ModelRegistry.name);
@@ -35,8 +36,8 @@ export class ModelRegistry {
         this.nodes.set(formatedId, {
           id: formatedId,
           name: c.name,
-          superTypes: c.superTypes || [],
-          attributes: c.attributes || [],
+          superTypes: this.formatSuperTypes(c.superTypes) || [],
+          attributes: this.mergeAttributes(c.attributes, c.superTypes) || [],
         });
       } else if (c.kind === 'GDataType') {
         const formatedId = this.formatId(c.id, model.id);
@@ -51,7 +52,7 @@ export class ModelRegistry {
       const formatedId = this.formatId(r.id, model.id);
       this.relations.set(formatedId, {
         id: formatedId,
-        superTypes: r.superTypes || [],
+        superTypes: this.formatSuperTypes(r.superTypes) || [],
         name: r.name,
         from: {
           ...r.from,
@@ -69,9 +70,7 @@ export class ModelRegistry {
     const node = this.getNodeType(name);
     if (!node) return undefined;
 
-    return Array.from(this.nodes.values()).filter((n) =>
-      node.superTypes.includes(n.id),
-    );
+    return this.allNodes.filter((n) => node.superTypes.has(n.id));
   }
 
   getNodeType(name: string) {
@@ -108,7 +107,7 @@ export class ModelRegistry {
       const node = this.getNodeType(cur);
       if (!node) continue;
 
-      for (const stRef of node.superTypes ?? []) {
+      for (const stRef of node.superTypes.keys() ?? []) {
         const stName = this.resolveNodeNameFromRef(stRef);
         if (!stName) continue;
         if (stName === baseName) return true;
@@ -119,26 +118,23 @@ export class ModelRegistry {
   }
 
   getNodeKeyField(typeName: string): string {
-    const visited = new Set<string>();
-    const stack = [typeName];
+    const type = this.getNodeType(typeName);
 
-    while (stack.length) {
-      const cur = stack.pop()!;
-      if (visited.has(cur)) continue;
-      visited.add(cur);
-
-      const node = this.getNodeType(cur);
-      if (!node) continue;
-
-      const key = node.attributes.find((a) => a.isKey)?.name;
-      if (key) return key;
-
-      for (const stRef of node.superTypes ?? []) {
-        const stName = this.resolveNodeNameFromRef(stRef);
-        if (stName) stack.push(stName);
-      }
+    if (!type) {
+      throw new NotFoundException(`Could not find the NodeType "${typeName}"`);
     }
-    throw new NotFoundException(`Could not find a key field for "${typeName}"`);
+    const key = type.attributes.find((attribute) => attribute.isKey);
+    if (!key) {
+      this.logger.debug(type);
+      throw new NotFoundException(
+        `Could not find a key field for "${typeName}"`,
+      );
+    }
+    return key.name;
+  }
+
+  getSubNodes(name: string) {
+    return this.allNodes.filter((n) => this.isSubtypeOf(n.name, name));
   }
 
   /** Alle Subtypen (z.B. Collection o. Entity */
@@ -146,6 +142,24 @@ export class ModelRegistry {
     return this.allNodes
       .map((n) => n.name)
       .filter((n) => this.isSubtypeOf(n, name));
+  }
+
+  getMostSpecificType(names: string[]): NodeType | undefined {
+    let type: NodeType | undefined = undefined;
+    for (const node of this.allNodes) {
+      if (!names.includes(node.name)) {
+        continue;
+      }
+      if (!type) {
+        type = node;
+        this.logger.debug('Setting ', type);
+      }
+      if (node.superTypes.size > type.superTypes.size) {
+        type = node;
+        this.logger.debug('Setting ', type);
+      }
+    }
+    return type;
   }
 
   /**
@@ -217,5 +231,35 @@ export class ModelRegistry {
 
   private formatId(id: string, modelId: string) {
     return `${modelId}:${id}`;
+  }
+
+  private formatSuperTypes(typeIds: string[]) {
+    const superTypes = new Map<string, string>();
+    typeIds.forEach((typeId) => {
+      const node = this.nodes.get(typeId);
+      if (!node) {
+        return;
+      }
+      superTypes.set(typeId, node.name);
+    });
+    return superTypes;
+  }
+
+  private mergeAttributes(attributes: GAttribute[], superTypes: string[]) {
+    const mergedAttributes: GAttribute[] = [...attributes.reverse()];
+    superTypes.forEach((typeId) => {
+      const node = this.nodes.get(typeId);
+      if (node) {
+        node.attributes.forEach((a) => {
+          const exists = mergedAttributes.find((existingAttribute) => {
+            return existingAttribute.name === a.name;
+          });
+          if (!exists) {
+            mergedAttributes.push(a);
+          }
+        });
+      }
+    });
+    return mergedAttributes.reverse();
   }
 }
