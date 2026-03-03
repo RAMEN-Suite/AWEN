@@ -123,20 +123,14 @@ export class ModelRegistry {
     return false;
   }
 
-  getNodeKeyField(typeName: string): string {
+  getNodeKeyField(typeName: string) {
     const type = this.getNodeType(typeName);
 
     if (!type) {
       throw new NotFoundException(`Could not find the NodeType "${typeName}"`);
     }
     const key = type.attributes.find((attribute) => attribute.isKey);
-    if (!key) {
-      this.logger.debug(type);
-      throw new NotFoundException(
-        `Could not find a key field for "${typeName}"`,
-      );
-    }
-    return key.name;
+    return key?.name;
   }
 
   getSubNodes(name: string) {

@@ -20,6 +20,7 @@ import {
   ANNOTATION_LABEL_NAME,
   COLLECTION_LABEL_NAME,
   ENTITY_LABEL_NAME,
+  ENTITY_NAME_PROPERTY,
 } from '../constants';
 import { EntityDto } from './dto/entity.dto';
 
@@ -27,19 +28,23 @@ import { EntityDto } from './dto/entity.dto';
 export class EntityService {
   logger = new Logger(EntityService.name);
 
+  ENTITY_KEY_PROPERTY!: string;
+
   constructor(
     private readonly neo4jService: Neo4jService,
     private readonly guidelinesService: GuidelinesService,
     private readonly collectionService: CollectionService,
     private readonly model: RamenModelService,
     private readonly nodes: NodeRepository,
-  ) {}
+  ) {
+    this.ENTITY_KEY_PROPERTY = this.model.getNodeKeyField(ENTITY_LABEL_NAME);
+  }
 
   async getById(id: string): Promise<EntityDto | undefined> {
     const entityNode: Node<Integer, Record<string, any>> | undefined =
       await this.nodes.getById(id, {
         labels: ENTITY_LABEL_NAME,
-        keyName: this.model.getNodeKeyField(ENTITY_LABEL_NAME),
+        keyName: this.ENTITY_KEY_PROPERTY,
       });
     if (!entityNode) return undefined;
 
@@ -65,13 +70,8 @@ export class EntityService {
       fulltextIndexes.search,
       name,
     );
-    const id = this.model.getNodeKeyField(ENTITY_LABEL_NAME);
     const label = this.model.getAttribute(ENTITY_LABEL_NAME, 'label');
 
-    if (!id) {
-      this.logger.error('There is no id field for entity nodes.');
-      throw new Error('There is no id field for entity nodes.');
-    }
     if (!label) {
       this.logger.error('There is no param named "Label" for entity nodes."');
       throw new Error('There is no param named "Label" for entity nodes."');
@@ -79,7 +79,7 @@ export class EntityService {
     return transformNodesToNameEntityDTOs(
       results.map((r) => r.node),
       label.name,
-      id,
+      this.ENTITY_KEY_PROPERTY,
     );
   }
 
@@ -87,8 +87,6 @@ export class EntityService {
     name: string,
     queryParams: EntityAutocompleteQueryDto,
   ): Promise<EntityNamesDto[]> {
-    const guidelines = await this.guidelinesService.get();
-
     const eNode = new Cypher.Node();
     const score = new Cypher.Variable();
 
@@ -100,7 +98,7 @@ export class EntityService {
       queryParams.collectionFilter &&
       Object.keys(queryParams.collectionFilter).length > 0
     ) {
-      collPattern = await this.addFilterByCollection(
+      collPattern = this.addFilterByCollection(
         eNode,
         queryParams.collectionFilter,
       );
@@ -137,8 +135,8 @@ export class EntityService {
 
     const { cypher, params } = query
       .return(
-        [eNode.property(guidelines.entity.nameLabel), 'label'],
-        [eNode.property(guidelines.entity.idLabel), 'id'],
+        [eNode.property(ENTITY_NAME_PROPERTY), 'label'],
+        [eNode.property(this.ENTITY_KEY_PROPERTY), 'id'],
       )
       .build();
 
@@ -174,17 +172,15 @@ export class EntityService {
   }
 
   private async entityReturnMap(eNode: Cypher.Node, query: Cypher.With) {
-    const guidelines = await this.guidelinesService.get();
-
     const l = new Cypher.Variable();
     const typesExpr = new Cypher.ListComprehension(l)
       .in(Cypher.labels(eNode))
-      .where(Cypher.neq(l, new Cypher.Literal(guidelines.entity.metaType)));
+      .where(Cypher.neq(l, new Cypher.Literal(ENTITY_LABEL_NAME)));
 
     const propsExpr = Cypher.properties(eNode);
     const keysExpr = new Cypher.List([
-      new Cypher.Literal(guidelines.entity.idLabel),
-      new Cypher.Literal(guidelines.entity.nameLabel),
+      new Cypher.Literal(this.ENTITY_KEY_PROPERTY),
+      new Cypher.Literal(ENTITY_NAME_PROPERTY),
     ]);
     const cleanedProps = new Cypher.Function('apoc.map.removeKeys', [
       propsExpr,
@@ -195,10 +191,10 @@ export class EntityService {
       await this.collectionService.getCollectionsOfEntityNode(eNode, query);
 
     const returnMap = new Cypher.Map({
-      nodeLabel: new Cypher.Literal(guidelines.entity.metaType),
+      nodeLabel: new Cypher.Literal(ENTITY_LABEL_NAME),
       types: typesExpr,
-      label: eNode.property(guidelines.entity.nameLabel),
-      id: eNode.property(guidelines.entity.idLabel),
+      label: eNode.property(ENTITY_NAME_PROPERTY),
+      id: eNode.property(this.ENTITY_KEY_PROPERTY),
       properties: cleanedProps,
       collections: collections,
     });
@@ -217,7 +213,7 @@ export class EntityService {
       queryParams.collectionFilter &&
       Object.keys(queryParams.collectionFilter).length > 0
     ) {
-      collPattern = await this.addFilterByCollection(
+      collPattern = this.addFilterByCollection(
         eNode,
         queryParams.collectionFilter,
       );
@@ -270,11 +266,10 @@ export class EntityService {
     return entities;
   }
 
-  private async addFilterByCollection(
+  private addFilterByCollection(
     eNode: Cypher.Node,
     collectionFilters: Record<string, string[]>,
   ) {
-    const guidelines = await this.guidelinesService.get();
     const collectionChains = this.model.getCollectionChains();
     this.logger.debug(collectionChains);
     const collectionChain = collectionChains.find((chain) => {
@@ -290,8 +285,6 @@ export class EntityService {
       throw new Error("CollectionChain doesn't exist");
     }
 
-    const filterableCollections =
-      guidelines.scenarios.findByCollection.filterable;
     const colIdLabel = this.model.getNodeKeyField(COLLECTION_LABEL_NAME);
 
     const aNode = new Cypher.Node();
@@ -327,7 +320,7 @@ export class EntityService {
       collections.set(col, collection);
     });
 
-    filterableCollections.forEach((collection) => {
+    for (const collection in collectionFilters) {
       const col = collections.get(collection)!;
       const colIDs = collectionFilters[collection];
 
@@ -336,7 +329,7 @@ export class EntityService {
           Cypher.in(col.property(colIdLabel), new Cypher.Literal(colIDs)),
         );
       }
-    });
+    }
 
     return newPattern as unknown as Pattern;
   }
