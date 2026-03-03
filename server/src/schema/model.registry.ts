@@ -11,6 +11,7 @@ export class ModelRegistry {
   private dataTypes = new Map<string, DataType>();
   private nodes = new Map<string, NodeType>();
   private relations = new Map<string, RelationType>();
+  private _collectionChains!: string[][];
 
   private get allDataTypes(): Array<DataType> {
     return Array.from(this.dataTypes.values());
@@ -24,9 +25,14 @@ export class ModelRegistry {
     return Array.from(this.relations.values());
   }
 
+  get collectionChains() {
+    return [...this._collectionChains];
+  }
+
   constructor(ramen: GModel, profile: GModel) {
     this.register(ramen);
     this.register(profile);
+    this._collectionChains = this.getCollectionChains();
   }
 
   private register(model: GModel) {
@@ -169,9 +175,8 @@ export class ModelRegistry {
    *
    * Ergebnis z.B.: [ ["Department","Volume","Regesta"], ... ]
    */
-  getCollectionChains(): string[][] {
+  private getCollectionChains(): string[][] {
     const partOfRelations = this.getRelationTypesByName('PART_OF');
-    this.logger.debug(partOfRelations);
     const childrenByParent = new Map<string, Set<string>>();
     const parentsByChild = new Map<string, Set<string>>();
 

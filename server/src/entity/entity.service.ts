@@ -234,6 +234,7 @@ export class EntityService {
     query = await this.addOrderByProperty(query, eNode, [[score, 'ASC']]);
 
     if (typePatten) {
+      this.logger.debug('typePatten', typePatten.toString());
       query = query
         .with(eNode, score)
         .match(typePatten)
@@ -275,7 +276,7 @@ export class EntityService {
   ) {
     const guidelines = await this.guidelinesService.get();
     const collectionChains = this.model.getCollectionChains();
-
+    this.logger.debug(collectionChains);
     const collectionChain = collectionChains.find((chain) => {
       let match = false;
       Object.keys(collectionFilters).forEach((key) => {
@@ -308,7 +309,7 @@ export class EntityService {
       Cypher.Node
     >();
 
-    collectionChain.forEach((col, index) => {
+    collectionChain.toReversed().forEach((col, index) => {
       const collection = new Cypher.Node();
       const partOf = new Cypher.Relationship();
 
@@ -341,6 +342,14 @@ export class EntityService {
   }
 
   private addFilterByTypes(eNode: Cypher.Node, types: string[]) {
+    const modelTypes = this.model.getSubtypes(ENTITY_LABEL_NAME);
+
+    types.forEach((type) => {
+      if (!modelTypes.includes(type)) {
+        throw new Error(`Unsupported type ${type}`);
+      }
+    });
+
     const labelConditions = types.map((type) => eNode.hasLabel(type));
     const orCondition = Cypher.or(...labelConditions);
 

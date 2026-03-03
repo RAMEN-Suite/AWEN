@@ -31,6 +31,10 @@ export class RamenModelService {
   }
 
   getCollectionChains() {
-    return this.schema.getRegistry().getCollectionChains();
+    return this.schema.getRegistry().collectionChains;
+  }
+
+  getSubtypes(name: string) {
+    return this.schema.getRegistry().getTypes(name);
   }
 }
