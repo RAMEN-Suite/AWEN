@@ -23,6 +23,7 @@ import {
   ENTITY_NAME_PROPERTY,
 } from '../constants';
 import { EntityDto } from './dto/entity.dto';
+import { RAMENError } from '../schema/RAMENError';
 
 @Injectable()
 export class EntityService {
@@ -73,8 +74,10 @@ export class EntityService {
     const label = this.model.getAttribute(ENTITY_LABEL_NAME, 'label');
 
     if (!label) {
-      this.logger.error('There is no param named "Label" for entity nodes."');
-      throw new Error('There is no param named "Label" for entity nodes."');
+      this.logger.error('There is no param named "label" for entity nodes."');
+      throw new RAMENError(
+        'There is no param named "label" for entity nodes."',
+      );
     }
     return transformNodesToNameEntityDTOs(
       results.map((r) => r.node),
@@ -282,7 +285,7 @@ export class EntityService {
 
     if (!collectionChain) {
       this.logger.error("CollectionChain doesn't exist");
-      throw new Error("CollectionChain doesn't exist");
+      throw new RAMENError("CollectionChain doesn't exist");
     }
 
     const colIdLabel = this.model.getNodeKeyField(COLLECTION_LABEL_NAME);
@@ -339,7 +342,7 @@ export class EntityService {
 
     types.forEach((type) => {
       if (!modelTypes.includes(type)) {
-        throw new Error(`Unsupported type ${type}`);
+        throw new RAMENError(`Unsupported type ${type}`);
       }
     });
 

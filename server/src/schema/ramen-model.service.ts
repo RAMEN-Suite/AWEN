@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { SchemaLoaderService } from './schema-loader.service';
+import { RAMENError } from './RAMENError';
 
 @Injectable()
 export class RamenModelService {
@@ -31,7 +32,7 @@ export class RamenModelService {
     const key = this.schema.getRegistry().getNodeKeyField(name);
     if (!key) {
       this.logger.error(`There is no id field for ${name} nodes.`);
-      throw new Error(`There is no id field for ${name} nodes.`);
+      throw new RAMENError(`There is no id field for ${name} nodes.`);
     }
     return key;
   }

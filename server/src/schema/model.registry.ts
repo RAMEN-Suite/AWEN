@@ -2,7 +2,7 @@ import { GModel } from './interfaces/g-model.interface';
 import { NodeType } from './interfaces/node-type.interface';
 import { RelationType } from './interfaces/relation-type.interface';
 import { DataType } from './interfaces/data-type.interface';
-import { Logger, NotFoundException } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { GAttribute } from './interfaces/g-attribute.interface';
 
 export class ModelRegistry {
@@ -11,7 +11,7 @@ export class ModelRegistry {
   private dataTypes = new Map<string, DataType>();
   private nodes = new Map<string, NodeType>();
   private relations = new Map<string, RelationType>();
-  private _collectionChains!: string[][];
+  private readonly _collectionChains!: string[][];
 
   private get allDataTypes(): Array<DataType> {
     return Array.from(this.dataTypes.values());
@@ -125,11 +125,7 @@ export class ModelRegistry {
 
   getNodeKeyField(typeName: string) {
     const type = this.getNodeType(typeName);
-
-    if (!type) {
-      throw new NotFoundException(`Could not find the NodeType "${typeName}"`);
-    }
-    const key = type.attributes.find((attribute) => attribute.isKey);
+    const key = type?.attributes.find((attribute) => attribute.isKey);
     return key?.name;
   }
 

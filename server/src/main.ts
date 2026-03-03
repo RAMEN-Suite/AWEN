@@ -3,11 +3,12 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Neo4jExceptionFilter } from './neo4j/neo4j-exception-filter';
+import { RAMENExceptionFilter } from './schema/ramen-exception-filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.useGlobalFilters(new Neo4jExceptionFilter());
+  app.useGlobalFilters(new Neo4jExceptionFilter(), new RAMENExceptionFilter());
   app.setGlobalPrefix(process.env.PREFIX ?? '');
 
   app.enableCors({
