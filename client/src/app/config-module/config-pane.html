@@ -2,3 +2,17 @@
 
 {{ config().collectionChains.join(', ') }} <br />
 {{ config().entityTypes.join(', ') }}
+
+<form [formGroup]="configForm">
+  <div class="card flex justify-center">
+    <p-multiselect
+      formControlName="entityTypes"
+      [options]="configOptions().entityTypes"
+      placeholder="Select which entity types should be available via this application"
+      display="chip"
+      class="w-full md:w-80"
+      [maxSelectedLabels]="10"
+      fluid
+    />
+  </div>
+</form>
