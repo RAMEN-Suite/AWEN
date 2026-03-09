@@ -1,8 +1,11 @@
 <div class="grid justify-content-center">
-  <div class="col-5 mt-5" >
-    <app-filter-pane/>
+  <div class="col-5 mt-5">
+    <app-config-pane />
+  </div>
+  <div class="col-5 mt-5">
+    <app-filter-pane />
   </div>
   <div class="col-12 flex justify-content-center">
-    <app-entity-list [entities]="entities()" [entitiesLoading]="loading()" width="40vw" height="68vh"/>
+    <app-entity-list [entities]="entities()" [entitiesLoading]="loading()" width="40vw" height="68vh" />
   </div>
 </div>

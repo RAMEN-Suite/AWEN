@@ -73,6 +73,11 @@ export interface IGuidelines {
   };
 }
 
+export interface EmConfig {
+  collectionChains: string[][];
+  entityTypes: string[];
+}
+
 export interface IEntity {
   metaType: string;
   types: string[];

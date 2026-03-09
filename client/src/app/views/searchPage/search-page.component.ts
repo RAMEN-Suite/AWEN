@@ -2,10 +2,11 @@ import { Component, inject } from '@angular/core';
 import { FilterPane } from '../../filter-pane/filter-pane';
 import { SearchService } from './search.service';
 import { EntityList } from '../../entity-list/entity-list';
+import { ConfigPane } from '../../config-module/config-pane';
 
 @Component({
   selector: 'app-search-page',
-  imports: [FilterPane, EntityList],
+  imports: [FilterPane, EntityList, ConfigPane],
   providers: [SearchService],
   templateUrl: './search-page.component.html',
 })
