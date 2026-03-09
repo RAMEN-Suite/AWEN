@@ -1,19 +1,10 @@
 import { Component, DestroyRef, effect, inject, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import {
-  AutoCompleteCompleteEvent,
-  AutoCompleteModule,
-  AutoCompleteSelectEvent,
-} from 'primeng/autocomplete';
+import { AutoCompleteCompleteEvent, AutoCompleteModule, AutoCompleteSelectEvent } from 'primeng/autocomplete';
 import { Message } from 'primeng/message';
 import { SearchService } from '../views/searchPage/search.service';
 import { Button } from 'primeng/button';
-import {
-  CollectionName,
-  EntityAutocompleteQuery,
-  EntityNames,
-  EntitySearchQuery,
-} from '../../interfaces';
+import { CollectionName, EntityAutocompleteQuery, EntityNames, EntitySearchQuery } from '../../interfaces';
 import { GuidelinesService } from '../api/guidelines.service';
 import { CollectionService } from '../api/collection.service';
 import { Select } from 'primeng/select';
@@ -22,6 +13,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TypeFilter } from './type-filter/type-filter';
 import { RouterLink } from '@angular/router';
 import { QueryParamsService } from '../utils/query-params.service';
+import { ConfigService } from '../config-module/config.service';
 
 interface CFOption {
   type: string;
@@ -30,15 +22,7 @@ interface CFOption {
 
 @Component({
   selector: 'app-filter-pane',
-  imports: [
-    ReactiveFormsModule,
-    AutoCompleteModule,
-    Message,
-    Button,
-    Select,
-    TypeFilter,
-    RouterLink,
-  ],
+  imports: [ReactiveFormsModule, AutoCompleteModule, Message, Button, Select, TypeFilter, RouterLink],
   templateUrl: './filter-pane.html',
 })
 export class FilterPane implements OnInit {
@@ -47,7 +31,10 @@ export class FilterPane implements OnInit {
   searchService = inject(SearchService);
   collectionService = inject(CollectionService);
   guidelines = inject(GuidelinesService);
+  configService = inject(ConfigService);
   private queryParamService = inject(QueryParamsService);
+
+  config = this.configService.getConfig();
 
   /** gesamte Kette aus Guidelines (vom spezifischsten → generischsten) */
   private collectionChain: string[] = [];
@@ -97,10 +84,7 @@ export class FilterPane implements OnInit {
     // 1) Controls & Options nur für activeChain anlegen
     const optionsInit: CFOption[] = [];
     for (const type of this.activeChain) {
-      this.form.controls.collectionFilter.addControl(
-        type,
-        new FormControl<CollectionName | null>({ value: null, disabled: true }),
-      );
+      this.form.controls.collectionFilter.addControl(type, new FormControl<CollectionName | null>({ value: null, disabled: true }));
       optionsInit.push({ type, values: [] });
     }
     this.collectionFilterOptions.set(optionsInit);
@@ -122,16 +106,13 @@ export class FilterPane implements OnInit {
           distinctUntilChanged(),
         )
         .subscribe(async (idOrNull) => {
-          const value = idOrNull
-            ? (this.form.controls.collectionFilter.get(type)?.value as CollectionName)
-            : null;
+          const value = idOrNull ? (this.form.controls.collectionFilter.get(type)?.value as CollectionName) : null;
           await this.onLevelChanged(idx, value);
         });
     });
 
     // Fill form
-    const queryParamValues: Record<string, never> =
-      await this.queryParamService.readDecodedQueryParams();
+    const queryParamValues: Record<string, never> = await this.queryParamService.readDecodedQueryParams();
     this.fillForm(this.form, queryParamValues);
     if (Object.keys(queryParamValues).length > 0) {
       await this.onSubmit();
@@ -229,9 +210,7 @@ export class FilterPane implements OnInit {
     const cfGroup = this.form.controls.collectionFilter;
 
     // Options leeren
-    const nextOptions = this.collectionFilterOptions().map((o, i) =>
-      i >= startIdx ? { ...o, values: [] } : o,
-    );
+    const nextOptions = this.collectionFilterOptions().map((o, i) => (i >= startIdx ? { ...o, values: [] } : o));
     this.collectionFilterOptions.set(nextOptions);
 
     // Controls zurücksetzen & disablen

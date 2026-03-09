@@ -1,3 +1,10 @@
 <p-toast />
+@if (loaded()) {
 <router-outlet />
+} @else {
+<div class="flex justify-center w-full h-screen">
+  <p-progress-spinner ariaLabel="loading" />
+</div>
+}
+
 <p-scrollTop />
