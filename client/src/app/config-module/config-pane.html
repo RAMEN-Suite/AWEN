@@ -1,18 +1,31 @@
-<p>config-pane works!</p>
-
-{{ config().collectionChains.join(', ') }} <br />
-{{ config().entityTypes.join(', ') }}
-
-<form [formGroup]="configForm">
-  <div class="card flex justify-center">
+<form [formGroup]="configForm" class="flex flex-column gap-2">
+  <p-floatlabel class="w-full" variant="on">
     <p-multiselect
       formControlName="entityTypes"
       [options]="configOptions().entityTypes"
-      placeholder="Select which entity types should be available via this application"
       display="chip"
-      class="w-full md:w-80"
+      id="config_entity_types_ms"
       [maxSelectedLabels]="10"
       fluid
     />
-  </div>
+    <label for="config_entity_types_ms">Entity Types</label>
+    <small>Select which entity types should be available via this application.</small>
+  </p-floatlabel>
+  <p-floatlabel class="" variant="on">
+    <p-multi-select
+      formControlName="collectionChains"
+      [options]="configOptions().collectionChains"
+      class="w-full md:w-80"
+      id="config_collection_chain_ms"
+      fluid
+    >
+      <ng-template let-collectionChain #item>
+        <div class="flex items-center gap-2">
+          <div>{{ displayCollectionChain(collectionChain) }}</div>
+        </div>
+      </ng-template>
+    </p-multi-select>
+    <label for="config_collection_chain_ms">Entity Types</label>
+    <small>Select which collection chain should be filterable.</small>
+  </p-floatlabel>
 </form>

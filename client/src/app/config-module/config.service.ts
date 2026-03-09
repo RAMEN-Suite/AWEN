@@ -14,6 +14,7 @@ export class ConfigService {
 
   private readonly _remoteConfig = signal<EmConfig>({ collectionChains: [], entityTypes: [] });
   private readonly _config = signal<EmConfig>({ collectionChains: [], entityTypes: [] });
+  private readonly _loaded = signal(false);
 
   constructor() {
     this.initConfigStore();
@@ -25,10 +26,15 @@ export class ConfigService {
 
   setConfig(value: EmConfig) {
     this._config.set(value);
+    this.store.saveData(EM_CONFIG_STORE_KEY, value);
   }
 
   getRemoteConfig() {
     return this._remoteConfig.asReadonly();
+  }
+
+  getLoaded() {
+    return this._loaded.asReadonly();
   }
 
   private async initConfigStore() {
@@ -40,6 +46,8 @@ export class ConfigService {
     } else {
       this.setConfig(remoteConfig);
     }
+    this._loaded.set(true);
+    console.log(this._config.asReadonly());
   }
 
   private async getConfigFromRemote(): Promise<EmConfig> {
