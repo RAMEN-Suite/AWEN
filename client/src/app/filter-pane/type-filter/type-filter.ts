@@ -1,42 +1,36 @@
-import { Component, effect, inject, model, OnInit, signal } from '@angular/core';
-import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Checkbox } from 'primeng/checkbox';
+import { Component, computed, effect, inject, model } from '@angular/core';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { TitleCasePipe } from '@angular/common';
+import { Checkbox } from 'primeng/checkbox';
 import { ConfigService } from '../../config-module/config.service';
 
 @Component({
   selector: 'app-type-filter',
-  imports: [Checkbox, ReactiveFormsModule, TitleCasePipe, FormsModule],
+  imports: [Checkbox, ReactiveFormsModule, TitleCasePipe],
   templateUrl: './type-filter.html',
 })
-export class TypeFilter implements OnInit {
+export class TypeFilter {
   private configService = inject(ConfigService);
 
   form = model.required<FormControl<string[]>>();
 
-  protected activeTypes = signal<string[]>([]);
-  protected types = signal<string[]>([]);
+  protected config = this.configService.getConfig();
+  protected types = computed(() => this.config().entityTypes);
 
   constructor() {
     effect(() => {
-      const config = this.configService.getConfig();
-      this.types.set(config().entityTypes);
-      const opts = this.activeTypes();
-      this.form().setValue(opts);
+      const availableTypes = this.types();
+      const current = this.form().value ?? [];
+      const next = current.filter((type) => availableTypes.includes(type));
+
+      if (!this.arraysEqual(current, next)) {
+        this.form().setValue(next, { emitEvent: false });
+      }
     });
   }
 
-  async ngOnInit(): Promise<void> {
-    this.form().valueChanges.subscribe((value) => {
-      if (value !== this.activeTypes()) {
-        for (const val of value) {
-          if (this.types().includes(val)) {
-            this.activeTypes.update((old) => {
-              return [...old, val];
-            });
-          }
-        }
-      }
-    });
+  private arraysEqual(a: string[], b: string[]): boolean {
+    if (a.length !== b.length) return false;
+    return a.every((v, i) => v === b[i]);
   }
 }
