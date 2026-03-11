@@ -3,11 +3,11 @@ import { ConfigService } from './config.service';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MultiSelect } from 'primeng/multiselect';
 import { FloatLabel } from 'primeng/floatlabel';
-import { EmConfig } from '../../interfaces';
+import { Select } from 'primeng/select';
 
 @Component({
   selector: 'app-config-pane',
-  imports: [ReactiveFormsModule, MultiSelect, FloatLabel],
+  imports: [ReactiveFormsModule, MultiSelect, FloatLabel, Select],
   templateUrl: './config-pane.html',
 })
 export class ConfigPane {
@@ -18,7 +18,8 @@ export class ConfigPane {
   loaded = this.configService.getLoaded();
 
   configForm = new FormGroup({
-    collectionChains: new FormControl<string[][]>([[]], { nonNullable: true }),
+    filterableCollections: new FormControl<string[]>({ value: [], disabled: true }, { nonNullable: true }),
+    selectedCollectionChain: new FormControl<string[]>([], { nonNullable: true }),
     entityTypes: new FormControl<string[]>([], { nonNullable: true }),
   });
 
@@ -29,7 +30,8 @@ export class ConfigPane {
 
       this.configForm.patchValue(
         {
-          collectionChains: config.collectionChains,
+          filterableCollections: config.filterableCollections,
+          selectedCollectionChain: config.selectedCollectionChain,
           entityTypes: config.entityTypes,
         },
         { emitEvent: false },
@@ -40,11 +42,18 @@ export class ConfigPane {
       } else {
         this.configForm.disable({ emitEvent: false });
       }
+
+      if (this.configForm.controls.selectedCollectionChain.value.length > 0) {
+        this.configForm.controls.filterableCollections.enable({ emitEvent: false });
+      } else {
+        this.configForm.controls.filterableCollections.disable({ emitEvent: false });
+      }
     });
 
     this.configForm.valueChanges.subscribe((value) => {
       this.configService.setConfig({
-        collectionChains: value.collectionChains ?? [],
+        filterableCollections: value.filterableCollections ?? [],
+        selectedCollectionChain: value.selectedCollectionChain ?? [],
         entityTypes: value.entityTypes ?? [],
       });
     });
@@ -52,9 +61,5 @@ export class ConfigPane {
 
   displayCollectionChain(chain: string[]) {
     return chain.join('-->');
-  }
-
-  applyConfig(config: EmConfig) {
-    this.configService.setConfig(config);
   }
 }

@@ -1,11 +1,10 @@
-import { Component, DestroyRef, effect, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, effect, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AutoCompleteCompleteEvent, AutoCompleteModule, AutoCompleteSelectEvent } from 'primeng/autocomplete';
 import { Message } from 'primeng/message';
 import { SearchService } from '../views/searchPage/search.service';
 import { Button } from 'primeng/button';
 import { CollectionName, EntityAutocompleteQuery, EntityNames, EntitySearchQuery } from '../../interfaces';
-import { GuidelinesService } from '../api/guidelines.service';
 import { CollectionService } from '../api/collection.service';
 import { Select } from 'primeng/select';
 import { distinctUntilChanged, firstValueFrom, map } from 'rxjs';
@@ -25,33 +24,21 @@ interface CFOption {
   imports: [ReactiveFormsModule, AutoCompleteModule, Message, Button, Select, TypeFilter, RouterLink],
   templateUrl: './filter-pane.html',
 })
-export class FilterPane implements OnInit {
+export class FilterPane {
   private destroyRef = inject(DestroyRef);
 
   searchService = inject(SearchService);
   collectionService = inject(CollectionService);
-  guidelines = inject(GuidelinesService);
   configService = inject(ConfigService);
   private queryParamService = inject(QueryParamsService);
 
+  remoteConfig = this.configService.getRemoteConfig();
   config = this.configService.getConfig();
 
   /** gesamte Kette aus Guidelines (vom spezifischsten → generischsten) */
   private collectionChain: string[] = [];
   /** nur filterbare Typen, in UI-Reihenfolge (generisch → spezifisch) */
   private activeChain: string[] = [];
-
-  constructor() {
-    // Enable Controls, sobald Options vorhanden sind
-    effect(() => {
-      const opts = this.collectionFilterOptions();
-      opts.forEach((opt) => {
-        if (opt.values.length > 0) {
-          this.form.controls.collectionFilter.get(opt.type)?.enable({ emitEvent: false });
-        }
-      });
-    });
-  }
 
   form = new FormGroup<{
     label: FormControl<string>;
@@ -70,53 +57,61 @@ export class FilterPane implements OnInit {
   suggestions = signal<EntityNames[]>([]);
   showEmptyMessage = signal<boolean>(false);
 
-  async ngOnInit() {
-    const g = await this.guidelines.get();
-
-    // Guidelines: letzter Eintrag ist generischster → UI startet dort
-    // Also Kette umdrehen, damit Index 0 = generischster Typ ist.
-    this.collectionChain = [...g.scenarios.findByCollection.collectionChain].reverse();
-
-    // Nur die filterbaren Typen zeigen
-    const filterable: string[] = g.scenarios.findByCollection.filterable;
-    this.activeChain = this.collectionChain.filter((t) => filterable.includes(t));
-
-    // 1) Controls & Options nur für activeChain anlegen
-    const optionsInit: CFOption[] = [];
-    for (const type of this.activeChain) {
-      this.form.controls.collectionFilter.addControl(type, new FormControl<CollectionName | null>({ value: null, disabled: true }));
-      optionsInit.push({ type, values: [] });
-    }
-    this.collectionFilterOptions.set(optionsInit);
-
-    // 2) Erstes (generischstes) Select befüllen & enablen
-    if (this.activeChain.length > 0) {
-      await this.loadAndSetOptionsAt(0 /* generischstes Level */);
-      this.enableAt(0, true);
-    }
-
-    // 3) Änderungen kaskadieren – nur für vorhandene Controls
-    this.activeChain.forEach((type, idx) => {
-      const ctrl = this.form.controls.collectionFilter.get(type);
-      if (!ctrl) return;
-      ctrl.valueChanges
-        .pipe(
-          takeUntilDestroyed(this.destroyRef),
-          map((v: CollectionName | null) => v?.id ?? null), // nur id betrachten
-          distinctUntilChanged(),
-        )
-        .subscribe(async (idOrNull) => {
-          const value = idOrNull ? (this.form.controls.collectionFilter.get(type)?.value as CollectionName) : null;
-          await this.onLevelChanged(idx, value);
-        });
+  constructor() {
+    effect(() => {
+      const opts = this.collectionFilterOptions();
+      opts.forEach((opt) => {
+        if (opt.values.length > 0) {
+          this.form.controls.collectionFilter.get(opt.type)?.enable({ emitEvent: false });
+        }
+      });
     });
+    effect(async () => {
+      // Guidelines: letzter Eintrag ist generischster → UI startet dort
+      // Also Kette umdrehen, damit Index 0 = generischster Typ ist.
+      this.collectionChain = this.config().selectedCollectionChain; // [...g.scenarios.findByCollection.collectionChain].reverse();
 
-    // Fill form
-    const queryParamValues: Record<string, never> = await this.queryParamService.readDecodedQueryParams();
-    this.fillForm(this.form, queryParamValues);
-    if (Object.keys(queryParamValues).length > 0) {
-      await this.onSubmit();
-    }
+      // Nur die filterbaren Typen zeigen
+      const filterable: string[] = this.config().filterableCollections; // g.scenarios.findByCollection.filterable;
+      this.activeChain = this.collectionChain.filter((t) => filterable.includes(t));
+
+      // 1) Controls & Options nur für activeChain anlegen
+      const optionsInit: CFOption[] = [];
+      for (const type of this.activeChain) {
+        this.form.controls.collectionFilter.addControl(type, new FormControl<CollectionName | null>({ value: null, disabled: true }));
+        optionsInit.push({ type, values: [] });
+      }
+      this.collectionFilterOptions.set(optionsInit);
+
+      // 2) Erstes (generischstes) Select befüllen & enablen
+      if (this.activeChain.length > 0) {
+        await this.loadAndSetOptionsAt(0 /* generischstes Level */);
+        this.enableAt(0, true);
+      }
+
+      // 3) Änderungen kaskadieren – nur für vorhandene Controls
+      this.activeChain.forEach((type, idx) => {
+        const ctrl = this.form.controls.collectionFilter.get(type);
+        if (!ctrl) return;
+        ctrl.valueChanges
+          .pipe(
+            takeUntilDestroyed(this.destroyRef),
+            map((v: CollectionName | null) => v?.id ?? null), // nur id betrachten
+            distinctUntilChanged(),
+          )
+          .subscribe(async (idOrNull) => {
+            const value = idOrNull ? (this.form.controls.collectionFilter.get(type)?.value as CollectionName) : null;
+            await this.onLevelChanged(idx, value);
+          });
+      });
+
+      // Fill form
+      const queryParamValues: Record<string, never> = await this.queryParamService.readDecodedQueryParams();
+      this.fillForm(this.form, queryParamValues);
+      if (Object.keys(queryParamValues).length > 0) {
+        await this.onSubmit();
+      }
+    });
   }
 
   async autocompleteChanges(e: AutoCompleteCompleteEvent) {

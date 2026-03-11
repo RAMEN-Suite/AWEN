@@ -12,11 +12,11 @@
     <small>Select which entity types should be available via this application.</small>
   </p-floatlabel>
   <p-floatlabel class="" variant="on">
-    <p-multi-select
-      formControlName="collectionChains"
+    <p-select
+      formControlName="selectedCollectionChain"
       [options]="configOptions().collectionChains"
       class="w-full md:w-80"
-      id="config_collection_chain_ms"
+      id="config_collection_chain_s"
       fluid
     >
       <ng-template let-collectionChain #item>
@@ -24,8 +24,22 @@
           <div>{{ displayCollectionChain(collectionChain) }}</div>
         </div>
       </ng-template>
+    </p-select>
+    <label for="config_collection_chain_s">Collection Chain</label>
+    <small>Select which should be the filter collection chain.</small>
+  </p-floatlabel>
+  <p-floatlabel class="" variant="on">
+    <p-multi-select
+      formControlName="filterableCollections"
+      [options]="configForm.controls.selectedCollectionChain.value"
+      class="w-full md:w-80"
+      display="chip"
+      id="config_collection_chain_ms"
+      [maxSelectedLabels]="4"
+      fluid
+    >
     </p-multi-select>
-    <label for="config_collection_chain_ms">Entity Types</label>
-    <small>Select which collection chain should be filterable.</small>
+    <label for="config_collection_chain_ms">Collection Types</label>
+    <small>Select which collections are filterable.</small>
   </p-floatlabel>
 </form>

@@ -1,6 +1,7 @@
 
 # Use the official Node.js image as the base image
 FROM node:24-alpine AS base
+ARG APP_VERSION=0.0.0
 
 # Dev
 FROM base AS dev
@@ -12,6 +13,8 @@ COPY package*.json ./
 RUN npm install
 # Copy the rest of the application files
 COPY . .
+
+ENV APP_VERSION=$APP_VERSION
 ENV NODE_ENV=development
 # Expose the application port
 EXPOSE 3000

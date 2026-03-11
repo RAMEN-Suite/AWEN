@@ -73,8 +73,14 @@ export interface IGuidelines {
   };
 }
 
-export interface EmConfig {
+export interface EmConfigRemote {
   collectionChains: string[][];
+  entityTypes: string[];
+}
+
+export interface EmConfig {
+  filterableCollections: string[];
+  selectedCollectionChain: string[];
   entityTypes: string[];
 }
 

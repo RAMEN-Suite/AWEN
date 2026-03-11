@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { EmConfig, IGuidelines } from '../../interfaces';
+import { EmConfigRemote, IGuidelines } from '../../interfaces';
 import { catchError, firstValueFrom } from 'rxjs';
 import { MessageService } from 'primeng/api';
 
@@ -25,7 +25,7 @@ export class GuidelinesService {
   }
 
   getConfig() {
-    const temp = this.http.get<EmConfig>('api/guidelines/config').pipe(
+    const temp = this.http.get<EmConfigRemote>('api/guidelines/config').pipe(
       catchError((err) => {
         this.messageService.add({
           severity: 'error',
