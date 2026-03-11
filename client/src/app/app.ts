@@ -19,6 +19,36 @@ import { HealthService } from './api/health.service';
       bottom: 16px;
       right: 16px;
     }
+    :host {
+      display: block;
+      height: 100%;
+    }
+
+    .app-shell {
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .topbar {
+      flex: 0 0 auto;
+    }
+
+    .app-content {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .loading-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
   `,
   templateUrl: './app.html',
 })

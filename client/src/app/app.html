@@ -1,35 +1,40 @@
 <p-toast />
-@if (loaded()) {
-<router-outlet />
-} @else {
-<div class="flex justify-center w-full h-screen">
-  <p-progress-spinner ariaLabel="loading" />
+
+<div class="app-shell">
+  <div class="app-content">
+    @if (loaded()) {
+    <router-outlet />
+    } @else {
+    <div class="loading-wrapper">
+      <p-progress-spinner ariaLabel="loading" />
+    </div>
+    }
+  </div>
 </div>
-}
-<div class="configMenuBar">
-  <p-menubar>
-    <ng-template #end>
-      <div class="flex items-center gap-2">
-        <a
-          pButton
-          class="no-underline h-3rem"
-          severity="secondary"
-          outlined
-          [href]="'https://github.com/THM-Graphs/entity-manager'"
-          target="_blank"
-        >
-          <div pButtonLabel class="flex flex-column justify-content-start text-left gap-1">
-            <span>Entity Manager</span>
-            <small>Version {{ version() }}</small>
-          </div>
-        </a>
-      </div>
-    </ng-template>
-    <ng-template #start>
-      <div class="flex items-center gap-2">
-        <p-button class="h-3rem" severity="secondary" icon="pi pi-cog" size="large" outlined [routerLink]="['config']" />
-      </div>
-    </ng-template>
-  </p-menubar>
-</div>
+
+<p-menubar class="configMenuBar">
+  <ng-template #start>
+    <div class="flex items-center gap-2">
+      <p-button class="h-3rem" severity="secondary" icon="pi pi-cog" size="large" outlined [routerLink]="['config']" />
+    </div>
+  </ng-template>
+
+  <ng-template #end>
+    <div class="flex items-center gap-2">
+      <a
+        pButton
+        class="no-underline h-3rem"
+        severity="secondary"
+        outlined
+        [href]="'https://github.com/THM-Graphs/entity-manager'"
+        target="_blank"
+      >
+        <div pButtonLabel class="flex flex-column justify-content-start text-left gap-1">
+          <span>Entity Manager</span>
+          <small>Version {{ version() }}</small>
+        </div>
+      </a>
+    </div>
+  </ng-template>
+</p-menubar>
 <p-scrollTop />
