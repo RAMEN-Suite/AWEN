@@ -30,6 +30,12 @@ services:
         - action: rebuild
           path: ./server/package.json
           target: /app/package.json
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3000/api/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
 
   frontend:
@@ -53,6 +59,7 @@ services:
         - action: rebuild
           path: ./client/package.json
           target: /app/package.json
+
 
   neo4j:
     container_name: neo4j
