@@ -7,5 +7,6 @@ import { CollectionService } from '../collection/collection.service';
 @Module({
   imports: [SchemaModule, GraphModule],
   providers: [AnnotationService, CollectionService],
+  exports: [AnnotationService],
 })
 export class AnnotationModule {}

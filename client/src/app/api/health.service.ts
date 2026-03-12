@@ -18,7 +18,7 @@ export class HealthService {
   }
 
   private async loadStatus() {
-    const temp = this.http.get<{ version: string; healthy: boolean }>('api/health').pipe(
+    const temp = this.http.get<{ version: string; healthy: boolean }>('/api/health').pipe(
       catchError((err) => {
         this.messageService.add({
           severity: 'error',

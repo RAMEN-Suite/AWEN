@@ -44,7 +44,9 @@ export class AnnotationService {
         [this.ENTITY_KEY_PROPERTY]: new Cypher.Param(entityId),
       },
     })
-      .related()
+      .related({
+        direction: 'undirected',
+      })
       .to(aNode, {
         labels: ANNOTATION_LABEL_NAME,
       });

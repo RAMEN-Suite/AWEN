@@ -12,7 +12,7 @@ export class GuidelinesService {
   private readonly messageService = inject(MessageService);
 
   get() {
-    const temp = this.http.get<IGuidelines>('api/guidelines').pipe(
+    const temp = this.http.get<IGuidelines>('/api/guidelines').pipe(
       catchError((err) => {
         this.messageService.add({
           severity: 'error',
@@ -25,7 +25,7 @@ export class GuidelinesService {
   }
 
   getConfig() {
-    const temp = this.http.get<EmConfigRemote>('api/guidelines/config').pipe(
+    const temp = this.http.get<EmConfigRemote>('/api/guidelines/config').pipe(
       catchError((err) => {
         this.messageService.add({
           severity: 'error',

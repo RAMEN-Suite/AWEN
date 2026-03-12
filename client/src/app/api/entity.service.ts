@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { OldEntity, EntityAutocompleteQuery, EntityNames, EntitySearchQuery, Entity } from '../../interfaces';
+import { OldEntity, EntityAutocompleteQuery, EntityNames, EntitySearchQuery, Entity, Annotation } from '../../interfaces';
 import { catchError, firstValueFrom, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { QueryParamsService } from '../utils/query-params.service';
@@ -62,5 +62,18 @@ export class EntityService {
         }),
       );
     return firstValueFrom(temp);
+  }
+
+  async getAnnotationsOf(entityId: string) {
+    const res = this.http.get<Annotation[]>(`/api/entity/${entityId}/annotations`).pipe(
+      catchError((err) => {
+        this.messageService.add({
+          severity: 'error',
+          detail: `Error while loading entity with id ${entityId}. Reload the page, or try again later.`,
+        });
+        throw err;
+      }),
+    );
+    return firstValueFrom(res);
   }
 }

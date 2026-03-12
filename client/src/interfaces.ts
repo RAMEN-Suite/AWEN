@@ -16,6 +16,24 @@ export interface EntityPropertyDto {
   typeId: string;
 }
 
+export interface Annotation {
+  type: string;
+  types: string[];
+  properties: AnnotationPropertyDto[];
+}
+
+export interface AnnotationPropertyDto {
+  value: string;
+  bounds: {
+    lowerBound: number;
+    upperBound: number;
+  };
+  isKey: boolean;
+  isReadOnly: boolean;
+  name: string;
+  typeId: string;
+}
+
 export interface OldEntity {
   nodeLabel: string;
   types: string[];
