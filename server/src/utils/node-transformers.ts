@@ -1,10 +1,17 @@
 import { Integer, Node } from 'neo4j-driver';
 import { EntityNodeDto } from '../entity/dto/entity-node.dto';
-import { ENTITY_LABEL_NAME } from '../constants';
+import {
+  ANNOTATION_TYPE_NAME,
+  ENTITY_LABEL_NAME,
+  ENTITY_NAME_PROPERTY,
+} from '../constants';
 import { EntityNamesDto } from '../entity/dto/entity-names.dto';
 import { EntityDto } from '../entity/dto/entity.dto';
 import { EntityPropertyDto } from '../entity/dto/entity-property.dto';
 import { NodeType } from '../schema/interfaces/node-type.interface';
+import { AnnotationDto } from '../annotation/dto/annotation.dto';
+import { AnnotationPropertyDto } from '../annotation/dto/annotation-property.dto';
+import { RAMENError } from '../schema/RAMENError';
 
 export const transformNodeToEntityNodeDTO = (
   node: Node<Integer, Record<string, any>>,
@@ -55,8 +62,8 @@ export const transformNodeToEntityDTO = (
   types.push(gNode.name);
 
   gNode.attributes.forEach((attribute) => {
-    if (attribute.name === 'label') {
-      label = node.properties['label'] as string | undefined;
+    if (attribute.name === ENTITY_NAME_PROPERTY) {
+      label = node.properties[ENTITY_NAME_PROPERTY] as string | undefined;
     } else if (attribute.name in node.properties) {
       props.push(
         new EntityPropertyDto({
@@ -96,5 +103,62 @@ export const transformNodesToEntityDTOs = (
 ): EntityDto[] => {
   return nodes.map((node) => {
     return transformNodeToEntityDTO(node, gNode);
+  });
+};
+
+export const transformNodeToAnnotationDTO = (
+  node: Node<Integer, Record<string, any>>,
+  gNode: NodeType,
+): AnnotationDto => {
+  let type: string | undefined;
+  const props: AnnotationPropertyDto[] = [];
+
+  const types = node.labels.filter((l) => {
+    return Array.from(gNode.superTypes.values()).includes(l);
+  });
+  types.push(gNode.name);
+
+  gNode.attributes.forEach((attribute) => {
+    if (attribute.name === ANNOTATION_TYPE_NAME) {
+      type = node.properties[ANNOTATION_TYPE_NAME] as string | undefined;
+    } else if (attribute.name in node.properties) {
+      props.push(
+        new AnnotationPropertyDto({
+          ...attribute,
+          isKey: attribute.isKey ?? false,
+          isReadOnly: attribute.isKey ?? false,
+          value: node.properties[attribute.name],
+        }),
+      );
+    } else {
+      props.push(
+        new AnnotationPropertyDto({
+          ...attribute,
+          isKey: attribute.isKey ?? false,
+          isReadOnly: attribute.isKey ?? false,
+          value: '',
+        }),
+      );
+    }
+  });
+
+  if (!type) {
+    // TODO: richtiges error handling
+    throw new RAMENError();
+  }
+
+  return new AnnotationDto({
+    type: type,
+    types: types,
+    properties: props,
+  });
+};
+
+export const transformNodesToAnnotationDTOs = (
+  nodes: Node<Integer, Record<string, any>>[],
+  gNode: NodeType,
+): AnnotationDto[] => {
+  return nodes.map((node) => {
+    return transformNodeToAnnotationDTO(node, gNode);
   });
 };

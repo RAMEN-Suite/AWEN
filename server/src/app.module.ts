@@ -8,6 +8,7 @@ import { Neo4jScheme } from './neo4j/neo4j-config.interface';
 import { SchemaModule } from './schema/schema.module';
 import { GraphModule } from './graph/graph.module';
 import { HealthController } from './health/health.controller';
+import { AnnotationModule } from './annotation/annotation.module';
 
 @Module({
   imports: [
@@ -31,7 +32,9 @@ import { HealthController } from './health/health.controller';
     CollectionModule,
     SchemaModule,
     GraphModule,
+    AnnotationModule,
   ],
   controllers: [HealthController],
+  providers: [],
 })
 export class AppModule {}

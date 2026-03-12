@@ -16,10 +16,15 @@ import { ApiResponse } from '@nestjs/swagger';
 import { EntityCollectionNameDto } from './dto/entity-collection-name.dto';
 import { EntityAutocompleteQueryDto } from './dto/entity-autocomplete-query.dto';
 import { EntityDto } from './dto/entity.dto';
+import { AnnotationService } from '../annotation/annotation.service';
+import { AnnotationDto } from '../annotation/dto/annotation.dto';
 
 @Controller('entity')
 export class EntityController {
-  constructor(private readonly entityService: EntityService) {}
+  constructor(
+    private readonly entityService: EntityService,
+    private readonly annotationService: AnnotationService,
+  ) {}
 
   @ApiResponse({ type: [OldEntityDto] })
   @Get('')
@@ -49,6 +54,19 @@ export class EntityController {
     }
 
     return entity;
+  }
+
+  @ApiResponse({ type: [AnnotationDto] })
+  @Get(':id/annotations')
+  async getAnnotationsOfEntity(
+    @Param() params: IdDto,
+  ): Promise<AnnotationDto[]> {
+    const { id } = params;
+
+    const annotations: AnnotationDto[] =
+      await this.annotationService.getAnnotationsOfEntity(id);
+
+    return annotations;
   }
 
   @ApiResponse({ type: [EntityNamesDto] })
