@@ -69,6 +69,19 @@ export class EntityController {
     return annotations;
   }
 
+  @ApiResponse({ type: [AnnotationDto] })
+  @Get(':id/annotations/content')
+  async getAnnotationsWithContentOfEntity(
+    @Param() params: IdDto,
+  ): Promise<AnnotationDto[]> {
+    const { id } = params;
+
+    const annotations: AnnotationDto[] =
+      await this.annotationService.getAnnotationsOfEntity(id);
+
+    return annotations;
+  }
+
   @ApiResponse({ type: [EntityNamesDto] })
   @Get('auto-complete/:label')
   async getAutoComplete(

@@ -73,4 +73,59 @@ export class AnnotationService {
       })
       .filter((annotation) => !!annotation);
   }
+
+  async getAnnotationsWithReferencesOfEntity(entityId: string) {
+    const eNode = new Cypher.Node();
+    const aNode = new Cypher.Node();
+    const conectedEntityNode = new Cypher.Node();
+    const conectedContentNode = new Cypher.Node();
+    const conectedCollectionNode = new Cypher.Node();
+
+    const searchPattern = new Cypher.Pattern(eNode, {
+      labels: ENTITY_LABEL_NAME,
+      properties: {
+        [this.ENTITY_KEY_PROPERTY]: new Cypher.Param(entityId),
+      },
+    })
+      .related({
+        direction: 'undirected',
+      })
+      .to(aNode, {
+        labels: ANNOTATION_LABEL_NAME,
+      });
+
+    // TODO: Optional patterns
+    const optionalEntityPattern = new Cypher.Pattern();
+    const optionalContentPattern = new Cypher.Pattern();
+    const optionalCollectionPattern = new Cypher.Pattern();
+
+    const clause = new Cypher.Match(searchPattern)
+      .optionalMatch(optionalEntityPattern)
+      .optionalMatch(optionalContentPattern)
+      .optionalMatch(optionalCollectionPattern)
+      .return(
+        [aNode, 'annotation'],
+        [conectedEntityNode, 'x'], // TODO: ordentliche return map für das ganze
+        [conectedContentNode, 'y'],
+        [conectedCollectionNode, 'z'],
+      );
+
+    const { cypher, params } = clause.build();
+
+    const res = await this.neo4jService.read<{
+      annotation: Node<Integer, Record<string, any>>;
+    }>(cypher, params);
+    const annotations = res.records.map((record) => {
+      return record.get('annotation');
+    });
+
+    return annotations
+      .map((annotation) => {
+        const gNode = this.model.getMostSpecificType(annotation.labels);
+        if (gNode) {
+          return transformNodeToAnnotationDTO(annotation, gNode);
+        }
+      })
+      .filter((annotation) => !!annotation);
+  }
 }

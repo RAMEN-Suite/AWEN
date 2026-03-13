@@ -38,7 +38,8 @@ import { HealthService } from './api/health.service';
     .app-content {
       flex: 1 1 auto;
       min-height: 0;
-      overflow: hidden;
+      overflow-y: scroll;
+      overflow-x: hidden;
       display: flex;
       flex-direction: column;
     }

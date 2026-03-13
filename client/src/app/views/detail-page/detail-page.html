@@ -12,7 +12,7 @@
     </div>
 
     <div class="w-full my-4">
-      <span class="text-3xl font-bold"> Statements </span>
+      <span class="text-3xl font-bold"> Meta </span>
     </div>
     <div class="w-full flex flex-column gap-4">
       @for (property of entity().properties; track $index) {
@@ -28,6 +28,38 @@
           } } @else {
           <div class="flex-row w-full">
             <span>{{property.value}}</span>
+          </div>
+          }
+        </div>
+      </div>
+      }
+    </div>
+    <div class="w-full my-4">
+      <span class="text-3xl font-bold"> Statements </span>
+    </div>
+    <div class="w-full flex flex-column gap-4">
+      @for (annotation of annotations(); track $index) {
+      <div class="w-full flex grid border-gray-300 border-1">
+        <div class="col-3 p-3 bg-gray-100">
+          <span class="sticky" style="top: 10px">{{annotation.type}}</span>
+        </div>
+        <div class="col p-3 flex flex-column gap-3">
+          @for (property of annotation.properties; track $index) {
+          <div class="w-full flex grid border-gray-300 border-1">
+            <div class="col-3 p-3 bg-gray-100">
+              <span class="sticky" style="top: 10px">{{property.name}}</span>
+            </div>
+            <div class="col p-3 flex flex-column gap-3">
+              @if (property.typeId === 'Array' && Array.isArray(property.value)) { @for (value of property.value; track $index) {
+              <div class="flex-row w-full">
+                <span>{{value}}</span>
+              </div>
+              } } @else {
+              <div class="flex-row w-full">
+                <span>{{property.value}}</span>
+              </div>
+              }
+            </div>
           </div>
           }
         </div>
