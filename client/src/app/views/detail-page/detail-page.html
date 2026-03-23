@@ -44,21 +44,22 @@
           <span class="sticky" style="top: 10px">{{annotation.type}}</span>
         </div>
         <div class="col p-3 flex flex-column gap-3">
-          @for (property of annotation.properties; track $index) {
+          @for (node of annotation.connectedNodes; track $index) {
           <div class="w-full flex grid border-gray-300 border-1">
             <div class="col-3 p-3 bg-gray-100">
-              <span class="sticky" style="top: 10px">{{property.name}}</span>
+              <span class="sticky" style="top: 10px">{{ node.types }}</span>
             </div>
             <div class="col p-3 flex flex-column gap-3">
-              @if (property.typeId === 'Array' && Array.isArray(property.value)) { @for (value of property.value; track $index) {
-              <div class="flex-row w-full">
-                <span>{{value}}</span>
-              </div>
-              } } @else {
-              <div class="flex-row w-full">
-                <span>{{property.value}}</span>
-              </div>
-              }
+              ToDo
+              <!--              @if (property.typeId === 'Array' && Array.isArray(property.value)) { @for (value of property.value; track $index) {-->
+              <!--              <div class="flex-row w-full">-->
+              <!--                <span>{{value}}</span>-->
+              <!--              </div>-->
+              <!--              } } @else {-->
+              <!--              <div class="flex-row w-full">-->
+              <!--                <span>{{property.value}}</span>-->
+              <!--              </div>-->
+              <!--              }-->
             </div>
           </div>
           }

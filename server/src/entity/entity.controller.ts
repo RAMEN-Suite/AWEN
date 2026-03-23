@@ -71,13 +71,13 @@ export class EntityController {
 
   @ApiResponse({ type: [AnnotationDto] })
   @Get(':id/annotations/content')
-  async getAnnotationsWithContentOfEntity(
+  async getAnnotationsWithContentOfContent(
     @Param() params: IdDto,
   ): Promise<AnnotationDto[]> {
     const { id } = params;
 
     const annotations: AnnotationDto[] =
-      await this.annotationService.getAnnotationsOfEntity(id);
+      await this.annotationService.getAnnotationsWithReferencesOfContent(id);
 
     return annotations;
   }

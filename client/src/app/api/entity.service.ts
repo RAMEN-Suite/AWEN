@@ -76,4 +76,17 @@ export class EntityService {
     );
     return firstValueFrom(res);
   }
+
+  async getAnnotationsWithConnectionsOf(entityId: string) {
+    const res = this.http.get<Annotation[]>(`/api/entity/${entityId}/annotations/content`).pipe(
+      catchError((err) => {
+        this.messageService.add({
+          severity: 'error',
+          detail: `Error while loading entity with id ${entityId}. Reload the page, or try again later.`,
+        });
+        throw err;
+      }),
+    );
+    return firstValueFrom(res);
+  }
 }

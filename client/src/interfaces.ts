@@ -19,10 +19,18 @@ export interface EntityPropertyDto {
 export interface Annotation {
   type: string;
   types: string[];
-  properties: AnnotationPropertyDto[];
+  properties: NodePropertyDto[];
+  connectedNodes: ConnectedNodeDto[];
 }
 
-export interface AnnotationPropertyDto {
+export interface ConnectedNodeDto {
+  types: string[];
+  properties: NodePropertyDto[];
+  relationshipProperties: Record<string, never>;
+  direction: string;
+}
+
+export interface NodePropertyDto {
   value: string;
   bounds: {
     lowerBound: number;

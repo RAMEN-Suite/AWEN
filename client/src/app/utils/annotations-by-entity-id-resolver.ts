@@ -7,5 +7,5 @@ export const annotationsByEntityIdResolver: ResolveFn<Annotation[]> = (route) =>
   const entityService = inject(EntityService);
   const entityId = route.paramMap.get('entityId')!;
 
-  return entityService.getAnnotationsOf(entityId);
+  return entityService.getAnnotationsWithConnectionsOf(entityId);
 };

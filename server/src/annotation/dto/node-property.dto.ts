@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { GAttribute } from '../../schema/interfaces/g-attribute.interface';
 
 // TODO: Type und Value richtig machen
-export class AnnotationPropertyDto implements GAttribute {
+export class NodePropertyDto implements GAttribute {
   @ApiProperty()
   value: string;
   @ApiProperty()
@@ -19,7 +19,7 @@ export class AnnotationPropertyDto implements GAttribute {
   @ApiProperty()
   typeId: string;
 
-  constructor(value: AnnotationPropertyDto) {
+  constructor(value: NodePropertyDto) {
     Object.assign(this, value);
   }
 }

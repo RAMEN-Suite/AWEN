@@ -1,4 +1,4 @@
-import { Integer, Node } from 'neo4j-driver';
+import { Integer, Node, Relationship } from 'neo4j-driver';
 import { EntityNodeDto } from '../entity/dto/entity-node.dto';
 import {
   ANNOTATION_TYPE_NAME,
@@ -10,8 +10,9 @@ import { EntityDto } from '../entity/dto/entity.dto';
 import { EntityPropertyDto } from '../entity/dto/entity-property.dto';
 import { NodeType } from '../schema/interfaces/node-type.interface';
 import { AnnotationDto } from '../annotation/dto/annotation.dto';
-import { AnnotationPropertyDto } from '../annotation/dto/annotation-property.dto';
+import { NodePropertyDto } from '../annotation/dto/node-property.dto';
 import { RAMENError } from '../schema/RAMENError';
+import { ConnectedNodeDto } from '../annotation/dto/connected-node.dto';
 
 export const transformNodeToEntityNodeDTO = (
   node: Node<Integer, Record<string, any>>,
@@ -111,7 +112,7 @@ export const transformNodeToAnnotationDTO = (
   gNode: NodeType,
 ): AnnotationDto => {
   let type: string | undefined;
-  const props: AnnotationPropertyDto[] = [];
+  const props: NodePropertyDto[] = [];
 
   const types = node.labels.filter((l) => {
     return Array.from(gNode.superTypes.values()).includes(l);
@@ -123,7 +124,7 @@ export const transformNodeToAnnotationDTO = (
       type = node.properties[ANNOTATION_TYPE_NAME] as string | undefined;
     } else if (attribute.name in node.properties) {
       props.push(
-        new AnnotationPropertyDto({
+        new NodePropertyDto({
           ...attribute,
           isKey: attribute.isKey ?? false,
           isReadOnly: attribute.isKey ?? false,
@@ -132,7 +133,7 @@ export const transformNodeToAnnotationDTO = (
       );
     } else {
       props.push(
-        new AnnotationPropertyDto({
+        new NodePropertyDto({
           ...attribute,
           isKey: attribute.isKey ?? false,
           isReadOnly: attribute.isKey ?? false,
@@ -151,6 +152,7 @@ export const transformNodeToAnnotationDTO = (
     type: type,
     types: types,
     properties: props,
+    connectedNodes: [],
   });
 };
 
@@ -160,5 +162,88 @@ export const transformNodesToAnnotationDTOs = (
 ): AnnotationDto[] => {
   return nodes.map((node) => {
     return transformNodeToAnnotationDTO(node, gNode);
+  });
+};
+
+export const transformConnectedNodeToDto = (
+  node: Node<Integer, Record<string, any>>,
+  relationship: Relationship<Integer, Record<string, any>>,
+  direction: string,
+  gNode: NodeType,
+): ConnectedNodeDto => {
+  const types = node.labels.filter((l) => {
+    return Array.from(gNode.superTypes.values()).includes(l);
+  });
+  types.push(gNode.name);
+
+  const props: NodePropertyDto[] = [];
+
+  gNode.attributes.forEach((attribute) => {
+    props.push(
+      new NodePropertyDto({
+        name: attribute.name,
+        value: (node.properties[attribute.name] as string) ?? '',
+        bounds: attribute.bounds,
+        typeId: attribute.typeId,
+        isKey: attribute.isKey ?? false,
+        isReadOnly: attribute.isKey ?? false,
+      }),
+    );
+  });
+
+  return new ConnectedNodeDto({
+    types: types,
+    properties: props,
+    relationshipProperties: relationship.properties,
+    direction,
+  });
+};
+
+export const transformNodeToAnnotationWithContentDTO = (
+  node: Node<Integer, Record<string, any>>,
+  gNode: NodeType,
+  connectedNodes: ConnectedNodeDto[] = [],
+): AnnotationDto => {
+  let type: string | undefined;
+  const props: NodePropertyDto[] = [];
+
+  const types = node.labels.filter((l) => {
+    return Array.from(gNode.superTypes.values()).includes(l);
+  });
+  types.push(gNode.name);
+
+  gNode.attributes.forEach((attribute) => {
+    if (attribute.name === ANNOTATION_TYPE_NAME) {
+      type = node.properties[ANNOTATION_TYPE_NAME] as string | undefined;
+    } else if (attribute.name in node.properties) {
+      props.push(
+        new NodePropertyDto({
+          ...attribute,
+          isKey: attribute.isKey ?? false,
+          isReadOnly: attribute.isKey ?? false,
+          value: node.properties[attribute.name],
+        }),
+      );
+    } else {
+      props.push(
+        new NodePropertyDto({
+          ...attribute,
+          isKey: attribute.isKey ?? false,
+          isReadOnly: attribute.isKey ?? false,
+          value: '',
+        }),
+      );
+    }
+  });
+
+  if (!type) {
+    throw new RAMENError();
+  }
+
+  return new AnnotationDto({
+    type: type,
+    types: types,
+    properties: props,
+    connectedNodes,
   });
 };
