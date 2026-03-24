@@ -233,7 +233,6 @@ export class EntityService {
     query = await this.addOrderByProperty(query, eNode, [[score, 'ASC']]);
 
     if (typePatten) {
-      this.logger.debug('typePatten', typePatten.toString());
       query = query
         .with(eNode, score)
         .match(typePatten)

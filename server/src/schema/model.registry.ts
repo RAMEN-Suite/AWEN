@@ -148,11 +148,9 @@ export class ModelRegistry {
       }
       if (!type) {
         type = node;
-        this.logger.debug('Setting ', type);
       }
       if (node.superTypes.size > type.superTypes.size) {
         type = node;
-        this.logger.debug('Setting ', type);
       }
     }
     return type;

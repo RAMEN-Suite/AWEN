@@ -1,6 +1,5 @@
-import { Component, computed, inject } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
-import { ScrollTop } from 'primeng/scrolltop';
+import { Component, computed, ElementRef, inject, ViewChild } from '@angular/core';
+import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
 import { Toast } from 'primeng/toast';
 import { ConfigService } from './config-module/config.service';
 import { ProgressSpinner } from 'primeng/progressspinner';
@@ -8,54 +7,38 @@ import { MenubarModule } from 'primeng/menubar';
 import { MenuItem } from 'primeng/api';
 import { Button, ButtonDirective, ButtonLabel } from 'primeng/button';
 import { HealthService } from './api/health.service';
+import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, ScrollTop, Toast, ProgressSpinner, MenubarModule, Button, RouterLink, ButtonDirective, ButtonLabel],
+  imports: [RouterOutlet, Toast, ProgressSpinner, MenubarModule, Button, RouterLink, ButtonDirective, ButtonLabel],
   providers: [ConfigService, HealthService],
-  styles: `
-    .configMenuBar {
-      position: fixed;
-      bottom: 16px;
-      right: 16px;
-    }
-    :host {
-      display: block;
-      height: 100%;
-    }
-
-    .app-shell {
-      height: 100dvh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    .topbar {
-      flex: 0 0 auto;
-    }
-
-    .app-content {
-      flex: 1 1 auto;
-      min-height: 0;
-      overflow-y: scroll;
-      overflow-x: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .loading-wrapper {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-  `,
+  styleUrl: './app.scss',
   templateUrl: './app.html',
 })
 export class App {
   config = inject(ConfigService);
   status = inject(HealthService);
+  router = inject(Router);
+
+  @ViewChild('appContent') appContent!: ElementRef<HTMLDivElement>;
+
+  showScrollTop = false;
+
+  constructor() {
+    this.router.events.pipe(filter((e) => e instanceof NavigationEnd)).subscribe(() => {
+      this.scrollToTop('instant');
+    });
+  }
+
+  onContentScroll(event: Event): void {
+    const target = event.target as HTMLDivElement;
+    this.showScrollTop = target.scrollTop > 300;
+  }
+
+  scrollToTop(behavior: ScrollBehavior = 'smooth'): void {
+    this.appContent?.nativeElement.scrollTo({ top: 0, behavior: behavior });
+  }
 
   loaded = computed(() => {
     const loaded = this.config.getLoaded();

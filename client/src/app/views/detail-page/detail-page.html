@@ -1,5 +1,8 @@
-<div class="grid flex justify-content-center">
-  <div class="col-7">
+<div style="position: fixed; top: 16px; left: 16px">
+  <app-back-button />
+</div>
+<div class="grid flex justify-content-center pt-5">
+  <div class="col-11 mb-8 md:col-9 md:mb-8 lg:col-7 lg:mb-5">
     <div class="w-full">
       <span class="text-4xl font-bold"> {{entity().label}} </span>
     </div>
@@ -14,63 +17,113 @@
     <div class="w-full my-4">
       <span class="text-3xl font-bold"> Meta </span>
     </div>
-    <div class="w-full flex flex-column gap-4">
+    <div class="w-full flex flex-column gap-3">
+      <!-- Annotation Node-Properties -->
       @for (property of entity().properties; track $index) {
-      <div class="w-full flex grid border-gray-300 border-1">
-        <div class="col-3 p-3 bg-gray-100">
-          <span class="sticky" style="top: 10px">{{property.name}}</span>
-        </div>
-        <div class="col p-3 flex flex-column gap-3">
-          @if (property.typeId === 'Array' && Array.isArray(property.value)) { @for (value of property.value; track $index) {
-          <div class="flex-row w-full">
-            <span>{{value}}</span>
+      <div class="border-1 border-gray-200 border-round">
+        <div class="grid m-0 border-bottom-1 border-round border-gray-200">
+          <div class="col-3 p-3 bg-gray-50 border-right-1 border-gray-200">
+            <span class="">{{ property.name }}</span>
           </div>
-          } } @else {
-          <div class="flex-row w-full">
-            <span>{{property.value}}</span>
+          <div class="col p-3 flex flex-column gap-2">
+            <div class="flex flex-column gap-1">
+              @if (property.typeId === 'Array') {
+              <div class="flex flex-wrap gap-1">
+                @for (val of $any(property.value); track $index) {
+                <p-chip [label]="val" />
+                }
+              </div>
+              } @else {
+              <span>{{ property.value }}</span>
+              }
+            </div>
           </div>
-          }
         </div>
       </div>
       }
     </div>
+
     <div class="w-full my-4">
-      <span class="text-3xl font-bold"> Statements </span>
+      <span class="text-3xl font-bold">Statements</span>
     </div>
-    <div class="w-full flex flex-column gap-4">
-      @for (annotation of annotations(); track $index) {
-      <div class="w-full flex grid border-gray-300 border-1">
-        <div class="col-3 p-3 bg-gray-100">
-          <span class="sticky" style="top: 10px">{{annotation.type}}</span>
+
+    <div class="w-full flex flex-column gap-6">
+      @for (group of groupedAnnotations(); track group.type) {
+
+      <!-- Typ-Sektion -->
+      <div class="flex flex-column gap-3">
+        <div class="flex align-items-center gap-3 pb-2 border-bottom-2 border-primary">
+          <span class="text-xl font-bold">{{ group.type }}</span>
+          <p-chip [label]="group.annotations.length.toString()" />
         </div>
-        <div class="col p-3 flex flex-column gap-3">
-          @for (node of annotation.connectedNodes; track $index) {
-          <div class="w-full flex grid border-gray-300 border-1">
-            <div class="col-3 p-3 bg-gray-100">
-              <span class="sticky" style="top: 10px">{{ node.types }}</span>
+
+        <!-- Annotations der Gruppe -->
+        @for (annotation of group.annotations; track $index) {
+        <div class="border-1 border-gray-200 border-round">
+          <!-- Annotation Properties -->
+          @if (visibleProperties(annotation.properties).length > 0) {
+          <div class="grid m-0 border-bottom-1 border-gray-200">
+            <div class="col-3 p-3 bg-gray-50 border-right-1 border-gray-200">
+              <span class="text-sm font-medium text-gray-500">Annotation</span>
             </div>
-            <div class="col p-3 flex flex-column gap-3">
-              ToDo
-              <!--              @if (property.typeId === 'Array' && Array.isArray(property.value)) { @for (value of property.value; track $index) {-->
-              <!--              <div class="flex-row w-full">-->
-              <!--                <span>{{value}}</span>-->
-              <!--              </div>-->
-              <!--              } } @else {-->
-              <!--              <div class="flex-row w-full">-->
-              <!--                <span>{{property.value}}</span>-->
-              <!--              </div>-->
-              <!--              }-->
+            <div class="col p-3 flex flex-column gap-2">
+              @for (property of visibleProperties(annotation.properties); track property.name) {
+              <div class="flex flex-column gap-1">
+                <span class="text-xs text-gray-400">{{ property.name }}</span>
+                @if (property.typeId === 'Array') {
+                <div class="flex flex-wrap gap-1">
+                  @for (val of $any(property.value); track $index) {
+                  <p-chip [label]="val" />
+                  }
+                </div>
+                } @else {
+                <span>{{ property.value }}</span>
+                }
+              </div>
+              }
+            </div>
+          </div>
+          }
+
+          <!-- Connected Nodes -->
+          @for (node of annotation.connectedNodes; track $index) {
+          <div class="grid m-0" [class.border-top-1]="$index > 0" [class.border-gray-200]="$index > 0">
+            <div class="col-3 p-3 bg-gray-50 border-right-1 border-gray-200 flex flex-column gap-2">
+              <p-tag [value]="node.direction" [severity]="node.direction === 'OUTGOING' ? 'success' : 'info'" styleClass="text-xs w-fit" />
+              @for (type of node.types; track type) {
+              <span class="text-sm font-medium">{{ type }}</span>
+              }
+
+              <!-- Key Property – mit Link wenn Entity -->
+              @if (keyProperty(node.properties); as key) { @if (isEntity(node) && entityRouterLink(node); as link) {
+              <a [routerLink]="link" class="text-xs text-primary no-underline hover:underline"> {{ key.value }} </a>
+              } @else {
+              <span class="text-xs text-gray-500">{{ key.value }}</span>
+              } }
+            </div>
+            <div class="col p-3 flex flex-column gap-2">
+              @for (property of visibleProperties(node.properties); track property.name) {
+              <div class="flex flex-column gap-1">
+                <span class="text-xs text-gray-400">{{ property.name }}</span>
+                @if (property.typeId === 'Array') {
+                <div class="flex flex-wrap gap-1">
+                  @for (val of $any(property.value); track $index) {
+                  <p-chip [label]="val" />
+                  }
+                </div>
+                } @else {
+                <span>{{ property.value }}</span>
+                }
+              </div>
+              }
             </div>
           </div>
           }
         </div>
+        }
       </div>
+
       }
     </div>
   </div>
 </div>
-
-<div class="w-full mt-7 mb-4">
-  <span class="text-2xl font-bold"> </span>
-</div>
-<div></div>

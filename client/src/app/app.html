@@ -1,7 +1,6 @@
 <p-toast />
-
 <div class="app-shell">
-  <div class="app-content">
+  <div class="app-content" #appContent (scroll)="onContentScroll($event)">
     @if (loaded()) {
     <router-outlet />
     } @else {
@@ -11,6 +10,17 @@
     }
   </div>
 </div>
+
+<!-- Scroll-to-top Button -->
+<p-button
+  class="scroll-top-btn"
+  [class.visible]="showScrollTop"
+  icon="pi pi-arrow-up"
+  severity="help"
+  outlined
+  rounded
+  (onClick)="scrollToTop()"
+/>
 
 <p-menubar class="configMenuBar">
   <ng-template #start>
@@ -37,4 +47,3 @@
     </div>
   </ng-template>
 </p-menubar>
-<p-scrollTop />

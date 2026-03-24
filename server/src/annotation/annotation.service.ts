@@ -10,7 +10,7 @@ import {
   CONTENT_LABEL_NAME,
   ENTITY_LABEL_NAME,
 } from '../constants';
-import Cypher from '@neo4j/cypher-builder';
+import Cypher, { eq, not } from '@neo4j/cypher-builder';
 import { Integer, Node, Relationship } from 'neo4j-driver';
 import {
   transformConnectedNodeToDto,
@@ -115,15 +115,23 @@ export class AnnotationService {
         labels: ANNOTATION_LABEL_NAME,
       });
 
-    const optionalEntityPattern = new Cypher.Pattern(aNode)
+    const optionalEntityPattern = searchPattern
       .related(relEntity, {
         direction: 'undirected',
       })
       .to(conectedEntityNode, {
         labels: ENTITY_LABEL_NAME,
-      });
+      })
+      .where(
+        not(
+          eq(
+            conectedEntityNode.property(this.ENTITY_KEY_PROPERTY),
+            new Cypher.Param(entityId),
+          ),
+        ),
+      );
 
-    const optionalContentPattern = new Cypher.Pattern(aNode)
+    const optionalContentPattern = searchPattern
       .related(relContent, {
         direction: 'undirected',
       })
@@ -131,7 +139,7 @@ export class AnnotationService {
         labels: CONTENT_LABEL_NAME,
       });
 
-    const optionalCollectionPattern = new Cypher.Pattern(aNode)
+    const optionalCollectionPattern = searchPattern
       .related(relCollection, {
         direction: 'undirected',
       })

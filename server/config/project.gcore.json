@@ -35,7 +35,13 @@
       "id": "eFW3VR7g8xLamEf1",
       "name": "Regesta",
       "superTypes": ["lW611f30a2ky4276g3l8N:aP3xK8nV1qR6tY2uZ9wB"],
-      "attributes": [],
+      "attributes": [
+        {
+          "name": "url",
+          "typeId": "String",
+          "bounds": { "lowerBound": 1, "upperBound": 1 }
+        }
+      ],
       "constraints": [],
       "ext": {}
     },
@@ -140,7 +146,13 @@
       "id": "IJqtazGhBwf28NVI",
       "name": "Annotation",
       "superTypes": ["lW611f30a2ky4276g3l8N:m2Xv8qL0sP6tN1yK7rB3"],
-      "attributes": [],
+      "attributes": [
+        {
+          "name": "value",
+          "typeId": "String",
+          "bounds": { "lowerBound": 1, "upperBound": 1 }
+        }
+      ],
       "constraints": [],
       "ext": {}
     },
