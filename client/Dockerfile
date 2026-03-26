@@ -1,5 +1,5 @@
 ARG NODE_VERSION=24-alpine
-ARG NGINX_VERSION=alpine3
+ARG NGINX_VERSION=1-alpine3.23
 
 FROM node:${NODE_VERSION} AS base
 
@@ -31,19 +31,18 @@ EXPOSE 4200
 CMD ["npm", "start", "--", "--proxy-config", "proxy.conf.docker.json", "--host=0.0.0.0"]
 
 
-
 # =========================================
-# Prod Stage 1
+# Stage 1: Build the Angular Application
 # =========================================
-FROM base AS prod-build
 
-ENV NODE_ENV=production
+# Use a lightweight DHI Node.js image for building
+FROM base AS builder
 
 # Set the working directory inside the container
 WORKDIR /app
 
 # Copy package-related files first to leverage Docker's caching mechanism
-COPY package.json *package-lock.json* ./
+COPY package.json package-lock.json* ./
 
 # Install project dependencies using npm ci (ensures a clean, reproducible install)
 RUN --mount=type=cache,target=/root/.npm npm ci
@@ -54,19 +53,19 @@ COPY . .
 # Build the Angular application
 RUN npm run build
 
+# =========================================
+# Stage 2: Prepare Nginx to Serve Static Files
+# =========================================
 
-# =========================================
-# Prod Stage 2
-# =========================================
-FROM nginxinc/nginx-unprivileged:${NGINX_VERSION} AS prod
+FROM nginx:${NGINX_VERSION} AS prod
 
 # Copy custom Nginx config
 COPY nginx.conf /etc/nginx/nginx.conf
 
 # Copy the static build output from the build stage to Nginx's default HTML serving directory
-COPY --chown=nginx:nginx --from=prod-build /app/dist/*/browser /usr/share/nginx/html
+COPY --chown=nginx:nginx --from=builder /app/dist/*/browser /usr/share/nginx/html
 
-# Use a built-in non-root user for security best practices
+# Use a non-root user for security best practices
 USER nginx
 
 # Expose port 8080 to allow HTTP traffic
