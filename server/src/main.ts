@@ -4,19 +4,57 @@ import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Neo4jExceptionFilter } from './neo4j/neo4j-exception-filter';
 import { RAMENExceptionFilter } from './schema/ramen-exception-filter';
+import express from 'express';
+import * as path from 'path';
+import * as fs from 'fs';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.useGlobalFilters(new Neo4jExceptionFilter(), new RAMENExceptionFilter());
-  app.setGlobalPrefix(process.env.PREFIX ?? '');
 
-  app.enableCors({
-    origin: true,
-    methods: ['GET', 'PUT', 'POST', 'DELETE'],
-    allowedHeaders: ['Content-Type', '*'],
-    credentials: true,
-  });
+  const prefix = process.env.PREFIX ? process.env.PREFIX + '/' : '/';
+  const serverSideClient = process.env.SERVER_SIDE_CLIENT
+    ? process.env.SERVER_SIDE_CLIENT === 'true'
+    : false;
+
+  if (serverSideClient) {
+    app.use(
+      prefix,
+      express.static(path.join(__dirname, '..', 'client'), {
+        index: false,
+      }),
+    );
+
+    const raw = fs.readFileSync(
+      path.join(__dirname, '..', 'client', 'index.html'),
+      'utf-8',
+    );
+    const indexHtml = raw.replace('__BASE_HREF__', prefix);
+
+    app.use(
+      prefix,
+      (
+        req: express.Request,
+        res: express.Response,
+        next: express.NextFunction,
+      ) => {
+        if (req.path.startsWith('/api')) return next();
+        if (req.path.length > prefix.length) return next();
+        res.setHeader('Content-Type', 'text/html');
+        res.send(indexHtml);
+      },
+    );
+  } else {
+    app.enableCors({
+      origin: true,
+      methods: ['GET', 'PUT', 'POST', 'DELETE'],
+      allowedHeaders: ['Content-Type', '*'],
+      credentials: true,
+    });
+  }
+
+  app.setGlobalPrefix('api');
 
   app.useGlobalPipes(
     new ValidationPipe({
