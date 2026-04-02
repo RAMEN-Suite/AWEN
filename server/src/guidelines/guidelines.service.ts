@@ -18,6 +18,7 @@ export class GuidelinesService {
     return {
       collectionChains: this.model.getCollectionChains(),
       entityTypes: this.model.getSubtypes(ENTITY_LABEL_NAME),
+      dataTypes: this.model.getDataTypes(),
     } satisfies EmConfig;
   }
 

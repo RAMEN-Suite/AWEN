@@ -24,6 +24,10 @@ export class RamenModelService {
     return this.schema.getRegistry().hasNodeType(name);
   }
 
+  getDataTypes() {
+    return this.schema.getRegistry().getDataTypes();
+  }
+
   getMostSpecificType(names: string[]) {
     return this.schema.getRegistry().getMostSpecificType(names);
   }

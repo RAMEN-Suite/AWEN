@@ -13,8 +13,9 @@
     <label for="create-entity-form_type-input">Entity-Type</label>
   </p-floatlabel>
 
-  @for (property of properties(); track property.name) {
+  @for (property of properties(); track property.name) { @if (findDataType(property.typeId); as dataType) {
   <form class="field" [formGroup]="propertiesForm">
+    @if (dataType.name.toLowerCase() === 'string') {
     <p-floatlabel variant="on">
       <input
         pInputText
@@ -24,8 +25,40 @@
       />
       <label [for]="`create-entity-form_${typeInput.value}_${property.name}`">{{ property.name }}</label>
     </p-floatlabel>
+    } @if (dataType.name.toLowerCase() === 'boolean') {
+    <p-toggle-button
+      [formControlName]="property.name"
+      [onLabel]="property.name"
+      [offLabel]="'Not ' + property.name"
+      [id]="`create-entity-form_${typeInput.value}_${property.name}`"
+    />
+    } @if (dataType.name.toLowerCase() === 'integer') {
+    <p-floatlabel variant="on">
+      <p-input-number
+        [formControlName]="property.name"
+        [id]="`create-entity-form_${typeInput.value}_${property.name}`"
+        mode="decimal"
+        [useGrouping]="false"
+        [maxFractionDigits]="0"
+        autocomplete="off"
+      />
+      <label [for]="`create-entity-form_${typeInput.value}_${property.name}`">{{ property.name }}</label>
+    </p-floatlabel>
+    } @if (dataType.name.toLowerCase() === 'float') {
+    <p-floatlabel variant="on">
+      <p-input-number
+        [formControlName]="property.name"
+        [id]="`create-entity-form_${typeInput.value}_${property.name}`"
+        mode="decimal"
+        [useGrouping]="false"
+        [minFractionDigits]="1"
+        autocomplete="off"
+      />
+      <label [for]="`create-entity-form_${typeInput.value}_${property.name}`">{{ property.name }}</label>
+    </p-floatlabel>
+    }
   </form>
-  }
+  } }
   <div class="field">
     <p-button (onClick)="clickCreateButton()" label="Create" />
   </div>

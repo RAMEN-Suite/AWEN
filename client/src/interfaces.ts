@@ -110,6 +110,7 @@ export interface IGuidelines {
 export interface EmConfigRemote {
   collectionChains: string[][];
   entityTypes: string[];
+  dataTypes: DataType[];
 }
 
 export interface EmConfig {

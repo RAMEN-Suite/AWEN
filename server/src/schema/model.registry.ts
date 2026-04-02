@@ -165,6 +165,10 @@ export class ModelRegistry {
       .filter((n) => this.isSubtypeOf(n, name));
   }
 
+  getDataTypes() {
+    return this.allDataTypes;
+  }
+
   getMostSpecificType(names: string[]): NodeType | undefined {
     let type: NodeType | undefined = undefined;
     for (const node of this.allNodes) {

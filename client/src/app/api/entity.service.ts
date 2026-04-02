@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { OldEntity, EntityAutocompleteQuery, EntityNames, EntitySearchQuery, Entity, Annotation } from '../../interfaces';
-import { catchError, firstValueFrom, of } from 'rxjs';
+import { catchError, firstValueFrom, map, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { QueryParamsService } from '../utils/query-params.service';
 import { MessageService } from 'primeng/api';
@@ -85,6 +85,25 @@ export class EntityService {
           detail: `Error while loading entity with id ${entityId}. Reload the page, or try again later.`,
         });
         throw err;
+      }),
+    );
+    return firstValueFrom(res);
+  }
+
+  async createEntity(payload: Record<string, unknown>) {
+    const res = this.http.post(`/api/entity`, payload).pipe(
+      catchError((err) => {
+        this.messageService.add({
+          severity: 'error',
+          detail: `Error while creating a new entity. Please try again.`,
+        });
+        throw err;
+      }),
+      map(() => {
+        this.messageService.add({
+          severity: 'success',
+          detail: `Entity Successfully created!`,
+        });
       }),
     );
     return firstValueFrom(res);

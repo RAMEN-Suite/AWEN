@@ -27,7 +27,7 @@ export class GuidelinesController {
 
   @Get('config/entity/properties/:type')
   getEntityProperties(@Param('type') type: string) {
-    const config = this.guidelinesService.getEntityProperties(type);
-    return config;
+    const types = this.guidelinesService.getEntityProperties(type);
+    return types;
   }
 }

@@ -1,4 +1,4 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { EmConfig, EmConfigRemote } from '../../interfaces';
 import { LocalStoreService } from '../utils/local-store.service';
 import { GuidelinesService } from '../api/guidelines.service';
@@ -12,7 +12,7 @@ export class ConfigService {
   private readonly store = inject(LocalStoreService);
   private readonly guidelines = inject(GuidelinesService);
 
-  private readonly _remoteConfig = signal<EmConfigRemote>({ collectionChains: [], entityTypes: [] });
+  private readonly _remoteConfig = signal<EmConfigRemote>({ collectionChains: [], entityTypes: [], dataTypes: [] });
   private readonly _config = signal<EmConfig>({ selectedCollectionChain: [], filterableCollections: [], entityTypes: [] });
   private readonly _loaded = signal(false);
 
@@ -22,6 +22,12 @@ export class ConfigService {
 
   getConfig() {
     return this._config.asReadonly();
+  }
+
+  getDataTypes() {
+    return computed(() => {
+      return this._remoteConfig().dataTypes;
+    });
   }
 
   setConfig(value: EmConfig) {
