@@ -30,6 +30,11 @@ export interface ConnectedNodeDto {
   direction: string;
 }
 
+export interface DataType {
+  id: string;
+  name: string;
+}
+
 export interface GAttribute {
   bounds: {
     lowerBound: number;

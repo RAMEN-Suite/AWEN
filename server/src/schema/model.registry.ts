@@ -4,6 +4,7 @@ import { RelationType } from './interfaces/relation-type.interface';
 import { DataType } from './interfaces/data-type.interface';
 import { Logger } from '@nestjs/common';
 import { GAttribute } from './interfaces/g-attribute.interface';
+import { BASE_DATA_TYPES } from '../constants';
 
 export class ModelRegistry {
   logger = new Logger(ModelRegistry.name);
@@ -30,9 +31,26 @@ export class ModelRegistry {
   }
 
   constructor(ramen: GModel, profile: GModel) {
+    this.registerBaseDataTypes();
     this.register(ramen);
     this.register(profile);
     this._collectionChains = this.getCollectionChains();
+  }
+
+  private registerBaseDataTypes() {
+    for (const type of BASE_DATA_TYPES) {
+      this.dataTypes.set(type, {
+        id: type,
+        name: type,
+      });
+      this.logger.log(
+        'DateType registered: ' +
+          JSON.stringify({
+            id: type,
+            name: type,
+          }),
+      );
+    }
   }
 
   private register(model: GModel) {
@@ -51,6 +69,13 @@ export class ModelRegistry {
           id: formatedId,
           name: c.name,
         });
+        this.logger.log(
+          'DateType registered: ' +
+            JSON.stringify({
+              id: formatedId,
+              name: c.name,
+            }),
+        );
       }
     });
 

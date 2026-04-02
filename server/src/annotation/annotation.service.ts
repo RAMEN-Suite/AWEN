@@ -38,14 +38,14 @@ export class AnnotationService {
     );
     this.ENTITY_KEY_PROPERTY = this.model.getNodeKeyField(ENTITY_LABEL_NAME);
     this.getAnnotationsOfEntity('fa3246bc-4ac9-4271-906d-3e4d768ccd5f').then(
-      (result) => {
-        this.logger.log(result);
+      () => {
+        this.logger.log('getAnnotationsOfEntity() is working!');
       },
     );
     this.getAnnotationsWithReferencesOfContent(
       'fa3246bc-4ac9-4271-906d-3e4d768ccd5f',
-    ).then((result) => {
-      this.logger.log('getAnnotationsWithReferencesOfEntity', result);
+    ).then(() => {
+      this.logger.log('getAnnotationsWithReferencesOfContent() is working!');
     });
   }
 

@@ -16,8 +16,8 @@ export class NodeRepository {
 
   constructor(private neo4j: Neo4jService) {
     this.getById('fa3246bc-4ac9-4271-906d-3e4d768ccd5f')
-      .then((node) => {
-        this.logger.log(`found node ${JSON.stringify(node)}`);
+      .then(() => {
+        this.logger.log('getById() is working!');
       })
       .catch((err) => {
         this.logger.error(
@@ -26,8 +26,8 @@ export class NodeRepository {
         );
       });
     this.getByProperty('label', 'Acqui')
-      .then((node) => {
-        this.logger.log(`found nodes ${JSON.stringify(node)}`);
+      .then(() => {
+        this.logger.log('getByProperty() is working!');
       })
       .catch((err) => {
         this.logger.error(
@@ -36,8 +36,8 @@ export class NodeRepository {
         );
       });
     this.indexFulltextQueryNodes('search', 'Aachen')
-      .then((node) => {
-        this.logger.log(`found index nodes ${JSON.stringify(node)}`);
+      .then(() => {
+        this.logger.log('indexFulltextQueryNodes() is working!');
       })
       .catch((err) => {
         this.logger.error(
