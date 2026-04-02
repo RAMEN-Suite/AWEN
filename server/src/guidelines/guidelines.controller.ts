@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { IGuidelines } from '../../shared/IGuidelines';
 import { GuidelinesService } from './guidelines.service';
 import { ApiResponse } from '@nestjs/swagger';
@@ -23,5 +23,11 @@ export class GuidelinesController {
   getConfig() {
     const config = this.guidelinesService.getConfig();
     return new EmConfigDto(config);
+  }
+
+  @Get('config/entity/properties/:type')
+  getEntityProperties(@Param('type') type: string) {
+    const config = this.guidelinesService.getEntityProperties(type);
+    return config;
   }
 }

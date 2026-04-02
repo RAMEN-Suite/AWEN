@@ -30,8 +30,7 @@ export interface ConnectedNodeDto {
   direction: string;
 }
 
-export interface NodePropertyDto {
-  value: string;
+export interface GAttribute {
   bounds: {
     lowerBound: number;
     upperBound: number;
@@ -40,6 +39,10 @@ export interface NodePropertyDto {
   isReadOnly: boolean;
   name: string;
   typeId: string;
+}
+
+export interface NodePropertyDto extends GAttribute {
+  value: string;
 }
 
 export interface OldEntity {

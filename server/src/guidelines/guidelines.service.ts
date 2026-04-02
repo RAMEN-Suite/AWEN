@@ -20,4 +20,9 @@ export class GuidelinesService {
       entityTypes: this.model.getSubtypes(ENTITY_LABEL_NAME),
     } satisfies EmConfig;
   }
+
+  getEntityProperties(type: string) {
+    const node = this.model.getNodeType(type);
+    return node.attributes.filter((attribute) => !attribute.isKey);
+  }
 }

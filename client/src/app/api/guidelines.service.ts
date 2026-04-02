@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { EmConfigRemote, IGuidelines } from '../../interfaces';
+import { EmConfigRemote, GAttribute, IGuidelines } from '../../interfaces';
 import { catchError, firstValueFrom } from 'rxjs';
 import { MessageService } from 'primeng/api';
 
@@ -30,6 +30,19 @@ export class GuidelinesService {
         this.messageService.add({
           severity: 'error',
           detail: `Error while loading important data. Reload the page, or try again later.`,
+        });
+        throw err;
+      }),
+    );
+    return firstValueFrom(temp);
+  }
+
+  getEntityProperties(type: string) {
+    const temp = this.http.get<GAttribute[]>('/api/guidelines/config/entity/properties/' + type).pipe(
+      catchError((err) => {
+        this.messageService.add({
+          severity: 'error',
+          detail: `Could not load Attributes of entity type ${type}. Reload the page, or try again later.`,
         });
         throw err;
       }),

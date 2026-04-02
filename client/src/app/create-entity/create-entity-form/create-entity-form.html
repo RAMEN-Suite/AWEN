@@ -1,0 +1,32 @@
+<div class="my-2">
+  <p-floatlabel variant="on" class="field">
+    <p-select
+      appendTo="body"
+      [formControl]="typeInput"
+      [options]="types()"
+      [filter]="true"
+      [showClear]="true"
+      [loading]="!typesLoaded()"
+      style="min-width: 12rem"
+      id="create-entity-form_type-input"
+    />
+    <label for="create-entity-form_type-input">Entity-Type</label>
+  </p-floatlabel>
+
+  @for (property of properties(); track property.name) {
+  <form class="field" [formGroup]="propertiesForm">
+    <p-floatlabel variant="on">
+      <input
+        pInputText
+        [formControlName]="property.name"
+        [id]="`create-entity-form_${typeInput.value}_${property.name}`"
+        autocomplete="off"
+      />
+      <label [for]="`create-entity-form_${typeInput.value}_${property.name}`">{{ property.name }}</label>
+    </p-floatlabel>
+  </form>
+  }
+  <div class="field">
+    <p-button (onClick)="clickCreateButton()" label="Create" />
+  </div>
+</div>

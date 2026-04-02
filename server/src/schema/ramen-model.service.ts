@@ -8,7 +8,12 @@ export class RamenModelService {
   constructor(private schema: SchemaLoaderService) {}
 
   getNodeType(name: string) {
-    return this.schema.getRegistry().getNodeType(name);
+    const type = this.schema.getRegistry().getNodeType(name);
+    if (!type) {
+      this.logger.error(`There is no node of the type "${name}".`);
+      throw new RAMENError(`There is no node of the type "${name}".`);
+    }
+    return type;
   }
 
   getSuperNodes(name: string) {
