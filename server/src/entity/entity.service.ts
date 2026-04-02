@@ -366,4 +366,38 @@ export class EntityService {
 
     return pattern.orderBy(...variables, ...orderByArr) as T;
   }
+
+  /**
+   *
+   * @param type
+   * @param properties
+   *
+   * @return id The id of the created Entity
+   */
+  async create(type: string, properties: Record<string, unknown>) {
+    const nodeType = this.model.getNodeType(type);
+    const key = this.model.getNodeKeyField(type);
+
+    const nodeLabels = Array.from(nodeType.superTypes.values());
+    nodeLabels.push(type);
+
+    const nodeProperties: Record<string, Cypher.Expr> = {};
+    Object.entries(properties).forEach(([key, value]) => {
+      if (value) {
+        nodeProperties[key] = new Cypher.Param(value);
+      }
+    });
+    nodeProperties[key] = Cypher.randomUUID();
+
+    const eNode = new Cypher.Node();
+    const pattern = new Cypher.Pattern(eNode, {
+      labels: nodeLabels,
+      properties: nodeProperties,
+    });
+    const { cypher, params } = new Cypher.Create(pattern)
+      .return([eNode.property(key), 'id'])
+      .build();
+    const res = await this.neo4jService.write<{ id: string }>(cypher, params);
+    return res.records[0].get('id');
+  }
 }

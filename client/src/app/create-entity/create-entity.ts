@@ -17,7 +17,7 @@ export class CreateEntity {
   ref: DynamicDialogRef<CreateEntityForm> | undefined;
 
   constructor() {
-    this.show();
+    //this.show();
   }
 
   show() {

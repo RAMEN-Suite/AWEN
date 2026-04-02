@@ -90,8 +90,13 @@ export class EntityService {
     return firstValueFrom(res);
   }
 
-  async createEntity(payload: Record<string, unknown>) {
-    const res = this.http.post(`/api/entity`, payload).pipe(
+  async createEntity(type: string, payload: Record<string, unknown>) {
+    const body = {
+      type: type,
+      properties: payload,
+    };
+
+    const res = this.http.post(`/api/entity`, body).pipe(
       catchError((err) => {
         this.messageService.add({
           severity: 'error',

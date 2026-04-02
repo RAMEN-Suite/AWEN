@@ -53,7 +53,7 @@ export class CreateEntityForm {
   }
 
   protected async clickCreateButton() {
-    await this.createEntityService.createEntity(this.createPayload());
+    await this.createEntityService.createEntity(this.typeInput.value, this.createPayload());
   }
 
   private createPayload() {

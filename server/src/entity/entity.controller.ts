@@ -1,8 +1,10 @@
 import {
+  Body,
   Controller,
   Get,
   NotFoundException,
   Param,
+  Post,
   Query,
 } from '@nestjs/common';
 import { EntityService } from './entity.service';
@@ -40,6 +42,13 @@ export class EntityController {
     });
 
     return entities;
+  }
+
+  @Post('')
+  async create(
+    @Body() body: { type: string; properties: Record<string, unknown> },
+  ): Promise<void> {
+    await this.entityService.create(body.type, body.properties);
   }
 
   @ApiResponse({ type: EntityDto })
