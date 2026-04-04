@@ -368,14 +368,32 @@ export class EntityService {
   }
 
   /**
+   * Creates a new node of the given type with the provided properties.
    *
-   * @param type
-   * @param properties
+   * Validates all attributes against the model before writing to the database.
+   * A UUID key is automatically generated and must not be provided manually.
    *
-   * @return id The id of the created Entity
+   * @param type - The node type name as defined in the GModel (e.g. `"Entity"`, `"Person"`)
+   * @param properties - Key-value pairs of the node's attributes (excluding the key field)
+   *
+   * @returns The generated UUID of the newly created node
+   *
+   * @throws {Error} `"Invalid Attributes"` – if attribute validation fails.
+   *                 `error.cause` contains the list of validation messages (`string[]`)
+   *
+   * @example
+   * const id = await service.create("Entity", { label: "Napoleon Bonaparte" });
    */
   async create(type: string, properties: Record<string, unknown>) {
     const nodeType = this.model.getNodeType(type);
+
+    const [valid, message]: [valid: boolean, message: string[]] =
+      this.model.validateAttributes(nodeType, properties);
+
+    if (!valid) {
+      throw new Error('Invalid Attributes', { cause: message });
+    }
+
     const key = this.model.getNodeKeyField(type);
 
     const nodeLabels = Array.from(nodeType.superTypes.values());

@@ -98,16 +98,26 @@ export class EntityService {
 
     const res = this.http.post(`/api/entity`, body).pipe(
       catchError((err) => {
-        this.messageService.add({
-          severity: 'error',
-          detail: `Error while creating a new entity. Please try again.`,
-        });
+        if (err.error.statusCode === 400) {
+          this.messageService.add({
+            severity: 'error',
+            summary: `Error while creating a new entity. Please try again.`,
+            detail: Array.isArray(err.error.message) ? err.error.message.join('\n') : err.error.message,
+            closable: true,
+            sticky: true,
+          });
+        } else {
+          this.messageService.add({
+            severity: 'error',
+            summary: `Error while creating a new entity. Please try again.`,
+          });
+        }
         throw err;
       }),
       map(() => {
         this.messageService.add({
           severity: 'success',
-          detail: `Entity Successfully created!`,
+          summary: `Entity Successfully created!`,
         });
       }),
     );

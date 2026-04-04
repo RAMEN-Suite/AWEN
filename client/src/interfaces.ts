@@ -35,11 +35,23 @@ export interface DataType {
   name: string;
 }
 
+interface GConstraint {
+  id: string;
+  name: string;
+  language: string;
+  expression: string;
+  severity: string;
+  message: string;
+  code: string;
+  tags: string[];
+}
+
 export interface GAttribute {
   bounds: {
     lowerBound: number;
     upperBound: number;
   };
+  constraints?: GConstraint[];
   isKey: boolean;
   isReadOnly: boolean;
   name: string;

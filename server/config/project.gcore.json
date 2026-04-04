@@ -39,7 +39,7 @@
         {
           "name": "url",
           "typeId": "String",
-          "bounds": { "lowerBound": 1, "upperBound": 1 }
+          "bounds": { "lowerBound": 0, "upperBound": -1 }
         }
       ],
       "constraints": [],
@@ -99,17 +99,17 @@
         {
           "name": "age",
           "typeId": "Integer",
-          "bounds": { "lowerBound": 1, "upperBound": 1 }
+          "bounds": { "lowerBound": 0, "upperBound": -1 }
         },
         {
           "name": "float test",
           "typeId": "Float",
-          "bounds": { "lowerBound": 1, "upperBound": 1 }
+          "bounds": { "lowerBound": 0, "upperBound": -1 }
         },
         {
           "name": "male",
           "typeId": "Boolean",
-          "bounds": { "lowerBound": 1, "upperBound": 1 }
+          "bounds": { "lowerBound": 0, "upperBound": -1 }
         }
       ],
       "constraints": [],
@@ -124,7 +124,7 @@
         {
           "name": "test",
           "typeId": "String",
-          "bounds": { "lowerBound": 1, "upperBound": 1 }
+          "bounds": { "lowerBound": 0, "upperBound": -1 }
         }
       ],
       "constraints": [],
@@ -166,7 +166,7 @@
         {
           "name": "value",
           "typeId": "String",
-          "bounds": { "lowerBound": 1, "upperBound": 1 }
+          "bounds": { "lowerBound": 0, "upperBound": -1 }
         }
       ],
       "constraints": [],

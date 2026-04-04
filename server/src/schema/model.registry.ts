@@ -169,6 +169,10 @@ export class ModelRegistry {
     return this.allDataTypes;
   }
 
+  getDataType(id: string) {
+    return this.dataTypes.get(id);
+  }
+
   getMostSpecificType(names: string[]): NodeType | undefined {
     let type: NodeType | undefined = undefined;
     for (const node of this.allNodes) {

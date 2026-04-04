@@ -1,3 +1,5 @@
+import { GConstraint } from './g-constraint.interface';
+
 export interface GAttribute {
   name: string;
   typeId: string;
@@ -5,7 +7,7 @@ export interface GAttribute {
     lowerBound: number;
     upperBound: number;
   };
-
+  constraints?: GConstraint[];
   isKey?: boolean;
   isReadOnly?: boolean;
 }

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -20,6 +21,7 @@ import { EntityAutocompleteQueryDto } from './dto/entity-autocomplete-query.dto'
 import { EntityDto } from './dto/entity.dto';
 import { AnnotationService } from '../annotation/annotation.service';
 import { AnnotationDto } from '../annotation/dto/annotation.dto';
+import { CreateEntityDto } from './dto/create-entity.dto';
 
 @Controller('entity')
 export class EntityController {
@@ -44,11 +46,17 @@ export class EntityController {
     return entities;
   }
 
+  @ApiResponse({ type: String })
   @Post('')
-  async create(
-    @Body() body: { type: string; properties: Record<string, unknown> },
-  ): Promise<void> {
-    await this.entityService.create(body.type, body.properties);
+  async create(@Body() body: CreateEntityDto): Promise<string> {
+    try {
+      return await this.entityService.create(body.type, body.properties);
+    } catch (error) {
+      if (error instanceof Error && error.message === 'Invalid Attributes') {
+        throw new BadRequestException(error.cause);
+      }
+      throw error;
+    }
   }
 
   @ApiResponse({ type: EntityDto })

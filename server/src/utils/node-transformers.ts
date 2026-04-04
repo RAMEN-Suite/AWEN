@@ -187,6 +187,7 @@ export const transformConnectedNodeToDto = (
         typeId: attribute.typeId,
         isKey: attribute.isKey ?? false,
         isReadOnly: attribute.isKey ?? false,
+        constraints: attribute.constraints,
       }),
     );
   });

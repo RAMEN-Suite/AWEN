@@ -21,14 +21,14 @@
         {
           "name": "uuid",
           "typeId": "Q9mT2aL7vK0pX4sN1cDz",
-          "bounds": { "lowerBound": 1, "upperBound": 1 },
+          "bounds": { "lowerBound": 0, "upperBound": -1 },
           "isKey": true,
           "isReadOnly": true
         },
         {
           "name": "label",
           "typeId": "String",
-          "bounds": { "lowerBound": 1, "upperBound": 1 }
+          "bounds": { "lowerBound": 0, "upperBound": -1 }
         }
       ]
     },
@@ -42,14 +42,14 @@
         {
           "name": "uuid",
           "typeId": "Q9mT2aL7vK0pX4sN1cDz",
-          "bounds": { "lowerBound": 1, "upperBound": 1 },
+          "bounds": { "lowerBound": 0, "upperBound": -1 },
           "isKey": true,
           "isReadOnly": true
         },
         {
           "name": "label",
           "typeId": "String",
-          "bounds": { "lowerBound": 1, "upperBound": 1 }
+          "bounds": { "lowerBound": 0, "upperBound": -1 }
         }
       ]
     },
@@ -63,14 +63,14 @@
         {
           "name": "uuid",
           "typeId": "Q9mT2aL7vK0pX4sN1cDz",
-          "bounds": { "lowerBound": 1, "upperBound": 1 },
+          "bounds": { "lowerBound": 0, "upperBound": -1 },
           "isKey": true,
           "isReadOnly": true
         },
         {
           "name": "label",
           "typeId": "String",
-          "bounds": { "lowerBound": 1, "upperBound": 1 }
+          "bounds": { "lowerBound": 0, "upperBound": -1 }
         }
       ]
     },
@@ -84,14 +84,14 @@
         {
           "name": "uuid",
           "typeId": "Q9mT2aL7vK0pX4sN1cDz",
-          "bounds": { "lowerBound": 1, "upperBound": 1 },
+          "bounds": { "lowerBound": 0, "upperBound": -1 },
           "isKey": true,
           "isReadOnly": true
         },
         {
           "name": "label",
           "typeId": "String",
-          "bounds": { "lowerBound": 1, "upperBound": 1 }
+          "bounds": { "lowerBound": 0, "upperBound": -1 }
         }
       ]
     },
@@ -105,14 +105,14 @@
         {
           "name": "uuid",
           "typeId": "Q9mT2aL7vK0pX4sN1cDz",
-          "bounds": { "lowerBound": 1, "upperBound": 1 },
+          "bounds": { "lowerBound": 0, "upperBound": -1 },
           "isKey": true,
           "isReadOnly": true
         },
         {
           "name": "type",
           "typeId": "String",
-          "bounds": { "lowerBound": 1, "upperBound": 1 },
+          "bounds": { "lowerBound": 0, "upperBound": -1 },
           "constraints": [
             {
               "id": "uN8k1P3qT6vB0xL9mR2s",

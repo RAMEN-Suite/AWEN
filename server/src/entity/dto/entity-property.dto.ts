@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { GAttribute } from '../../schema/interfaces/g-attribute.interface';
+import { GConstraint } from '../../schema/interfaces/g-constraint.interface';
 
 // TODO: Type und Value richtig machen
 export class EntityPropertyDto implements GAttribute {
@@ -10,6 +11,8 @@ export class EntityPropertyDto implements GAttribute {
     lowerBound: number;
     upperBound: number;
   };
+  @ApiProperty()
+  constraints?: GConstraint[];
   @ApiProperty()
   isKey: boolean;
   @ApiProperty()
