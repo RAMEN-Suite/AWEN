@@ -1,9 +1,17 @@
-<div class="grid justify-content-center">
-  <div class="col-5 mt-5">
-    <app-create-entity />
+<div class="grid justify-content-center mt-5">
+  <div class="hidden md:block col"></div>
+  <div class="col-12 md:col-8 lg:col-5 px-4 md:px-2 flex-order-1 md:flex-order-0">
     <app-filter-pane />
   </div>
-  <div class="col-12 flex justify-content-center">
-    <app-entity-list [entities]="entities()" [entitiesLoading]="loading()" width="40vw" height="68vh" />
+  <div class="col flex md:justify-content-end px-4 md:px-2 flex-order-0 md:flex-order-1">
+    <div class="flex md:mx-3">
+      <app-create-entity />
+    </div>
+  </div>
+</div>
+
+<div class="grid justify-content-center">
+  <div class="col-12 md:col-8 lg:col-5">
+    <app-entity-list [entities]="entities()" [entitiesLoading]="loading()" height="68vh" />
   </div>
 </div>

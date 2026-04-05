@@ -17,7 +17,7 @@ import { Tooltip } from 'primeng/tooltip';
 export class EntityList {
   messageService = inject(MessageService);
 
-  width = input<string>('200px');
+  width = input<string>('100%');
   height = input<string>('400px');
 
   entities = input.required<OldEntity[]>();

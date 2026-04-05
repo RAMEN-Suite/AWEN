@@ -1,4 +1,4 @@
-import { Component, inject, signal, Signal, WritableSignal } from '@angular/core';
+import { Component, effect, inject, input, signal, Signal, WritableSignal } from '@angular/core';
 import { CreateEntityService } from '../create-entity.service';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Select } from 'primeng/select';
@@ -19,25 +19,38 @@ export class CreateEntityForm {
   createEntityService = inject(CreateEntityService);
   configService = inject(ConfigService);
 
+  preselectedType = input<string>();
+
   readonly dataTypes: Signal<DataType[]> = this.configService.getDataTypes();
 
   readonly types: Signal<string[]> = this.createEntityService.getEntityTypes();
   readonly typesLoaded: Signal<boolean> = this.createEntityService.getEntityTypesLoaded();
   readonly properties: WritableSignal<GAttribute[]> = signal<GAttribute[]>([]);
-  readonly propertiesLoaded: WritableSignal<boolean> = signal<boolean>(true);
+  readonly propertiesLoaded: WritableSignal<boolean> = signal<boolean>(true); // TODO: UI Loading state
 
   typeInput = new FormControl('', { nonNullable: true });
 
   propertiesForm = new FormGroup({});
 
   constructor() {
-    this.typeInput.valueChanges.subscribe(async (value) => {
-      this.propertiesLoaded.set(false);
-      const props: GAttribute[] = await this.createEntityService.getEntityProperties(value);
-      this.properties.set(props);
-      this.fillPropertyFormGroup(props);
-      this.propertiesLoaded.set(true);
+    effect(async () => {
+      const type = this.preselectedType();
+      if (type) {
+        this.typeInput.setValue(type, { emitEvent: false });
+        await this.loadAndDisplayPropertyInputs(type);
+      }
     });
+    this.typeInput.valueChanges.subscribe(async (value) => {
+      await this.loadAndDisplayPropertyInputs(value);
+    });
+  }
+
+  private async loadAndDisplayPropertyInputs(type: string) {
+    this.propertiesLoaded.set(false);
+    const props: GAttribute[] = await this.createEntityService.getEntityProperties(type);
+    this.properties.set(props);
+    this.fillPropertyFormGroup(props);
+    this.propertiesLoaded.set(true);
   }
 
   private fillPropertyFormGroup(props: GAttribute[]) {
