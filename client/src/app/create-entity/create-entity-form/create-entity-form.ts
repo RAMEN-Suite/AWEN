@@ -59,7 +59,7 @@ export class CreateEntityForm {
   private createPayload() {
     const payload: Record<string, unknown> = {};
     Object.entries(this.propertiesForm.value).forEach(([key, value]) => {
-      if (value) {
+      if (value !== undefined && value !== null) {
         payload[key] = value;
       }
     });
@@ -74,7 +74,7 @@ export class CreateEntityForm {
     let form: FormControl | undefined = undefined;
 
     if (dataType.name.toLowerCase() === 'string') {
-      form = new FormControl<string>('', { nonNullable: true });
+      form = new FormControl<string | null>(null, { nonNullable: false });
     }
 
     if (dataType.name.toLowerCase() === 'integer') {

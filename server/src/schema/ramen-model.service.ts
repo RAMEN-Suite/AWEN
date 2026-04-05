@@ -70,9 +70,10 @@ export class RamenModelService {
     attributes: Record<string, unknown>,
   ): [valid: boolean, message: string[]] {
     const ret: [valid: boolean, message: string[]] = [true, []];
-    Object.entries(attributes).forEach(([key, val]) => {
-      this.validateAttribute(type, key, val, ret);
-    });
+    for (const attribute of type.attributes) {
+      const key = attribute.name;
+      this.validateAttribute(type, key, attributes[key], ret);
+    }
     return ret;
   }
 
@@ -93,34 +94,86 @@ export class RamenModelService {
       return ret;
     }
 
-    const valIsString = typeof attributeValue === 'string';
-    const valIsBoolean = typeof attributeValue === 'boolean';
-    const valIsNumber = typeof attributeValue === 'number';
+    const { lowerBound, upperBound } = attribute.bounds;
 
-    if (valIsString) {
-      this.validateStringAttribute(attribute, attributeValue, ret);
-    } else if (valIsBoolean) {
-      this.validateBooleanAttribute(attribute, attributeValue, ret);
-    } else if (valIsNumber) {
-      this.validateNumberAttribute(attribute, attributeValue, ret);
+    if (Array.isArray(attributeValue)) {
+      if (attributeValue.length < lowerBound) {
+        ret[0] = false;
+        ret[1].push(
+          `Attribute "${attribute.name}" requires at least ${lowerBound} entries, but got ${attributeValue.length}.`,
+        );
+        return ret;
+      }
+
+      if (upperBound !== -1 && attributeValue.length > upperBound) {
+        ret[0] = false;
+        ret[1].push(
+          `Attribute "${attribute.name}" allows at most ${upperBound} entries, but got ${attributeValue.length}.`,
+        );
+        return ret;
+      }
+
+      for (const entry of attributeValue) {
+        this.validateSingleValue(attribute, entry, ret);
+      }
+    } else {
+      if (lowerBound !== 1 || upperBound !== 1) {
+        ret[0] = false;
+        ret[1].push(
+          `Attribute "${attribute.name}" requires ${lowerBound} to ${upperBound} entries, but got one.`,
+        );
+        return ret;
+      }
+
+      const isEmpty =
+        attributeValue === null ||
+        attributeValue === undefined ||
+        attributeValue === '';
+
+      if (lowerBound === 1 && isEmpty) {
+        ret[0] = false;
+        ret[1].push(
+          `Attribute "${attribute.name}" is required but got an empty value.`,
+        );
+        return ret;
+      }
+
+      if (!isEmpty) {
+        this.validateSingleValue(attribute, attributeValue, ret);
+      }
+    }
+
+    return ret;
+  }
+
+  private validateSingleValue(
+    attribute: GAttribute,
+    value: unknown,
+    ret: [valid: boolean, message: string[]],
+  ): [valid: boolean, message: string[]] {
+    if (typeof value === 'string') {
+      this.validateStringAttribute(attribute, value, ret);
+    } else if (typeof value === 'boolean') {
+      this.validateBooleanAttribute(attribute, value, ret);
+    } else if (typeof value === 'number') {
+      this.validateNumberAttribute(attribute, value, ret);
     }
 
     if (attribute.constraints) {
       for (const constraint of attribute.constraints) {
         if (constraint.language === 'regex') {
           const regex = new RegExp(constraint.expression);
-          if (!regex.test(String(attributeValue))) {
+          if (!regex.test(String(value))) {
             ret[0] = false;
             ret[1].push(
               constraint.message ??
-                `Attribute "${attributeKey}" violates constraint "${constraint.name}" (code: ${constraint.code}).`,
+                `Attribute "${attribute.name}" violates constraint "${constraint.name}" (code: ${constraint.code}).`,
             );
           }
         }
         // TODO
       }
     }
-
     return ret;
   }
 
@@ -154,22 +207,6 @@ export class RamenModelService {
         `Attribute "${attribute.name}" is expected to be typeof "${dataType.name}", but is "String".`,
       );
       return ret;
-    }
-
-    const { lowerBound, upperBound } = attribute.bounds;
-
-    if (attributeValue.length < lowerBound) {
-      ret[0] = false;
-      ret[1].push(
-        `Attribute "${attribute.name}" requires a length of at least ${lowerBound}, but got ${attributeValue.length}.`,
-      );
-    }
-
-    if (upperBound !== -1 && attributeValue.length > upperBound) {
-      ret[0] = false;
-      ret[1].push(
-        `Attribute "${attribute.name}" allows a length of at most ${upperBound}, but got ${attributeValue.length}.`,
-      );
     }
 
     return ret;
