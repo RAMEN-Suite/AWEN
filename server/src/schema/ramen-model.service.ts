@@ -117,7 +117,7 @@ export class RamenModelService {
         this.validateSingleValue(attribute, entry, ret);
       }
     } else {
-      if (lowerBound !== 1 || upperBound !== 1) {
+      if (upperBound > 1) {
         ret[0] = false;
         ret[1].push(
           `Attribute "${attribute.name}" requires ${lowerBound} to ${upperBound} entries, but got one.`,
