@@ -93,6 +93,9 @@ export class RamenModelService {
       );
       return ret;
     }
+    if (attribute.isKey) {
+      return ret;
+    }
 
     const { lowerBound, upperBound } = attribute.bounds;
 
@@ -238,23 +241,6 @@ export class RamenModelService {
       );
       return ret;
     }
-
-    const { lowerBound, upperBound } = attribute.bounds;
-
-    if (attributeValue < lowerBound) {
-      ret[0] = false;
-      ret[1].push(
-        `Attribute "${attribute.name}" requires a value of at least ${lowerBound}, but got ${attributeValue}.`,
-      );
-    }
-
-    if (upperBound !== -1 && attributeValue > upperBound) {
-      ret[0] = false;
-      ret[1].push(
-        `Attribute "${attribute.name}" allows a value of at most ${upperBound}, but got ${attributeValue}.`,
-      );
-    }
-
     return ret;
   }
 }

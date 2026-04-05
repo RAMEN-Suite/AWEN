@@ -9,6 +9,8 @@ import { Button } from 'primeng/button';
 import { ConfigService } from '../../config-module/config.service';
 import { ToggleButton } from 'primeng/togglebutton';
 import { InputNumber } from 'primeng/inputnumber';
+import { DynamicDialogRef } from 'primeng/dynamicdialog';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-create-entity-form',
@@ -18,6 +20,8 @@ import { InputNumber } from 'primeng/inputnumber';
 export class CreateEntityForm {
   createEntityService = inject(CreateEntityService);
   configService = inject(ConfigService);
+  private readonly messageService = inject(MessageService);
+  dialogRef = inject(DynamicDialogRef);
 
   preselectedType = input<string>();
 
@@ -66,7 +70,14 @@ export class CreateEntityForm {
   }
 
   protected async clickCreateButton() {
-    await this.createEntityService.createEntity(this.typeInput.value, this.createPayload());
+    const createdId = await this.createEntityService.createEntity(this.typeInput.value, this.createPayload());
+    this.messageService.add({
+      severity: 'success',
+      summary: `Entity with id ${createdId} Successfully created!`,
+      life: 12000,
+      // TODO: Link to detail page
+    });
+    this.dialogRef.close();
   }
 
   private createPayload() {

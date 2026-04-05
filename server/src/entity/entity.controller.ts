@@ -46,11 +46,14 @@ export class EntityController {
     return entities;
   }
 
-  @ApiResponse({ type: String })
+  @ApiResponse({ type: IdDto })
   @Post('')
-  async create(@Body() body: CreateEntityDto): Promise<string> {
+  async create(@Body() body: CreateEntityDto): Promise<IdDto> {
     try {
-      return await this.entityService.create(body.type, body.properties);
+      const id = await this.entityService.create(body.type, body.properties);
+      return {
+        id: id,
+      };
     } catch (error) {
       if (error instanceof Error && error.message === 'Invalid Attributes') {
         throw new BadRequestException(error.cause);

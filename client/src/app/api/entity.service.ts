@@ -96,7 +96,7 @@ export class EntityService {
       properties: payload,
     };
 
-    const res = this.http.post(`/api/entity`, body).pipe(
+    const res = this.http.post<{ id: string }>(`/api/entity`, body).pipe(
       catchError((err) => {
         if (err.error.statusCode === 400) {
           this.messageService.add({
@@ -114,11 +114,8 @@ export class EntityService {
         }
         throw err;
       }),
-      map(() => {
-        this.messageService.add({
-          severity: 'success',
-          summary: `Entity Successfully created!`,
-        });
+      map((value) => {
+        return value.id;
       }),
     );
     return firstValueFrom(res);
