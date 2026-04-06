@@ -1,6 +1,6 @@
 import { Component, effect, inject, input, signal, Signal, WritableSignal } from '@angular/core';
 import { CreateEntityService } from '../create-entity.service';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Select } from 'primeng/select';
 import { DataType, GAttribute } from '../../../interfaces';
 import { InputText } from 'primeng/inputtext';
@@ -11,10 +11,13 @@ import { ToggleButton } from 'primeng/togglebutton';
 import { InputNumber } from 'primeng/inputnumber';
 import { DynamicDialogRef } from 'primeng/dynamicdialog';
 import { MessageService } from 'primeng/api';
+import { AutoComplete } from 'primeng/autocomplete';
+import { KeyFilter } from 'primeng/keyfilter';
+import { hidden } from '@angular/forms/signals';
 
 @Component({
   selector: 'app-create-entity-form',
-  imports: [Select, ReactiveFormsModule, InputText, FloatLabel, Button, ToggleButton, InputNumber],
+  imports: [Select, ReactiveFormsModule, InputText, FloatLabel, Button, ToggleButton, InputNumber, AutoComplete, KeyFilter],
   templateUrl: './create-entity-form.html',
 })
 export class CreateEntityForm {
@@ -70,53 +73,92 @@ export class CreateEntityForm {
   }
 
   protected async clickCreateButton() {
-    const createdId = await this.createEntityService.createEntity(this.typeInput.value, this.createPayload());
-    this.messageService.add({
-      severity: 'success',
-      summary: `Entity with id ${createdId} Successfully created!`,
-      life: 12000,
-      // TODO: Link to detail page
-    });
-    this.dialogRef.close();
+    this.propertiesForm.disable();
+    try {
+      const createdId = await this.createEntityService.createEntity(this.typeInput.value, this.createPayload());
+      this.messageService.add({
+        severity: 'success',
+        summary: `Entity with id ${createdId} Successfully created!`,
+        life: 12000,
+        // TODO: Link to detail page
+      });
+      this.dialogRef.close();
+    } catch {
+      /* empty */
+    }
+    this.propertiesForm.disable();
   }
 
   private createPayload() {
     const payload: Record<string, unknown> = {};
+
     Object.entries(this.propertiesForm.value).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        payload[key] = value;
+      if (value === undefined || value === null) return;
+
+      const prop = this.properties().find((p) => p.name === key);
+      if (!prop) return;
+
+      const dataType = this.findDataType(prop.typeId);
+      if (!dataType) return;
+
+      const isArray = prop.bounds.upperBound === -1 || prop.bounds.upperBound > 1;
+
+      if (isArray && Array.isArray(value)) {
+        payload[key] = value.map((v) => this.castValue(v, dataType.name));
+      } else {
+        payload[key] = this.castValue(value, dataType.name);
       }
     });
+
     return payload;
+  }
+
+  private castValue(value: unknown, dataTypeName: string): unknown {
+    switch (dataTypeName.toLowerCase()) {
+      case 'integer':
+        return parseInt(String(value), 10);
+      case 'float':
+        return parseFloat(String(value));
+      case 'boolean':
+        return Boolean(value);
+      default:
+        return value;
+    }
+  }
+
+  private isArray(bounds: { lowerBound: number; upperBound: number }): boolean {
+    return bounds.upperBound === -1 || bounds.upperBound > 1;
   }
 
   private createFormControl(prop: GAttribute): FormControl | undefined {
     const dataType = this.findDataType(prop.typeId);
-    if (!dataType) {
-      return undefined;
-    }
-    let form: FormControl | undefined = undefined;
+    if (!dataType) return undefined;
 
-    if (dataType.name.toLowerCase() === 'string') {
-      form = new FormControl<string | null>(null, { nonNullable: false });
-    }
+    const { lowerBound, upperBound } = prop.bounds;
+    const isArray = this.isArray(prop.bounds);
 
-    if (dataType.name.toLowerCase() === 'integer') {
-      form = new FormControl<number | null>(null, { nonNullable: false });
+    const validators = [...(lowerBound >= 1 ? [Validators.required] : [])];
+
+    if (isArray) {
+      validators.push(Validators.minLength(lowerBound), ...(upperBound !== -1 ? [Validators.maxLength(upperBound)] : []));
     }
 
-    if (dataType.name.toLowerCase() === 'float') {
-      form = new FormControl<number | null>(null, { nonNullable: false });
+    switch (dataType.name.toLowerCase()) {
+      case 'string':
+        return new FormControl<string | string[] | null>(isArray ? [] : null, { validators });
+      case 'integer':
+      case 'float':
+        return new FormControl<number | number[] | null>(isArray ? [] : null, { validators });
+      case 'boolean':
+        return isArray ? new FormControl<boolean[]>([], { validators }) : new FormControl<boolean>(false, { nonNullable: true });
+      default:
+        return undefined;
     }
-
-    if (dataType.name.toLowerCase() === 'boolean') {
-      form = new FormControl<boolean>(false, { nonNullable: true });
-    }
-
-    return form;
   }
 
   protected findDataType(id: string) {
     return this.dataTypes().find((dataType) => dataType.id === id);
   }
+
+  protected readonly hidden = hidden;
 }

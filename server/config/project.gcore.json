@@ -97,14 +97,29 @@
       "superTypes": ["lW611f30a2ky4276g3l8N:n7Vb2Qx0Lm9P3sT6yK1h"],
       "attributes": [
         {
+          "name": "fun facts",
+          "typeId": "String",
+          "bounds": { "lowerBound": 0, "upperBound": 4 }
+        },
+        {
           "name": "age",
           "typeId": "Integer",
-          "bounds": { "lowerBound": 1, "upperBound": 1 }
+          "bounds": { "lowerBound": 0, "upperBound": 1 }
+        },
+        {
+          "name": "age mult",
+          "typeId": "Integer",
+          "bounds": { "lowerBound": 2, "upperBound": -1 }
         },
         {
           "name": "float test",
           "typeId": "Float",
           "bounds": { "lowerBound": 1, "upperBound": 1 }
+        },
+        {
+          "name": "float mult test",
+          "typeId": "Float",
+          "bounds": { "lowerBound": 0, "upperBound": -1 }
         },
         {
           "name": "male",
