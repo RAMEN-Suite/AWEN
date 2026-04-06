@@ -23,17 +23,18 @@
 />
 
 <p-menubar class="configMenuBar">
-  <ng-template #start>
+  <ng-template #end>
     <div class="flex items-center gap-2">
-      <p-button class="h-3rem" severity="secondary" icon="pi pi-cog" size="large" outlined [routerLink]="['config']" />
+      <p-button class="" severity="secondary" icon="pi pi-cog" size="large" outlined [routerLink]="['config']" />
     </div>
   </ng-template>
 
-  <ng-template #end>
+  <ng-template #start>
     <div class="flex items-center gap-2">
       <a
         pButton
         class="no-underline h-3rem"
+        size="small"
         severity="secondary"
         outlined
         [href]="'https://github.com/THM-Graphs/entity-manager'"

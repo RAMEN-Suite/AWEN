@@ -9,6 +9,13 @@ import { CreateEntity } from '../../create-entity/create-entity';
   imports: [FilterPane, EntityList, CreateEntity],
   providers: [SearchService],
   templateUrl: './search-page.component.html',
+  styles: `
+    :host {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+  `,
 })
 export class SearchPage {
   searchService = inject(SearchService);

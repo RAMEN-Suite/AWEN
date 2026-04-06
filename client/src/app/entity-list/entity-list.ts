@@ -13,12 +13,20 @@ import { Tooltip } from 'primeng/tooltip';
   selector: 'app-entity-list',
   imports: [Scroller, NgClass, PrimeTemplate, ProgressSpinner, Chip, RouterLink, Button, Tooltip],
   templateUrl: './entity-list.html',
+  styles: `
+    :host {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      min-height: 0;
+    }
+  `,
 })
 export class EntityList {
   messageService = inject(MessageService);
 
   width = input<string>('100%');
-  height = input<string>('400px');
+  height = input<string>('100%');
 
   entities = input.required<OldEntity[]>();
   entitiesLoading = input.required<boolean>();
