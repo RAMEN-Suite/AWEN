@@ -81,7 +81,7 @@ export class CollectionService {
     const parentCol = new Cypher.Node();
     const c = new Cypher.Variable();
 
-    const matchCollections = new Cypher.Match(
+    const matchCollections = new Cypher.OptionalMatch(
       new Cypher.Pattern(entityNode)
         .related(new Cypher.Relationship(), {
           direction: 'left',
@@ -123,9 +123,9 @@ export class CollectionService {
     });
 
     const lx = new Cypher.Variable();
-    const withEntityC = new Cypher.With(entityNode, c)
-      .where(Cypher.isNotNull(c))
-      .where(
+    const withEntityC = new Cypher.With(entityNode, c).where(
+      Cypher.or(
+        Cypher.isNull(c),
         Cypher.any(
           lx,
           Cypher.labels(c),
@@ -136,7 +136,8 @@ export class CollectionService {
             ),
           ),
         ),
-      );
+      ),
+    );
 
     const withDistinctC = new Cypher.With(entityNode, [
       Cypher.collect(collectionMap).distinct(),
@@ -144,7 +145,7 @@ export class CollectionService {
     ]).distinct();
 
     const clause = query
-      .match(matchCollections)
+      .optionalMatch(matchCollections)
       .optionalMatch(optionalParents)
       .with(withEntityCol)
       .unwind(unwind)

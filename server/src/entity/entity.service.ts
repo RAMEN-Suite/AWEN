@@ -24,6 +24,7 @@ import {
 } from '../constants';
 import { EntityDto } from './dto/entity.dto';
 import { RAMENError } from '../schema/RAMENError';
+import { metadataForNewNode } from '../utils/utils';
 
 @Injectable()
 export class EntityService {
@@ -273,7 +274,6 @@ export class EntityService {
     collectionFilters: Record<string, string[]>,
   ) {
     const collectionChains = this.model.getCollectionChains();
-    this.logger.debug(collectionChains);
     const collectionChain = collectionChains.find((chain) => {
       let match = false;
       Object.keys(collectionFilters).forEach((key) => {
@@ -413,6 +413,7 @@ export class EntityService {
       properties: nodeProperties,
     });
     const { cypher, params } = new Cypher.Create(pattern)
+      .set(...metadataForNewNode(eNode))
       .return([eNode.property(key), 'id'])
       .build();
     const res = await this.neo4jService.write<{ id: string }>(cypher, params);
