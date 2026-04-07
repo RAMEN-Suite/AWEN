@@ -1,5 +1,6 @@
 ARG NODE_VERSION=24-alpine
 ARG NGINX_VERSION=1-alpine3.23
+ARG APP_VERSION=0.0.0
 
 FROM node:${NODE_VERSION} AS base
 
@@ -33,6 +34,8 @@ RUN npx ng build --configuration=production
 # Builder
 FROM base AS server-builder
 WORKDIR /usr/src/app
+ENV NODE_ENV=production
+ENV APP_VERSION=$APP_VERSION
 ENV SERVER_SIDE_CLIENT=true
 COPY server/package*.json ./
 RUN npm ci
@@ -45,6 +48,7 @@ FROM base AS server-prod
 WORKDIR /usr/src/app
 
 ENV NODE_ENV=production
+ENV APP_VERSION=$APP_VERSION
 ENV SERVER_SIDE_CLIENT=true
 
 COPY server/package*.json* ./

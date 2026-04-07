@@ -7,7 +7,7 @@ services:
       target: dev
       dockerfile: Dockerfile
       args:
-        - APP_VERSION=2025.3.11
+        - APP_VERSION=2026.4.7
     image: em-backend
     restart: unless-stopped
     depends_on:

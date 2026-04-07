@@ -8,7 +8,7 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        - APP_VERSION=2025.3.11
+        - APP_VERSION=2026.4.7
     image: entity-manager
     restart: unless-stopped
     environment:
