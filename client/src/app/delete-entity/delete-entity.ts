@@ -2,6 +2,7 @@ import { Component, inject, input, signal } from '@angular/core';
 import { Button } from 'primeng/button';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { EntityService } from '../api/entity.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-delete-entity',
@@ -9,6 +10,7 @@ import { EntityService } from '../api/entity.service';
   templateUrl: './delete-entity.html',
 })
 export class DeleteEntity {
+  private router = inject(Router);
   private confirmationService = inject(ConfirmationService);
   private messageService = inject(MessageService);
   private entityAPI = inject(EntityService);
@@ -40,12 +42,17 @@ export class DeleteEntity {
           await this.deleteEntity(this.entityId());
         } finally {
           this.loading.set(false);
+          await this.redirectToHome();
         }
       },
     });
   }
 
-  async deleteEntity(id: string) {
+  private async redirectToHome() {
+    await this.router.navigate(['/']);
+  }
+
+  private async deleteEntity(id: string) {
     await this.entityAPI.deleteEntity(id);
     this.messageService.add({ severity: 'info', summary: 'Entity deleted', detail: 'The Entity was deleted successfully' });
   }

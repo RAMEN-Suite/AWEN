@@ -2,7 +2,9 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
+  InternalServerErrorException,
   NotFoundException,
   Param,
   Post,
@@ -22,6 +24,7 @@ import { EntityDto } from './dto/entity.dto';
 import { AnnotationService } from '../annotation/annotation.service';
 import { AnnotationDto } from '../annotation/dto/annotation.dto';
 import { CreateEntityDto } from './dto/create-entity.dto';
+import { RAMENError } from '../schema/RAMENError';
 
 @Controller('entity')
 export class EntityController {
@@ -74,6 +77,20 @@ export class EntityController {
     }
 
     return entity;
+  }
+
+  @Delete(':id')
+  async deleteById(@Param() params: IdDto) {
+    const { id } = params;
+
+    try {
+      await this.entityService.delete(id);
+    } catch (error) {
+      if (!(error instanceof RAMENError)) {
+        throw new InternalServerErrorException('Could not delete entity');
+      }
+      throw error;
+    }
   }
 
   @ApiResponse({ type: [AnnotationDto] })

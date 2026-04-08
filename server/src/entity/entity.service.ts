@@ -419,4 +419,19 @@ export class EntityService {
     const res = await this.neo4jService.write<{ id: string }>(cypher, params);
     return res.records[0].get('id');
   }
+
+  async delete(id: string) {
+    const key = this.model.getNodeKeyField(ENTITY_LABEL_NAME);
+    const eNode = new Cypher.Node();
+    const pattern = new Cypher.Pattern(eNode, {
+      labels: ENTITY_LABEL_NAME,
+      properties: {
+        [key]: new Cypher.Param(id),
+      },
+    });
+    const { cypher, params } = new Cypher.Match(pattern)
+      .detachDelete(eNode) //TODO: auch annotation properties löschen, die keine weiterne verknüpfungen haben?
+      .build();
+    await this.neo4jService.write(cypher, params);
+  }
 }
