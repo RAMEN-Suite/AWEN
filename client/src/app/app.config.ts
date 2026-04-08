@@ -1,19 +1,14 @@
-import {
-  ApplicationConfig,
-  inject,
-  provideBrowserGlobalErrorListeners,
-  provideZonelessChangeDetection
-} from '@angular/core';
-import {provideRouter, Router, withComponentInputBinding, withNavigationErrorHandler} from '@angular/router';
+import { ApplicationConfig, inject, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
+import { provideRouter, Router, withComponentInputBinding, withNavigationErrorHandler } from '@angular/router';
 import { routes } from './app.routes';
 import { provideHttpClient } from '@angular/common/http';
-import {providePrimeNG} from 'primeng/config';
+import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
-import {MessageService} from 'primeng/api';
-
+import { ConfirmationService, MessageService } from 'primeng/api';
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    ConfirmationService,
     MessageService,
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
@@ -30,16 +25,15 @@ export const appConfig: ApplicationConfig = {
         } else {
           router.navigate(['/error', 'unknown']);
         }
-
-      })
+      }),
     ),
     providePrimeNG({
       theme: {
         preset: Aura,
         options: {
-          darkModeSelector: 'none'
-        }
-      }
+          darkModeSelector: 'none',
+        },
+      },
     }),
     provideHttpClient(),
   ],

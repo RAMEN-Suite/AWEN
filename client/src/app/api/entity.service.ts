@@ -120,4 +120,18 @@ export class EntityService {
     );
     return firstValueFrom(res);
   }
+
+  async deleteEntity(id: string) {
+    const res = this.http.delete('/api/entity/' + id).pipe(
+      catchError((err) => {
+        this.messageService.add({
+          severity: 'error',
+          detail: `Error while deleting entity with id ${id}. Try again later.`,
+        });
+        throw err;
+      }),
+    );
+    await firstValueFrom(res);
+    return;
+  }
 }

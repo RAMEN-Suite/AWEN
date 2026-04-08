@@ -6,6 +6,7 @@ import { Tag } from 'primeng/tag';
 import { ENTITY_LABEL_NAME } from '../../../constants';
 import { RouterLink } from '@angular/router';
 import { BackButtonComponent } from '../../utils/back-button.component';
+import { DeleteEntity } from '../../delete-entity/delete-entity';
 
 interface AnnotationGroup {
   type: string;
@@ -14,12 +15,16 @@ interface AnnotationGroup {
 
 @Component({
   selector: 'app-detail-page',
-  imports: [TableModule, Chip, Tag, RouterLink, BackButtonComponent],
+  imports: [TableModule, Chip, Tag, RouterLink, BackButtonComponent, DeleteEntity],
   templateUrl: './detail-page.html',
 })
 export class DetailPage {
   entity = input.required<Entity>();
   annotations = input.required<Annotation[]>();
+  entityKeyValue = computed(() => {
+    const key = this.keyProperty(this.entity().properties);
+    return key!.value!;
+  });
 
   groupedAnnotations = computed<AnnotationGroup[]>(() => {
     const groups = new Map<string, Annotation[]>();

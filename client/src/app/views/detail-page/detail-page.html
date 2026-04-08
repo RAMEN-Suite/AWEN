@@ -1,8 +1,17 @@
-<div style="position: fixed; top: 16px; left: 16px">
-  <app-back-button />
-</div>
+<!--<div style="position: fixed; top: 16px; left: 16px">-->
+<!--  <app-back-button />-->
+<!--</div>-->
+<!--<div style="position: fixed; top: 16px; right: 16px">-->
+<!--  <app-delete-entity [entityId]="entityKeyValue()" />-->
+<!--</div>-->
 <div class="grid flex justify-content-center pt-5">
-  <div class="col-11 mb-8 md:col-9 md:mb-8 lg:col-7 lg:mb-5">
+  <div class="col-6 sm:col px-3 flex flex-order-0 sm:flex-order-0">
+    <app-back-button />
+  </div>
+  <div class="col-6 sm:col px-3 flex justify-content-end flex-order-1 sm:flex-order-2">
+    <app-delete-entity [entityId]="entityKeyValue()" />
+  </div>
+  <div class="col-11 mb-8 md:col-9 md:mb-8 lg:col-7 lg:mb-5 flex-order-2 sm:flex-order-1">
     <div class="w-full">
       <span class="text-4xl font-bold"> {{entity().label}} </span>
     </div>
@@ -18,8 +27,7 @@
       <span class="text-3xl font-bold"> Meta </span>
     </div>
     <div class="w-full flex flex-column gap-3">
-      <!-- Annotation Node-Properties -->
-      @for (property of entity().properties; track $index) {
+      @for (property of visibleProperties(entity().properties); track $index) {
       <div class="border-1 border-gray-200 border-round">
         <div class="grid m-0 border-bottom-1 border-round border-gray-200">
           <div class="col-3 p-3 bg-gray-50 border-right-1 border-gray-200">

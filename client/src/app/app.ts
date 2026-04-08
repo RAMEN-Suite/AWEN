@@ -8,10 +8,11 @@ import { MenuItem } from 'primeng/api';
 import { Button, ButtonDirective, ButtonLabel } from 'primeng/button';
 import { HealthService } from './api/health.service';
 import { filter } from 'rxjs';
+import { ConfirmDialog } from 'primeng/confirmdialog';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Toast, ProgressSpinner, MenubarModule, Button, RouterLink, ButtonDirective, ButtonLabel],
+  imports: [RouterOutlet, Toast, ProgressSpinner, MenubarModule, Button, RouterLink, ButtonDirective, ButtonLabel, ConfirmDialog],
   providers: [ConfigService, HealthService],
   styleUrl: './app.scss',
   templateUrl: './app.html',
