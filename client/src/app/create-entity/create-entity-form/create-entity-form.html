@@ -43,9 +43,16 @@
     } @else {
 
     <!-- Single Value Inputs -->
-    @if (dataType.name.toLowerCase() === 'string') {
+    @if (dataType.name.toLowerCase() === 'string') { @let isLabel = property.name === ENTITY_NAME_PROPERTY;
     <p-floatlabel variant="on">
-      <input pInputText [formControlName]="property.name" [id]="fieldId" autocomplete="off" fluid />
+      <input
+        pInputText
+        [formControlName]="property.name"
+        (blur)="isLabel ? onLabelBlur($event):null"
+        [id]="fieldId"
+        autocomplete="off"
+        fluid
+      />
       <label [for]="fieldId">{{ property.name }}<small class="text-red-400"> *</small></label>
     </p-floatlabel>
     } @if (dataType.name.toLowerCase() === 'boolean') {

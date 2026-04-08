@@ -45,9 +45,9 @@ export class EntityService {
     return firstValueFrom(res);
   }
 
-  async getAutocomplete(search: string, query: EntityAutocompleteQuery): Promise<EntityNames[]> {
+  async getAutocomplete(search: string, query?: EntityAutocompleteQuery): Promise<EntityNames[]> {
     const parsedQuery = encodeURIComponent(search);
-    const httpParams = this.queryParamService.transformQueryParams(query);
+    const httpParams = query ? this.queryParamService.transformQueryParams(query) : undefined;
     const temp = this.http
       .get<EntityNames[]>('/api/entity/auto-complete/' + parsedQuery, {
         params: httpParams,

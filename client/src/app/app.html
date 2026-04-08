@@ -1,4 +1,11 @@
-<p-toast />
+<p-toast>
+  <ng-template let-message pTemplate="message">
+    <div class="p-toast-message-text">
+      <span class="p-toast-summary">{{ message.summary }}</span>
+      <div class="p-toast-detail" [innerHTML]="message.detail"></div>
+    </div>
+  </ng-template>
+</p-toast>
 <div class="app-shell">
   <div class="app-content" #appContent (scroll)="onContentScroll($event)">
     @if (loaded()) {

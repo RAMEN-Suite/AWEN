@@ -31,4 +31,8 @@ export class CreateEntityService {
   async createEntity(type: string, payload: Record<string, unknown>) {
     return await this.entityAPI.createEntity(type, payload);
   }
+
+  async checkForSimilarLabels(label: string) {
+    return await this.entityAPI.getAutocomplete(label);
+  }
 }

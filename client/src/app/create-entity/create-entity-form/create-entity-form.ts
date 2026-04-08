@@ -13,7 +13,7 @@ import { DynamicDialogRef } from 'primeng/dynamicdialog';
 import { MessageService } from 'primeng/api';
 import { AutoComplete } from 'primeng/autocomplete';
 import { KeyFilter } from 'primeng/keyfilter';
-import { hidden } from '@angular/forms/signals';
+import { ENTITY_NAME_PROPERTY } from '../../../constants';
 
 @Component({
   selector: 'app-create-entity-form',
@@ -37,7 +37,7 @@ export class CreateEntityForm {
 
   typeInput = new FormControl('', { nonNullable: true });
 
-  propertiesForm = new FormGroup({});
+  propertiesForm = new FormGroup<Record<string, FormControl<unknown>>>({});
 
   constructor() {
     effect(async () => {
@@ -70,6 +70,11 @@ export class CreateEntityForm {
     }
 
     this.propertiesForm = new FormGroup(controlls);
+  }
+
+  async onLabelBlur(event: FocusEvent) {
+    const value = (event.target as HTMLInputElement).value;
+    await this.checkForSimilarLabels(value);
   }
 
   protected async clickCreateButton() {
@@ -160,5 +165,18 @@ export class CreateEntityForm {
     return this.dataTypes().find((dataType) => dataType.id === id);
   }
 
-  protected readonly hidden = hidden;
+  private async checkForSimilarLabels(label: string) {
+    if (label.length === 0) return;
+    const similarEntities = await this.createEntityService.checkForSimilarLabels(label);
+    const detailMsg = similarEntities.map((entity) => `There is already an Entity named <b>${entity.label}</b>`);
+    if (detailMsg.length === 0) return;
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Similar Label found',
+      detail: detailMsg.join('\n'),
+      life: 11000,
+    });
+  }
+
+  protected readonly ENTITY_NAME_PROPERTY = ENTITY_NAME_PROPERTY;
 }
