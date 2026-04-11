@@ -30,6 +30,10 @@ export class ConfigService {
     });
   }
 
+  findDataType(id: string) {
+    return this.getDataTypes()().find((dataType) => dataType.id === id);
+  }
+
   setConfig(value: EmConfig) {
     this._config.set(value);
     this.store.saveData(EM_CONFIG_STORE_KEY, value);

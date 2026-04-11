@@ -1,0 +1,84 @@
+@for (property of properties(); track property.name) { @if (findDataType(property.typeId); as dataType) {
+<form class="field" [formGroup]="propertiesForm()">
+  @let isArray = property.bounds.upperBound === -1 || property.bounds.upperBound > 1; @let fieldId = 'create-entity-form_' + formName + '_'
+  + property.name; @if (isArray) {
+
+  <!-- Array-Input via AutoComplete Chips -->
+  <p-floatlabel variant="on">
+    @let keyFilter = dataType.name.toLowerCase() === 'integer' ? 'pint' : dataType.name.toLowerCase() === 'float' ? 'pnum' : undefined;
+    <p-auto-complete
+      [pKeyFilter]="keyFilter"
+      [formControlName]="property.name"
+      [inputId]="fieldId"
+      [multiple]="true"
+      [typeahead]="false"
+      fluid
+      appendTo="body"
+    />
+    <label [for]="fieldId">
+      {{ property.name }} @if (property.bounds.upperBound !== -1) {
+      <small class="text-gray-400"> (max. {{ property.bounds.upperBound }})</small>
+      } @if (property.bounds.lowerBound > 0) {
+      <small class="text-red-400"> *</small>
+      }
+    </label>
+  </p-floatlabel>
+
+  } @else {
+
+  <!-- Single Value Inputs -->
+  @if (dataType.name.toLowerCase() === 'string') { @let isLabel = property.name === ENTITY_NAME_PROPERTY;
+  <p-floatlabel variant="on">
+    <input
+      pInputText
+      [formControlName]="property.name"
+      (blur)="isLabel ? onLabelBlur($event):null"
+      [id]="fieldId"
+      autocomplete="off"
+      fluid
+    />
+    <label [for]="fieldId">{{ property.name }}<small class="text-red-400"> *</small></label>
+  </p-floatlabel>
+  } @if (dataType.name.toLowerCase() === 'boolean') {
+  <p-toggle-button [formControlName]="property.name" [onLabel]="property.name" [offLabel]="'Not ' + property.name" [id]="fieldId" />
+  } @if (dataType.name.toLowerCase() === 'integer') {
+  <p-floatlabel variant="on">
+    <p-input-number
+      [formControlName]="property.name"
+      [id]="fieldId"
+      mode="decimal"
+      [useGrouping]="false"
+      [maxFractionDigits]="0"
+      autocomplete="off"
+      fluid
+    />
+    <label [for]="fieldId"
+      >{{ property.name }}@if (property.bounds.lowerBound > 0) {
+      <small class="text-red-400"> *</small>
+      }</label
+    >
+  </p-floatlabel>
+  } @if (dataType.name.toLowerCase() === 'float') {
+  <p-floatlabel variant="on">
+    <p-input-number
+      [formControlName]="property.name"
+      [id]="fieldId"
+      mode="decimal"
+      [useGrouping]="false"
+      [minFractionDigits]="1"
+      autocomplete="off"
+      fluid
+    />
+    <label [for]="fieldId">{{ property.name }}<small class="text-red-400"> *</small></label>
+  </p-floatlabel>
+  } }
+
+  <!-- Validierungsfehler -->
+  @if (propertiesForm().get(property.name)?.invalid && propertiesForm().get(property.name)?.dirty) {
+  <small class="text-red-400">
+    @if (propertiesForm().get(property.name)?.errors?.['minlength']) { At least {{ property.bounds.lowerBound }} value(s) required. } @if
+    (propertiesForm().get(property.name)?.errors?.['maxlength']) { At most {{ property.bounds.upperBound }} value(s) allowed. }
+  </small>
+  }
+</form>
+} }
