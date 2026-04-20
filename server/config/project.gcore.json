@@ -40,6 +40,11 @@
           "name": "url",
           "typeId": "String",
           "bounds": { "lowerBound": 1, "upperBound": 1 }
+        },
+        {
+          "name": "date",
+          "typeId": "String",
+          "bounds": { "lowerBound": 1, "upperBound": 1 }
         }
       ],
       "constraints": [],

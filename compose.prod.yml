@@ -13,8 +13,9 @@ services:
     restart: unless-stopped
     environment:
       APP_NAME: Entity-Manager
+      PREFIX: "/em"
     ports:
-      - "8080:3000"
+      - "8000:3000"
     env_file:
       - path: ./server/.env
         required: true

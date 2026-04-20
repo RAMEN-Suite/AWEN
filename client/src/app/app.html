@@ -8,8 +8,10 @@
 </p-toast>
 <p-confirm-dialog />
 
-<div>
-  <div #appContent (scroll)="onContentScroll($event)">
+<div class="app-shell">
+  <app-navbar class="topbar" />
+
+  <div class="app-content" #appContent (scroll)="onContentScroll($event)">
     @if (loaded()) {
     <router-outlet />
     } @else {

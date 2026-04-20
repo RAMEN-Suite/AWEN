@@ -9,11 +9,13 @@ import { Button, ButtonDirective, ButtonLabel } from 'primeng/button';
 import { HealthService } from './api/health.service';
 import { filter } from 'rxjs';
 import { ConfirmDialog } from 'primeng/confirmdialog';
+import { Navbar } from './navbar/navbar';
+import { LocalStoreService } from './utils/local-store.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Toast, ProgressSpinner, MenubarModule, Button, RouterLink, ButtonDirective, ButtonLabel, ConfirmDialog],
-  providers: [ConfigService, HealthService],
+  imports: [RouterOutlet, Toast, ProgressSpinner, MenubarModule, Button, RouterLink, ButtonDirective, ButtonLabel, ConfirmDialog, Navbar],
+  providers: [ConfigService, HealthService, LocalStoreService],
   styleUrl: './app.scss',
   templateUrl: './app.html',
 })

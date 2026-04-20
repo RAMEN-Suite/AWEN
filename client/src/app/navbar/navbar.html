@@ -1,0 +1,12 @@
+<p-menubar [model]="items" class="border-noround border-0 bg-gray-200">
+  <ng-template #start>
+    @if (!isHomeRoute()) {
+    <app-back-button />
+    }
+  </ng-template>
+  <ng-template #end>
+    @if (entity(); as entity) {
+    <span class="text-2xl">{{ entity.label }}</span>
+    }
+  </ng-template>
+</p-menubar>

@@ -6,10 +6,11 @@ import { GAttribute } from '../../../interfaces';
 import { FloatLabel } from 'primeng/floatlabel';
 import { Button } from 'primeng/button';
 import { DynamicDialogRef } from 'primeng/dynamicdialog';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService } from 'primeng/api';
 import { ENTITY_NAME_PROPERTY } from '../../../constants';
 import { ConfigService } from '../../config-module/config.service';
 import { AttributeForm } from '../../utils/attribute-form/attribute-form';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-create-entity-form',
@@ -19,8 +20,10 @@ import { AttributeForm } from '../../utils/attribute-form/attribute-form';
 export class CreateEntityForm {
   private readonly createEntityService = inject(CreateEntityService);
   private readonly configService = inject(ConfigService);
-  private readonly messageService = inject(MessageService);
+  private readonly router = inject(Router);
   dialogRef = inject(DynamicDialogRef);
+
+  private confirmationService = inject(ConfirmationService);
 
   preselectedType = input<string>();
 
@@ -58,15 +61,30 @@ export class CreateEntityForm {
   protected async clickCreateButton() {
     try {
       const createdId = await this.createEntityService.createEntity(this.typeInput.value, this.createPayload());
-      this.messageService.add({
-        severity: 'success',
-        summary: `Entity with id ${createdId} Successfully created!`,
-        life: 12000,
-        // TODO: Link to detail page
+      this.confirmationService.confirm({
+        message: 'The Entity was successfully created!',
+        header: 'Success',
+        icon: 'pi pi-info-circle',
+        rejectButtonProps: {
+          label: 'Stay here',
+          severity: 'secondary',
+          outlined: true,
+        },
+        acceptButtonProps: {
+          label: 'Go to Entity',
+          severity: 'primary',
+        },
+
+        accept: async () => {
+          await this.router.navigate(['entity', createdId]);
+          this.dialogRef.close();
+        },
+        reject: () => {
+          this.dialogRef.close();
+        },
       });
-      this.dialogRef.close();
     } catch {
-      /* empty */
+      /* empty - Msg is displayed via Entity API */
     }
   }
 
