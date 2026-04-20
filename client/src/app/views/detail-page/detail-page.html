@@ -52,84 +52,93 @@
         <span class="text-3xl font-bold">Statements</span>
       </div>
       <div class="col-12 mx-0 grid w-full gap-5">
-        @for (group of groupedAnnotations(); track group.type) {
-        <!-- Typ-Sektion -->
-        <div class="col-12 mx-0 flex flex-column gap-3">
-          <div class="flex align-items-center gap-3 pb-2 border-bottom-2 border-primary">
-            <span class="text-xl font-bold">{{ group.type }}</span>
-            <p-chip [label]="group.annotations.length.toString()" />
-          </div>
-
-          <!-- Annotations der Gruppe -->
-          @for (annotation of group.annotations; track $index) {
-          <div class="border-1 border-gray-200 border-round">
-            <!-- Annotation Properties -->
-            @if (visibleProperties(annotation.properties).length > 0) {
-            <div class="grid m-0 border-bottom-1 border-gray-200">
-              <div class="col-3 p-3 bg-gray-50 border-right-1 border-gray-200">
-                <span class="text-sm font-medium text-gray-500">Annotation</span>
+        <p-accordion [multiple]="true" class="w-full">
+          @for (group of groupedAnnotations(); track group.type) {
+          <p-accordion-panel [value]="group.type">
+            <!-- Typ-Sektion -->
+            <!-- <div class="col-12 mx-0 flex flex-column gap-3"> -->
+            <p-accordion-header>
+              <div class="w-full flex align-items-center gap-3 pb-2 border-bottom-2 border-primary text-color">
+                <span class="text-xl font-bold">{{ group.type }}</span>
+                <p-chip [label]="group.annotations.length.toString()" />
               </div>
-              <div class="col p-3 flex flex-column gap-2">
-                @for (property of visibleProperties(annotation.properties); track property.name) {
-                <div class="flex flex-column gap-1">
-                  <span class="text-xs text-gray-400">{{ property.name }}</span>
-                  @if (property.typeId === 'Array') {
-                  <div class="flex flex-wrap gap-1">
-                    @for (val of $any(property.value); track $index) {
-                    <p-chip [label]="val" />
-                    }
+            </p-accordion-header>
+            <!-- Annotations der Gruppe -->
+            <p-accordion-content>
+              <div class="col-12 mx-0 flex flex-column gap-3">
+                @for (annotation of group.annotations; track $index) {
+                <div class="border-1 border-gray-200 border-round">
+                  <!-- Annotation Properties -->
+                  @if (visibleProperties(annotation.properties).length > 0) {
+                  <div class="grid m-0 border-bottom-1 border-gray-200">
+                    <div class="col-3 p-3 bg-gray-50 border-right-1 border-gray-200">
+                      <span class="text-sm font-medium text-gray-500">Annotation</span>
+                    </div>
+                    <div class="col p-3 flex flex-column gap-2">
+                      @for (property of visibleProperties(annotation.properties); track property.name) {
+                      <div class="flex flex-column gap-1">
+                        <span class="text-xs text-gray-400">{{ property.name }}</span>
+                        @if (property.typeId === 'Array') {
+                        <div class="flex flex-wrap gap-1">
+                          @for (val of $any(property.value); track $index) {
+                          <p-chip [label]="val" />
+                          }
+                        </div>
+                        } @else {
+                        <span>{{ property.value }}</span>
+                        }
+                      </div>
+                      }
+                    </div>
                   </div>
-                  } @else {
-                  <span>{{ property.value }}</span>
+                  }
+
+                  <!-- Connected Nodes -->
+                  @for (node of annotation.connectedNodes; track $index) {
+                  <div class="grid m-0" [class.border-top-1]="$index > 0" [class.border-gray-200]="$index > 0">
+                    <div class="col-3 p-3 bg-gray-50 border-right-1 border-gray-200 flex flex-column gap-2">
+                      <p-tag
+                        [value]="node.direction"
+                        [severity]="node.direction === 'OUTGOING' ? 'success' : 'info'"
+                        styleClass="text-xs w-fit"
+                      />
+                      @for (type of node.types; track type) {
+                      <span class="text-sm font-medium">{{ type }}</span>
+                      }
+
+                      <!-- Key Property – mit Link wenn Entity -->
+                      @if (keyProperty(node.properties); as key) { @if (isEntity(node) && entityRouterLink(node); as link) {
+                      <a [routerLink]="link" class="text-xs text-primary no-underline hover:underline"> {{ key.value }} </a>
+                      } @else {
+                      <span class="text-xs text-gray-500">{{ key.value }}</span>
+                      } }
+                    </div>
+                    <div class="col p-3 flex flex-column gap-2">
+                      @for (property of visibleProperties(node.properties); track property.name) {
+                      <div class="flex flex-column gap-1">
+                        <span class="text-xs text-gray-400">{{ property.name }}</span>
+                        @if (property.typeId === 'Array') {
+                        <div class="flex flex-wrap gap-1">
+                          @for (val of $any(property.value); track $index) {
+                          <p-chip [label]="val" />
+                          }
+                        </div>
+                        } @else {
+                        <span>{{ property.value }}</span>
+                        }
+                      </div>
+                      }
+                    </div>
+                  </div>
                   }
                 </div>
                 }
               </div>
-            </div>
-            }
-
-            <!-- Connected Nodes -->
-            @for (node of annotation.connectedNodes; track $index) {
-            <div class="grid m-0" [class.border-top-1]="$index > 0" [class.border-gray-200]="$index > 0">
-              <div class="col-3 p-3 bg-gray-50 border-right-1 border-gray-200 flex flex-column gap-2">
-                <p-tag
-                  [value]="node.direction"
-                  [severity]="node.direction === 'OUTGOING' ? 'success' : 'info'"
-                  styleClass="text-xs w-fit"
-                />
-                @for (type of node.types; track type) {
-                <span class="text-sm font-medium">{{ type }}</span>
-                }
-
-                <!-- Key Property – mit Link wenn Entity -->
-                @if (keyProperty(node.properties); as key) { @if (isEntity(node) && entityRouterLink(node); as link) {
-                <a [routerLink]="link" class="text-xs text-primary no-underline hover:underline"> {{ key.value }} </a>
-                } @else {
-                <span class="text-xs text-gray-500">{{ key.value }}</span>
-                } }
-              </div>
-              <div class="col p-3 flex flex-column gap-2">
-                @for (property of visibleProperties(node.properties); track property.name) {
-                <div class="flex flex-column gap-1">
-                  <span class="text-xs text-gray-400">{{ property.name }}</span>
-                  @if (property.typeId === 'Array') {
-                  <div class="flex flex-wrap gap-1">
-                    @for (val of $any(property.value); track $index) {
-                    <p-chip [label]="val" />
-                    }
-                  </div>
-                  } @else {
-                  <span>{{ property.value }}</span>
-                  }
-                </div>
-                }
-              </div>
-            </div>
-            }
-          </div>
+            </p-accordion-content>
+            <!--            </div>-->
+          </p-accordion-panel>
           }
-        </div>
-        }
+        </p-accordion>
       </div>
     </div>
   </div>

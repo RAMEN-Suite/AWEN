@@ -5,8 +5,8 @@ import { Chip } from 'primeng/chip';
 import { Tag } from 'primeng/tag';
 import { ENTITY_LABEL_NAME } from '../../../constants';
 import { RouterLink } from '@angular/router';
-import { BackButtonComponent } from '../../utils/back-button.component';
 import { DeleteEntity } from '../../delete-entity/delete-entity';
+import { Accordion, AccordionContent, AccordionHeader, AccordionPanel } from 'primeng/accordion';
 
 interface AnnotationGroup {
   type: string;
@@ -15,8 +15,23 @@ interface AnnotationGroup {
 
 @Component({
   selector: 'app-detail-page',
-  imports: [TableModule, Chip, Tag, RouterLink, BackButtonComponent, DeleteEntity],
+  imports: [TableModule, Chip, Tag, RouterLink, DeleteEntity, Accordion, AccordionPanel, AccordionHeader, AccordionContent],
   templateUrl: './detail-page.html',
+  styles: `
+    :host ::ng-deep {
+      // Das Panel braucht position: relative als Sticky-Boundary
+      .p-accordionpanel {
+        position: relative;
+      }
+
+      // Der generierte Button im Header sticky machen
+      .p-accordionheader {
+        position: sticky !important;
+        top: 0;
+        z-index: 10;
+      }
+    }
+  `,
 })
 export class DetailPage {
   entity = input.required<Entity>();
@@ -37,6 +52,7 @@ export class DetailPage {
       annotations,
     }));
   });
+
   visibleProperties(properties: NodePropertyDto[]): NodePropertyDto[] {
     return properties.filter((p) => !p.isKey && p.value !== '');
   }
