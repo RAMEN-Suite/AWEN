@@ -405,9 +405,7 @@ export class EntityService {
 
     const nodeProperties: Record<string, Cypher.Expr> = {};
     Object.entries(properties).forEach(([key, value]) => {
-      if (value) {
-        nodeProperties[key] = new Cypher.Param(value);
-      }
+      nodeProperties[key] = new Cypher.Param(value);
     });
     nodeProperties[key] = Cypher.randomUUID();
 

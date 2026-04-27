@@ -4,15 +4,14 @@ import { Entity, EntityPropertyDto, GAttribute } from '../../../interfaces';
 import { Button } from 'primeng/button';
 import { DynamicDialogRef } from 'primeng/dynamicdialog';
 import { MessageService } from 'primeng/api';
-import { ConfigService } from '../../config-module/config.service';
 import { AttributeForm } from '../../utils/attribute-form/attribute-form';
 import { EditEntityService } from '../edit-entity.service';
 import { getKeyProperty } from '../../utils/entity.utils';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { from, map, switchMap } from 'rxjs';
 import { ENTITY_NAME_PROPERTY } from '../../../constants';
-import { castValue, castValues } from '../../utils/utils';
 import { EntityService } from '../../views/detail-page/entity.service';
+import { UtilsService } from '../../utils/utils.service';
 
 interface AttributeWithOptValue extends Omit<EntityPropertyDto, 'value'>, Partial<Pick<EntityPropertyDto, 'value'>> {}
 
@@ -24,7 +23,7 @@ interface AttributeWithOptValue extends Omit<EntityPropertyDto, 'value'>, Partia
 export class EditEntityForm {
   private readonly entityService = inject(EntityService);
   private readonly editEntityService = inject(EditEntityService);
-  private readonly configService = inject(ConfigService);
+  private readonly utilService = inject(UtilsService);
   private readonly messageService = inject(MessageService);
   dialogRef = inject(DynamicDialogRef);
 
@@ -55,7 +54,8 @@ export class EditEntityForm {
     }
     try {
       this.loading.set(true);
-      await this.editEntityService.updateEntity(key.value as string, this.createPayload());
+      const payload = this.utilService.createPayload(this.propertiesForm().value, this.properties());
+      await this.editEntityService.updateEntity(key.value as string, payload);
       this.messageService.add({
         severity: 'success',
         summary: `The Entity was successfully updated!`,
@@ -68,30 +68,6 @@ export class EditEntityForm {
       this.loading.set(false);
       /* empty - Msg is displayed via Entity API */
     }
-  }
-
-  private createPayload() {
-    const payload: Record<string, unknown> = {};
-
-    Object.entries(this.propertiesForm().value).forEach(([key, value]) => {
-      if (value === undefined) return;
-
-      const prop = this.properties().find((p) => p.name === key);
-      if (!prop) return;
-
-      const dataType = this.configService.findDataType(prop.typeId);
-      if (!dataType) return;
-
-      const isArray = prop.bounds.upperBound === -1 || prop.bounds.upperBound > 1;
-
-      if (isArray && Array.isArray(value)) {
-        payload[key] = castValues(value, dataType.name);
-      } else {
-        payload[key] = castValue(value, dataType.name);
-      }
-    });
-
-    return payload;
   }
 
   private mergePropArrays(props: EntityPropertyDto[], attributes: AttributeWithOptValue[]) {

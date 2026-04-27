@@ -127,7 +127,7 @@ export class RamenModelService {
         this.validateSingleValue(attribute, entry, ret);
       }
     } else {
-      if (upperBound > 1) {
+      if (upperBound > 1 && lowerBound > 0) {
         ret[0] = false;
         ret[1].push(
           `Attribute "${attribute.name}" requires ${lowerBound} to ${upperBound} entries, but got one.`,
@@ -140,7 +140,7 @@ export class RamenModelService {
         attributeValue === undefined ||
         attributeValue === '';
 
-      if (lowerBound === 1 && isEmpty) {
+      if (lowerBound > 0 && isEmpty) {
         ret[0] = false;
         ret[1].push(
           `Attribute "${attribute.name}" is required but got an empty value.`,
@@ -161,11 +161,15 @@ export class RamenModelService {
     value: unknown,
     ret: [valid: boolean, message: string[]],
   ): [valid: boolean, message: string[]] {
-    if (typeof value === 'string') {
+    const dataType = this.getDataType(attribute.typeId);
+    if (dataType.name.toLowerCase() === 'string') {
       this.validateStringAttribute(attribute, value, ret);
-    } else if (typeof value === 'boolean') {
+    } else if (dataType.name.toLowerCase() === 'boolean') {
       this.validateBooleanAttribute(attribute, value, ret);
-    } else if (typeof value === 'number') {
+    } else if (
+      dataType.name.toLowerCase() === 'integer' ||
+      dataType.name.toLowerCase() === 'float'
+    ) {
       this.validateNumberAttribute(attribute, value, ret);
     }
 
@@ -189,11 +193,11 @@ export class RamenModelService {
 
   private validateBooleanAttribute(
     attribute: GAttribute,
-    attributeValue: boolean,
+    attributeValue: unknown,
     ret: [valid: boolean, message: string[]],
   ): [valid: boolean, message: string[]] {
     const dataType = this.getDataType(attribute.typeId);
-    if (dataType.name.toLowerCase() !== 'boolean') {
+    if (typeof attributeValue !== 'boolean') {
       ret[0] = false;
       ret[1].push(
         `Attribute "${attribute.name}" is expected to be typeof "${dataType.name}", but is "Boolean".`,
@@ -205,16 +209,16 @@ export class RamenModelService {
 
   private validateStringAttribute(
     attribute: GAttribute,
-    attributeValue: string,
+    attributeValue: unknown,
     ret: [valid: boolean, message: string[]],
   ): [valid: boolean, message: string[]] {
     const dataType = this.getDataType(attribute.typeId);
 
     //TODO: andere cases abfangen
-    if (dataType.name.toLowerCase() !== 'string') {
+    if (typeof attributeValue !== 'string') {
       ret[0] = false;
       ret[1].push(
-        `Attribute "${attribute.name}" is expected to be typeof "${dataType.name}", but is "String".`,
+        `Attribute "${attribute.name}" is expected to be typeof "${dataType.name}", but is "${typeof attributeValue}".`,
       );
       return ret;
     }
@@ -224,14 +228,11 @@ export class RamenModelService {
 
   private validateNumberAttribute(
     attribute: GAttribute,
-    attributeValue: number,
+    attributeValue: unknown,
     ret: [valid: boolean, message: string[]],
   ): [valid: boolean, message: string[]] {
     const dataType = this.getDataType(attribute.typeId);
-    if (
-      dataType.name.toLowerCase() !== 'integer' &&
-      dataType.name.toLowerCase() !== 'float'
-    ) {
+    if (typeof attributeValue !== 'number') {
       ret[0] = false;
       ret[1].push(
         `Attribute "${attribute.name}" is expected to be typeof "${dataType.name}", but is "Integer" or "Float".`,

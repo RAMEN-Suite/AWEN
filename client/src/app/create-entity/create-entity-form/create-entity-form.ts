@@ -7,10 +7,9 @@ import { FloatLabel } from 'primeng/floatlabel';
 import { Button } from 'primeng/button';
 import { DynamicDialogRef } from 'primeng/dynamicdialog';
 import { ConfirmationService } from 'primeng/api';
-import { ConfigService } from '../../config-module/config.service';
 import { AttributeForm } from '../../utils/attribute-form/attribute-form';
 import { Router } from '@angular/router';
-import { castValue, castValues } from '../../utils/utils';
+import { UtilsService } from '../../utils/utils.service';
 
 @Component({
   selector: 'app-create-entity-form',
@@ -19,7 +18,7 @@ import { castValue, castValues } from '../../utils/utils';
 })
 export class CreateEntityForm {
   private readonly createEntityService = inject(CreateEntityService);
-  private readonly configService = inject(ConfigService);
+  private readonly utilService = inject(UtilsService);
   private readonly router = inject(Router);
   dialogRef = inject(DynamicDialogRef);
 
@@ -60,7 +59,10 @@ export class CreateEntityForm {
 
   protected async clickCreateButton() {
     try {
-      const createdId = await this.createEntityService.createEntity(this.typeInput.value, this.createPayload());
+      const createdId = await this.createEntityService.createEntity(
+        this.typeInput.value,
+        this.utilService.createPayload(this.propertiesForm().value, this.properties()),
+      );
       this.confirmationService.confirm({
         message: 'The Entity was successfully created!',
         header: 'Success',
@@ -86,29 +88,5 @@ export class CreateEntityForm {
     } catch {
       /* empty - Msg is displayed via Entity API */
     }
-  }
-
-  private createPayload() {
-    const payload: Record<string, unknown> = {};
-
-    Object.entries(this.propertiesForm().value).forEach(([key, value]) => {
-      if (value === undefined || value === null) return;
-
-      const prop = this.properties().find((p) => p.name === key);
-      if (!prop) return;
-
-      const dataType = this.configService.findDataType(prop.typeId);
-      if (!dataType) return;
-
-      const isArray = prop.bounds.upperBound === -1 || prop.bounds.upperBound > 1;
-
-      if (isArray && Array.isArray(value)) {
-        payload[key] = castValues(value, dataType.name);
-      } else {
-        payload[key] = castValue(value, dataType.name);
-      }
-    });
-
-    return payload;
   }
 }
