@@ -8,7 +8,7 @@ import { ToggleButton } from 'primeng/togglebutton';
 import { ENTITY_NAME_PROPERTY } from '../../../constants';
 import { EntityPropertyDto } from '../../../interfaces';
 import { ConfigService } from '../../config-module/config.service';
-import { EntityService } from '../../api/entity.service';
+import { EntityApiService } from '../../api/entity-api.service';
 import { MessageService } from 'primeng/api';
 import { KeyFilter } from 'primeng/keyfilter';
 import { castValue, castValues } from '../utils';
@@ -22,7 +22,7 @@ interface AttributeWithOptValue extends Omit<EntityPropertyDto, 'value'>, Partia
 })
 export class AttributeForm {
   private readonly configService = inject(ConfigService);
-  private readonly entityAPI = inject(EntityService);
+  private readonly entityAPI = inject(EntityApiService);
   private readonly messageService = inject(MessageService);
 
   properties = input.required<AttributeWithOptValue[]>();
@@ -38,7 +38,6 @@ export class AttributeForm {
     const controlls: Record<string, FormControl> = {};
 
     for (const prop of props) {
-      console.log(prop.name, prop.value);
       const formControl = this.createFormControl(prop);
       if (!formControl) continue;
       controlls[prop.name] = formControl;
@@ -72,7 +71,6 @@ export class AttributeForm {
         let val: number | number[] | null = isArray ? [] : null;
         if (prop.value)
           val = isArray && Array.isArray(prop.value) ? castValues<number>(prop.value, 'float') : castValue<number>(prop.value, 'float');
-        console.log('float', prop.value, val);
         return new FormControl<number | number[] | null>(val, { validators });
       }
       case 'boolean': {

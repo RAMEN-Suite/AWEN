@@ -1,13 +1,13 @@
 import { inject, Injectable } from '@angular/core';
 import { GuidelinesService } from '../api/guidelines.service';
-import { EntityService } from '../api/entity.service';
+import { EntityApiService } from '../api/entity-api.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class EditEntityService {
   guidelineAPI = inject(GuidelinesService);
-  entityAPI = inject(EntityService);
+  entityAPI = inject(EntityApiService);
 
   async getEntityProperties(type: string) {
     return this.guidelineAPI.getEntityProperties(type);

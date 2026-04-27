@@ -1,7 +1,7 @@
 import { Component, inject, input, signal } from '@angular/core';
 import { Button } from 'primeng/button';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { EntityService } from '../api/entity.service';
+import { EntityApiService } from '../api/entity-api.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -13,7 +13,7 @@ export class DeleteEntity {
   private router = inject(Router);
   private confirmationService = inject(ConfirmationService);
   private messageService = inject(MessageService);
-  private entityAPI = inject(EntityService);
+  private entityAPI = inject(EntityApiService);
 
   entityId = input.required<string>();
   protected loading = signal(false);

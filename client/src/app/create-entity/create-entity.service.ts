@@ -1,7 +1,7 @@
 import { computed, inject, Injectable } from '@angular/core';
 import { ConfigService } from '../config-module/config.service';
 import { GuidelinesService } from '../api/guidelines.service';
-import { EntityService } from '../api/entity.service';
+import { EntityApiService } from '../api/entity-api.service';
 
 @Injectable({
   providedIn: 'root',
@@ -9,7 +9,7 @@ import { EntityService } from '../api/entity.service';
 export class CreateEntityService {
   configService = inject(ConfigService);
   guidelineAPI = inject(GuidelinesService);
-  entityAPI = inject(EntityService);
+  entityAPI = inject(EntityApiService);
 
   private readonly _config = this.configService.getConfig();
   private readonly _entityTypes = computed(() => {

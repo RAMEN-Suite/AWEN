@@ -17,8 +17,6 @@ export class Navbar implements OnInit {
   private activatedRoute = inject(ActivatedRoute);
 
   ngOnInit() {
-    console.log('route snapshot data:', this.activatedRoute.snapshot.data);
-    console.log('route snapshot params:', this.activatedRoute.snapshot.params);
     this.activatedRoute.data.subscribe(({ entity }) => {
       console.log(entity);
     });

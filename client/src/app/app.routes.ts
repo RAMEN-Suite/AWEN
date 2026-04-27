@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { SearchPage } from './views/searchPage/search-page.component';
 import { DetailPage } from './views/detail-page/detail-page';
-import { entityByIdResolver } from './utils/entity-by-id-resolver';
+import { entityIdResolver } from './utils/entity-id-resolver';
 import { ErrorPage } from './views/error-page/error-page';
 import { ConfigPage } from './views/config-page/config-page';
 import { annotationsByEntityIdResolver } from './utils/annotations-by-entity-id-resolver';
@@ -15,7 +15,7 @@ export const routes: Routes = [
     path: 'entity/:entityId',
     component: DetailPage,
     resolve: {
-      entity: entityByIdResolver,
+      entityId: entityIdResolver,
       annotations: annotationsByEntityIdResolver,
     },
   },

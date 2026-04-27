@@ -4,24 +4,25 @@
 <!--<div style="position: fixed; top: 16px; right: 16px">-->
 <!--  <app-delete-entity [entityId]="entityKeyValue()" />-->
 <!--</div>-->
+@if (entity(); as entity) {
 <div class="grid flex justify-content-center pt-5">
   <div class="col px-3 md:flex flex-order-0 md:flex-order-0"></div>
   <div class="col px-3 flex gap-2 justify-content-end flex-order-1 md:flex-order-2">
-    <app-edit-entity [entity]="entity()" />
-    <app-delete-entity [entityId]="entityKeyValue()" />
+    <app-edit-entity [entity]="entity" />
+    <app-delete-entity [entityId]="entityId()" />
   </div>
   <div class="col-11 mb-8 md:col-9 md:mb-8 lg:col-7 lg:mb-5 flex-order-2 md:flex-order-1 grid gap-3">
     <div class="col-12">
-      <span class="text-4xl font-bold"> {{entity().label}} </span>
+      <span class="text-4xl font-bold"> {{ entity.label }} </span>
       <div class="flex gap-2">
-        @for (type of entity().types; track $index) {
+        @for (type of entity.types; track $index) {
         <p-chip class="py-1" [label]="type" />
         }
       </div>
     </div>
     <div class="col-12 grid">
       <div class="col-12 flex flex-column gap-3">
-        @for (property of visibleProperties(entity().properties); track $index) {
+        @for (property of visibleProperties(entity.properties); track $index) {
         <div class="col-12 mx-0">
           <div class="border-1 border-gray-200 border-round">
             <div class="grid m-0 border-bottom-1 border-round border-gray-200">
@@ -144,3 +145,8 @@
     </div>
   </div>
 </div>
+} @else {
+<div class="loading-wrapper">
+  <p-progress-spinner ariaLabel="loading" />
+</div>
+}

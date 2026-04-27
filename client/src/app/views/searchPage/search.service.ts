@@ -1,12 +1,12 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { EntityService } from '../../api/entity.service';
+import { EntityApiService } from '../../api/entity-api.service';
 import { OldEntity, EntityAutocompleteQuery, EntitySearchQuery } from '../../../interfaces';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SearchService {
-  entityService = inject(EntityService);
+  entityService = inject(EntityApiService);
 
   private entities = signal<OldEntity[]>([]);
   private entitiesLoading = signal<boolean>(false);

@@ -8,7 +8,7 @@ import { MessageService } from 'primeng/api';
 @Injectable({
   providedIn: 'root',
 })
-export class EntityService {
+export class EntityApiService {
   private http = inject(HttpClient);
   private queryParamService = inject(QueryParamsService);
   private readonly messageService = inject(MessageService);

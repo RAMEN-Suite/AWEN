@@ -3,7 +3,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { Entity, EntityPropertyDto, GAttribute } from '../../../interfaces';
 import { Button } from 'primeng/button';
 import { DynamicDialogRef } from 'primeng/dynamicdialog';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
 import { ConfigService } from '../../config-module/config.service';
 import { AttributeForm } from '../../utils/attribute-form/attribute-form';
 import { EditEntityService } from '../edit-entity.service';
@@ -12,6 +12,7 @@ import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { from, map, switchMap } from 'rxjs';
 import { ENTITY_NAME_PROPERTY } from '../../../constants';
 import { castValue, castValues } from '../../utils/utils';
+import { EntityService } from '../../views/detail-page/entity.service';
 
 interface AttributeWithOptValue extends Omit<EntityPropertyDto, 'value'>, Partial<Pick<EntityPropertyDto, 'value'>> {}
 
@@ -21,12 +22,11 @@ interface AttributeWithOptValue extends Omit<EntityPropertyDto, 'value'>, Partia
   templateUrl: './edit-entity-form.html',
 })
 export class EditEntityForm {
+  private readonly entityService = inject(EntityService);
   private readonly editEntityService = inject(EditEntityService);
   private readonly configService = inject(ConfigService);
   private readonly messageService = inject(MessageService);
   dialogRef = inject(DynamicDialogRef);
-
-  private confirmationService = inject(ConfirmationService);
 
   entity = input.required<Entity>();
   loading = signal<boolean>(false);
@@ -50,34 +50,20 @@ export class EditEntityForm {
         severity: 'error',
         summary: `Error while editing a new entity. Please try again.`,
         closable: true,
-        sticky: true,
       });
       return;
     }
     try {
       this.loading.set(true);
       await this.editEntityService.updateEntity(key.value as string, this.createPayload());
-      this.confirmationService.confirm({
-        message: 'The Entity was successfully created!',
-        header: 'Success',
-        icon: 'pi pi-info-circle',
-        rejectButtonProps: {
-          label: 'Stay here',
-          severity: 'secondary',
-          outlined: true,
-        },
-        acceptButtonProps: {
-          label: 'Go to Entity',
-          severity: 'primary',
-        },
-
-        accept: async () => {
-          this.dialogRef.close();
-        },
-        reject: () => {
-          this.dialogRef.close();
-        },
+      this.messageService.add({
+        severity: 'success',
+        summary: `The Entity was successfully updated!`,
+        closable: true,
       });
+      await this.entityService.reloadEntity();
+      this.dialogRef.close();
+      this.loading.set(false);
     } catch {
       this.loading.set(false);
       /* empty - Msg is displayed via Entity API */

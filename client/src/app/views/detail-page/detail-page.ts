@@ -1,5 +1,5 @@
-import { Component, computed, input } from '@angular/core';
-import { Annotation, ConnectedNodeDto, Entity, NodePropertyDto } from '../../../interfaces';
+import { Component, computed, inject, input, OnInit } from '@angular/core';
+import { Annotation, ConnectedNodeDto, NodePropertyDto } from '../../../interfaces';
 import { TableModule } from 'primeng/table';
 import { Chip } from 'primeng/chip';
 import { Tag } from 'primeng/tag';
@@ -9,6 +9,8 @@ import { DeleteEntity } from '../../delete-entity/delete-entity';
 import { Accordion, AccordionContent, AccordionHeader, AccordionPanel } from 'primeng/accordion';
 import { getKeyProperty } from '../../utils/entity.utils';
 import { EditEntity } from '../../edit-entity/edit-entity';
+import { EntityService } from './entity.service';
+import { ProgressSpinner } from 'primeng/progressspinner';
 
 interface AnnotationGroup {
   type: string;
@@ -17,7 +19,20 @@ interface AnnotationGroup {
 
 @Component({
   selector: 'app-detail-page',
-  imports: [TableModule, Chip, Tag, RouterLink, DeleteEntity, Accordion, AccordionPanel, AccordionHeader, AccordionContent, EditEntity],
+  providers: [EntityService],
+  imports: [
+    TableModule,
+    Chip,
+    Tag,
+    RouterLink,
+    DeleteEntity,
+    Accordion,
+    AccordionPanel,
+    AccordionHeader,
+    AccordionContent,
+    EditEntity,
+    ProgressSpinner,
+  ],
   templateUrl: './detail-page.html',
   styles: `
     :host ::ng-deep {
@@ -35,13 +50,13 @@ interface AnnotationGroup {
     }
   `,
 })
-export class DetailPage {
-  entity = input.required<Entity>();
+export class DetailPage implements OnInit {
+  private readonly entityService = inject(EntityService);
+
+  entityId = input.required<string>();
   annotations = input.required<Annotation[]>();
-  entityKeyValue = computed(() => {
-    const key = this.keyProperty(this.entity().properties);
-    return key!.value!;
-  });
+
+  entity = this.entityService.entity;
 
   groupedAnnotations = computed<AnnotationGroup[]>(() => {
     const groups = new Map<string, Annotation[]>();
@@ -54,6 +69,10 @@ export class DetailPage {
       annotations,
     }));
   });
+
+  async ngOnInit(): Promise<void> {
+    await this.entityService.loadNewEntity(this.entityId());
+  }
 
   visibleProperties(properties: NodePropertyDto[]): NodePropertyDto[] {
     return properties.filter((p) => !p.isKey && p.value !== '');

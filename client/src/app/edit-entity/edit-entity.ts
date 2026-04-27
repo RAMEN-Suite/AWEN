@@ -16,7 +16,7 @@ export class EditEntity {
 
   editEntityDialogRef: DynamicDialogRef<EditEntityForm> | null = null;
 
-  entity = input.required<Entity>();
+  entity = input<Entity>();
 
   show() {
     this.editEntityDialogRef = this.dialogService.open(EditEntityForm, {
