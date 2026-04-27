@@ -12,7 +12,6 @@ import { EditEntityForm } from './edit-entity-form/edit-entity-form';
   templateUrl: './edit-entity.html',
 })
 export class EditEntity {
-  editEntityService = inject(EditEntityService);
   dialogService = inject(DialogService);
 
   editEntityDialogRef: DynamicDialogRef<EditEntityForm> | null = null;
@@ -24,7 +23,7 @@ export class EditEntity {
       inputValues: {
         entity: this.entity(),
       },
-      header: 'Edit',
+      header: 'Edit Entity',
       styleClass: 'w-11 md:w-9 lg:w-8',
       style: {
         'min-height': '20vh',

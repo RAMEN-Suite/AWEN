@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, Signal, viewChild } from '@angular/core';
+import { Component, computed, inject, input, signal, Signal, viewChild } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Entity, EntityPropertyDto, GAttribute } from '../../../interfaces';
 import { Button } from 'primeng/button';
@@ -6,12 +6,12 @@ import { DynamicDialogRef } from 'primeng/dynamicdialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfigService } from '../../config-module/config.service';
 import { AttributeForm } from '../../utils/attribute-form/attribute-form';
-import { Router } from '@angular/router';
 import { EditEntityService } from '../edit-entity.service';
 import { getKeyProperty } from '../../utils/entity.utils';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { from, map, switchMap } from 'rxjs';
 import { ENTITY_NAME_PROPERTY } from '../../../constants';
+import { castValue, castValues } from '../../utils/utils';
 
 interface AttributeWithOptValue extends Omit<EntityPropertyDto, 'value'>, Partial<Pick<EntityPropertyDto, 'value'>> {}
 
@@ -23,13 +23,13 @@ interface AttributeWithOptValue extends Omit<EntityPropertyDto, 'value'>, Partia
 export class EditEntityForm {
   private readonly editEntityService = inject(EditEntityService);
   private readonly configService = inject(ConfigService);
-  private readonly router = inject(Router);
   private readonly messageService = inject(MessageService);
   dialogRef = inject(DynamicDialogRef);
 
   private confirmationService = inject(ConfirmationService);
 
   entity = input.required<Entity>();
+  loading = signal<boolean>(false);
 
   readonly properties: Signal<(GAttribute | EntityPropertyDto)[]> = toSignal(
     toObservable(this.entity).pipe(
@@ -55,7 +55,8 @@ export class EditEntityForm {
       return;
     }
     try {
-      const createdId = await this.editEntityService.updateEntity(key.value, this.createPayload());
+      this.loading.set(true);
+      await this.editEntityService.updateEntity(key.value as string, this.createPayload());
       this.confirmationService.confirm({
         message: 'The Entity was successfully created!',
         header: 'Success',
@@ -71,7 +72,6 @@ export class EditEntityForm {
         },
 
         accept: async () => {
-          await this.router.navigate(['entity', createdId]);
           this.dialogRef.close();
         },
         reject: () => {
@@ -79,6 +79,7 @@ export class EditEntityForm {
         },
       });
     } catch {
+      this.loading.set(false);
       /* empty - Msg is displayed via Entity API */
     }
   }
@@ -98,26 +99,13 @@ export class EditEntityForm {
       const isArray = prop.bounds.upperBound === -1 || prop.bounds.upperBound > 1;
 
       if (isArray && Array.isArray(value)) {
-        payload[key] = value.map((v) => this.castValue(v, dataType.name));
+        payload[key] = castValues(value, dataType.name);
       } else {
-        payload[key] = this.castValue(value, dataType.name);
+        payload[key] = castValue(value, dataType.name);
       }
     });
 
     return payload;
-  }
-
-  private castValue(value: unknown, dataTypeName: string): unknown {
-    switch (dataTypeName.toLowerCase()) {
-      case 'integer':
-        return parseInt(String(value), 10);
-      case 'float':
-        return parseFloat(String(value));
-      case 'boolean':
-        return Boolean(value);
-      default:
-        return value;
-    }
   }
 
   private mergePropArrays(props: EntityPropertyDto[], attributes: AttributeWithOptValue[]) {

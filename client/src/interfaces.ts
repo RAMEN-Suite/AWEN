@@ -5,7 +5,7 @@ export interface Entity {
 }
 
 export interface EntityPropertyDto {
-  value: string;
+  value: unknown;
   bounds: {
     lowerBound: number;
     upperBound: number;
@@ -59,7 +59,7 @@ export interface GAttribute {
 }
 
 export interface NodePropertyDto extends GAttribute {
-  value: string;
+  value: unknown;
 }
 
 export interface OldEntity {

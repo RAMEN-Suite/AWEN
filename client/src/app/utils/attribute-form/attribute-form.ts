@@ -11,6 +11,7 @@ import { ConfigService } from '../../config-module/config.service';
 import { EntityService } from '../../api/entity.service';
 import { MessageService } from 'primeng/api';
 import { KeyFilter } from 'primeng/keyfilter';
+import { castValue, castValues } from '../utils';
 
 interface AttributeWithOptValue extends Omit<EntityPropertyDto, 'value'>, Partial<Pick<EntityPropertyDto, 'value'>> {}
 
@@ -62,19 +63,23 @@ export class AttributeForm {
     switch (dataType.name.toLowerCase()) {
       case 'string': {
         let val: string | string[] | null = isArray ? [] : null;
-        if (prop.value) val = prop.value;
+        if (prop.value)
+          val = isArray && Array.isArray(prop.value) ? castValues<string>(prop.value, 'string') : castValue<string>(prop.value, 'string');
         return new FormControl<string | string[] | null>(val, { validators });
       }
       case 'integer':
       case 'float': {
         let val: number | number[] | null = isArray ? [] : null;
-        if (prop.value) val = prop.value as unknown as number | number[] | null;
+        if (prop.value)
+          val = isArray && Array.isArray(prop.value) ? castValues<number>(prop.value, 'float') : castValue<number>(prop.value, 'float');
         console.log('float', prop.value, val);
         return new FormControl<number | number[] | null>(val, { validators });
       }
       case 'boolean': {
         let val: boolean | boolean[] = isArray ? new Array<boolean>() : false;
-        if (prop.value) val = prop.value as unknown as boolean | boolean[];
+        if (prop.value)
+          val =
+            isArray && Array.isArray(prop.value) ? castValues<boolean>(prop.value, 'boolean') : castValue<boolean>(prop.value, 'boolean');
         // @ts-expect-error ???
         return isArray ? new FormControl<boolean[]>(val, { validators }) : new FormControl<boolean>(val, { nonNullable: true });
       }

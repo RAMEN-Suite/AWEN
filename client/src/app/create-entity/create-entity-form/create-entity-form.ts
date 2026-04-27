@@ -7,10 +7,10 @@ import { FloatLabel } from 'primeng/floatlabel';
 import { Button } from 'primeng/button';
 import { DynamicDialogRef } from 'primeng/dynamicdialog';
 import { ConfirmationService } from 'primeng/api';
-import { ENTITY_NAME_PROPERTY } from '../../../constants';
 import { ConfigService } from '../../config-module/config.service';
 import { AttributeForm } from '../../utils/attribute-form/attribute-form';
 import { Router } from '@angular/router';
+import { castValue, castValues } from '../../utils/utils';
 
 @Component({
   selector: 'app-create-entity-form',
@@ -103,27 +103,12 @@ export class CreateEntityForm {
       const isArray = prop.bounds.upperBound === -1 || prop.bounds.upperBound > 1;
 
       if (isArray && Array.isArray(value)) {
-        payload[key] = value.map((v) => this.castValue(v, dataType.name));
+        payload[key] = castValues(value, dataType.name);
       } else {
-        payload[key] = this.castValue(value, dataType.name);
+        payload[key] = castValue(value, dataType.name);
       }
     });
 
     return payload;
   }
-
-  private castValue(value: unknown, dataTypeName: string): unknown {
-    switch (dataTypeName.toLowerCase()) {
-      case 'integer':
-        return parseInt(String(value), 10);
-      case 'float':
-        return parseFloat(String(value));
-      case 'boolean':
-        return Boolean(value);
-      default:
-        return value;
-    }
-  }
-
-  protected readonly ENTITY_NAME_PROPERTY = ENTITY_NAME_PROPERTY;
 }
