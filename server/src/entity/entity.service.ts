@@ -2,7 +2,11 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Neo4jService } from '../neo4j/neo4j.service';
 import { GuidelinesService } from '../guidelines/guidelines.service';
 import { EntityNamesDto } from './dto/entity-names.dto';
-import Cypher, { PartialPattern, Pattern } from '@neo4j/cypher-builder';
+import Cypher, {
+  PartialPattern,
+  Pattern,
+  type SetParam,
+} from '@neo4j/cypher-builder';
 import { EntitySearchDto } from './dto/entity-search.dto';
 import { EntityCollectionNameDto } from './dto/entity-collection-name.dto';
 import { CollectionService } from '../collection/collection.service';
@@ -24,7 +28,7 @@ import {
 } from '../constants';
 import { EntityDto } from './dto/entity.dto';
 import { RAMENError } from '../schema/RAMENError';
-import { metadataForNewNode } from '../utils/utils';
+import { metadataForNewNode, metadataForUpdateNode } from '../utils/utils';
 
 @Injectable()
 export class EntityService {
@@ -414,6 +418,47 @@ export class EntityService {
     });
     const { cypher, params } = new Cypher.Create(pattern)
       .set(...metadataForNewNode(eNode))
+      .return([eNode.property(key), 'id'])
+      .build();
+    const res = await this.neo4jService.write<{ id: string }>(cypher, params);
+    return res.records[0].get('id');
+  }
+
+  async update(id: string, properties: Record<string, unknown>) {
+    const entityNode = await this.nodes.getById(id, {
+      labels: ENTITY_LABEL_NAME,
+    });
+
+    if (!entityNode) {
+      throw new Error('There is no entity with the given Id.');
+    }
+
+    const nodeType = this.model.getMostSpecificType(entityNode.labels);
+
+    const [valid, message]: [valid: boolean, message: string[]] =
+      this.model.validateAttributes(nodeType, properties);
+
+    if (!valid) {
+      throw new Error('Invalid Attributes', { cause: message });
+    }
+
+    const key = this.model.getNodeKeyField(nodeType.name);
+
+    const eNode = new Cypher.Node();
+
+    const nodeProperties: SetParam[] = [];
+    Object.entries(properties).forEach(([key, value]) => {
+      nodeProperties.push([eNode.property(key), new Cypher.Param(value)]);
+    });
+
+    const pattern = new Cypher.Pattern(eNode, {
+      properties: {
+        [key]: new Cypher.Param(id),
+      },
+    });
+    const { cypher, params } = new Cypher.Match(pattern)
+      .set(...nodeProperties)
+      .set(...metadataForUpdateNode(eNode))
       .return([eNode.property(key), 'id'])
       .build();
     const res = await this.neo4jService.write<{ id: string }>(cypher, params);

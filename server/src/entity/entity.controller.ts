@@ -8,6 +8,7 @@ import {
   NotFoundException,
   Param,
   Post,
+  Put,
   Query,
 } from '@nestjs/common';
 import { EntityService } from './entity.service';
@@ -25,6 +26,7 @@ import { AnnotationService } from '../annotation/annotation.service';
 import { AnnotationDto } from '../annotation/dto/annotation.dto';
 import { CreateEntityDto } from './dto/create-entity.dto';
 import { RAMENError } from '../schema/RAMENError';
+import { UpdateEntityDto } from './dto/update-entity.dto';
 
 @Controller('entity')
 export class EntityController {
@@ -85,6 +87,20 @@ export class EntityController {
 
     try {
       await this.entityService.delete(id);
+    } catch (error) {
+      if (!(error instanceof RAMENError)) {
+        throw new InternalServerErrorException('Could not delete entity');
+      }
+      throw error;
+    }
+  }
+
+  @Put(':id')
+  async putById(@Param() params: IdDto, @Body() body: UpdateEntityDto) {
+    const { id } = params;
+
+    try {
+      await this.entityService.update(id, body.properties);
     } catch (error) {
       if (!(error instanceof RAMENError)) {
         throw new InternalServerErrorException('Could not delete entity');

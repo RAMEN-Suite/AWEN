@@ -7,6 +7,8 @@ import { ENTITY_LABEL_NAME } from '../../../constants';
 import { RouterLink } from '@angular/router';
 import { DeleteEntity } from '../../delete-entity/delete-entity';
 import { Accordion, AccordionContent, AccordionHeader, AccordionPanel } from 'primeng/accordion';
+import { getKeyProperty } from '../../utils/entity.utils';
+import { EditEntity } from '../../edit-entity/edit-entity';
 
 interface AnnotationGroup {
   type: string;
@@ -15,7 +17,7 @@ interface AnnotationGroup {
 
 @Component({
   selector: 'app-detail-page',
-  imports: [TableModule, Chip, Tag, RouterLink, DeleteEntity, Accordion, AccordionPanel, AccordionHeader, AccordionContent],
+  imports: [TableModule, Chip, Tag, RouterLink, DeleteEntity, Accordion, AccordionPanel, AccordionHeader, AccordionContent, EditEntity],
   templateUrl: './detail-page.html',
   styles: `
     :host ::ng-deep {
@@ -58,7 +60,7 @@ export class DetailPage {
   }
 
   keyProperty(properties: NodePropertyDto[]): NodePropertyDto | undefined {
-    return properties.find((p) => p.isKey);
+    return getKeyProperty(properties);
   }
 
   isEntity(node: ConnectedNodeDto): boolean {

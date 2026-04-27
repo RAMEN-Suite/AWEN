@@ -40,7 +40,14 @@ export class RamenModelService {
   }
 
   getMostSpecificType(names: string[]) {
-    return this.schema.getRegistry().getMostSpecificType(names);
+    const type = this.schema.getRegistry().getMostSpecificType(names);
+    if (!type) {
+      this.logger.error(`There is no node of the types "${names.join(', ')}".`);
+      throw new RAMENError(
+        `There is no node of the types "${names.join(', ')}".`,
+      );
+    }
+    return type;
   }
 
   getAttribute(nodeName: string, paramName: string) {

@@ -134,4 +134,34 @@ export class EntityService {
     await firstValueFrom(res);
     return;
   }
+
+  async updateEntity(id: string, payload: Record<string, unknown>) {
+    const body = {
+      properties: payload,
+    };
+
+    const res = this.http.put<{ id: string }>(`/api/entity/${id}`, body).pipe(
+      catchError((err) => {
+        if (err.error.statusCode === 400) {
+          this.messageService.add({
+            severity: 'error',
+            summary: `Error while updating a entity. Please try again.`,
+            detail: Array.isArray(err.error.message) ? err.error.message.join('\n') : err.error.message,
+            closable: true,
+            sticky: true,
+          });
+        } else {
+          this.messageService.add({
+            severity: 'error',
+            summary: `Error while creating a new entity. Please try again.`,
+          });
+        }
+        throw err;
+      }),
+      map((value) => {
+        return value.id;
+      }),
+    );
+    return firstValueFrom(res);
+  }
 }

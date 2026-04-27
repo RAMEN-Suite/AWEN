@@ -6,11 +6,13 @@ import { InputText } from 'primeng/inputtext';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ToggleButton } from 'primeng/togglebutton';
 import { ENTITY_NAME_PROPERTY } from '../../../constants';
-import { GAttribute } from '../../../interfaces';
+import { EntityPropertyDto } from '../../../interfaces';
 import { ConfigService } from '../../config-module/config.service';
 import { EntityService } from '../../api/entity.service';
 import { MessageService } from 'primeng/api';
 import { KeyFilter } from 'primeng/keyfilter';
+
+interface AttributeWithOptValue extends Omit<EntityPropertyDto, 'value'>, Partial<Pick<EntityPropertyDto, 'value'>> {}
 
 @Component({
   selector: 'app-attribute-form',
@@ -22,18 +24,20 @@ export class AttributeForm {
   private readonly entityAPI = inject(EntityService);
   private readonly messageService = inject(MessageService);
 
-  properties = input.required<GAttribute[]>();
+  properties = input.required<AttributeWithOptValue[]>();
   formName = input.required<string>();
+  enableCheckForSimilarLabels = input<boolean>(false);
 
   readonly propertiesForm = computed(() => {
     const props = this.properties();
     return this.buildFormGroup(props);
   });
 
-  private buildFormGroup(props: GAttribute[]) {
+  private buildFormGroup(props: AttributeWithOptValue[]) {
     const controlls: Record<string, FormControl> = {};
 
     for (const prop of props) {
+      console.log(prop.name, prop.value);
       const formControl = this.createFormControl(prop);
       if (!formControl) continue;
       controlls[prop.name] = formControl;
@@ -42,7 +46,7 @@ export class AttributeForm {
     return new FormGroup(controlls);
   }
 
-  private createFormControl(prop: GAttribute): FormControl | undefined {
+  private createFormControl(prop: AttributeWithOptValue): FormControl | undefined {
     const dataType = this.findDataType(prop.typeId);
     if (!dataType) return undefined;
 
@@ -56,13 +60,24 @@ export class AttributeForm {
     }
 
     switch (dataType.name.toLowerCase()) {
-      case 'string':
-        return new FormControl<string | string[] | null>(isArray ? [] : null, { validators });
+      case 'string': {
+        let val: string | string[] | null = isArray ? [] : null;
+        if (prop.value) val = prop.value;
+        return new FormControl<string | string[] | null>(val, { validators });
+      }
       case 'integer':
-      case 'float':
-        return new FormControl<number | number[] | null>(isArray ? [] : null, { validators });
-      case 'boolean':
-        return isArray ? new FormControl<boolean[]>([], { validators }) : new FormControl<boolean>(false, { nonNullable: true });
+      case 'float': {
+        let val: number | number[] | null = isArray ? [] : null;
+        if (prop.value) val = prop.value as unknown as number | number[] | null;
+        console.log('float', prop.value, val);
+        return new FormControl<number | number[] | null>(val, { validators });
+      }
+      case 'boolean': {
+        let val: boolean | boolean[] = isArray ? new Array<boolean>() : false;
+        if (prop.value) val = prop.value as unknown as boolean | boolean[];
+        // @ts-expect-error ???
+        return isArray ? new FormControl<boolean[]>(val, { validators }) : new FormControl<boolean>(val, { nonNullable: true });
+      }
       default:
         return undefined;
     }
@@ -78,7 +93,9 @@ export class AttributeForm {
 
   async onLabelBlur(event: FocusEvent) {
     const value = (event.target as HTMLInputElement).value;
-    await this.checkForSimilarLabels(value);
+    if (this.enableCheckForSimilarLabels()) {
+      await this.checkForSimilarLabels(value);
+    }
   }
 
   private async checkForSimilarLabels(label: string) {
