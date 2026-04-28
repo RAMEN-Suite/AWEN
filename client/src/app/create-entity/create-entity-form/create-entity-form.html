@@ -1,4 +1,4 @@
-<div class="my-2">
+<form (submit)="onSubmit($event)" class="my-2">
   <p-floatlabel variant="on" class="field">
     <p-select
       appendTo="body"
@@ -15,6 +15,6 @@
   </p-floatlabel>
   <app-attribute-form [formName]="typeInput.value" [properties]="properties()" [enableCheckForSimilarLabels]="true" />
   <div class="field justify-content-end flex" [class]="typeInput.value === '' ? 'hidden':''">
-    <p-button (onClick)="clickCreateButton()" size="large" label="Create" [disabled]="propertiesForm().invalid" />
+    <button pButton type="submit" size="large" [disabled]="propertiesForm().invalid">Create</button>
   </div>
-</div>
+</form>

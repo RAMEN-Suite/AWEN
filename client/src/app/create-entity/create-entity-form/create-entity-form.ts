@@ -4,7 +4,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Select } from 'primeng/select';
 import { GAttribute } from '../../../interfaces';
 import { FloatLabel } from 'primeng/floatlabel';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { DynamicDialogRef } from 'primeng/dynamicdialog';
 import { ConfirmationService } from 'primeng/api';
 import { AttributeForm } from '../../utils/attribute-form/attribute-form';
@@ -13,7 +13,7 @@ import { UtilsService } from '../../utils/utils.service';
 
 @Component({
   selector: 'app-create-entity-form',
-  imports: [Select, ReactiveFormsModule, FloatLabel, Button, AttributeForm],
+  imports: [Select, ReactiveFormsModule, FloatLabel, AttributeForm, ButtonDirective],
   templateUrl: './create-entity-form.html',
 })
 export class CreateEntityForm {
@@ -30,6 +30,7 @@ export class CreateEntityForm {
   readonly typesLoaded: Signal<boolean> = this.createEntityService.getEntityTypesLoaded();
   readonly properties: WritableSignal<GAttribute[]> = signal<GAttribute[]>([]);
   readonly propertiesLoaded: WritableSignal<boolean> = signal<boolean>(true); // TODO: UI Loading state
+  loading = signal<boolean>(false);
 
   attributeForm = viewChild.required<AttributeForm>(AttributeForm);
 
@@ -57,8 +58,10 @@ export class CreateEntityForm {
     this.propertiesLoaded.set(true);
   }
 
-  protected async clickCreateButton() {
+  protected async onSubmit(event: SubmitEvent) {
+    event.preventDefault();
     try {
+      this.loading.set(true);
       const createdId = await this.createEntityService.createEntity(
         this.typeInput.value,
         this.utilService.createPayload(this.propertiesForm().value, this.properties()),
@@ -80,12 +83,15 @@ export class CreateEntityForm {
         accept: async () => {
           await this.router.navigate(['entity', createdId]);
           this.dialogRef.close();
+          this.loading.set(false);
         },
         reject: () => {
           this.dialogRef.close();
+          this.loading.set(false);
         },
       });
     } catch {
+      this.loading.set(false);
       /* empty - Msg is displayed via Entity API */
     }
   }

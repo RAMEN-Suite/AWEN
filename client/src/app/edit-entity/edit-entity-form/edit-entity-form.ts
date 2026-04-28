@@ -1,7 +1,7 @@
 import { Component, computed, inject, input, signal, Signal, viewChild } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Entity, EntityPropertyDto, GAttribute } from '../../../interfaces';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { DynamicDialogRef } from 'primeng/dynamicdialog';
 import { MessageService } from 'primeng/api';
 import { AttributeForm } from '../../utils/attribute-form/attribute-form';
@@ -17,7 +17,7 @@ interface AttributeWithOptValue extends Omit<EntityPropertyDto, 'value'>, Partia
 
 @Component({
   selector: 'app-create-entity-form',
-  imports: [ReactiveFormsModule, Button, AttributeForm],
+  imports: [ReactiveFormsModule, AttributeForm, ButtonDirective],
   templateUrl: './edit-entity-form.html',
 })
 export class EditEntityForm {
@@ -42,7 +42,8 @@ export class EditEntityForm {
 
   propertiesForm = computed(() => this.attributeForm().propertiesForm());
 
-  protected async clickEditButton() {
+  protected async onSubmit(event: SubmitEvent) {
+    event.preventDefault();
     const key = getKeyProperty(this.entity().properties);
     if (!key?.value) {
       this.messageService.add({

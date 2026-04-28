@@ -1,5 +1,5 @@
 @for (property of properties(); track property.name) { @if (findDataType(property.typeId); as dataType) {
-<form class="field" [formGroup]="propertiesForm()">
+<div class="field" [formGroup]="propertiesForm()">
   @let isArray = property.bounds.upperBound === -1 || property.bounds.upperBound > 1; @let fieldId = 'create-entity-form_' + formName + '_'
   + property.name; @if (isArray) {
 
@@ -80,5 +80,5 @@
     (propertiesForm().get(property.name)?.errors?.['maxlength']) { At most {{ property.bounds.upperBound }} value(s) allowed. }
   </small>
   }
-</form>
+</div>
 } }
