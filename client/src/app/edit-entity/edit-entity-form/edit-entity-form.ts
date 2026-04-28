@@ -10,7 +10,7 @@ import { getKeyProperty } from '../../utils/entity.utils';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { from, map, switchMap } from 'rxjs';
 import { ENTITY_NAME_PROPERTY } from '../../../constants';
-import { EntityService } from '../../views/detail-page/entity.service';
+import { EntityService } from '../../entity.service';
 import { UtilsService } from '../../utils/utils.service';
 
 interface AttributeWithOptValue extends Omit<EntityPropertyDto, 'value'>, Partial<Pick<EntityPropertyDto, 'value'>> {}

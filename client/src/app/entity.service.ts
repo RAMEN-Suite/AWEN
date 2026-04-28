@@ -1,7 +1,10 @@
 import { inject, Injectable, signal, WritableSignal } from '@angular/core';
-import { Entity } from '../../../interfaces';
-import { EntityApiService } from '../../api/entity-api.service';
+import { Entity } from '../interfaces';
+import { EntityApiService } from './api/entity-api.service';
 
+/**
+ * This service should be a singleton. It holds the entity, currently displayed on the detail page.
+ */
 @Injectable({
   providedIn: 'root',
 })

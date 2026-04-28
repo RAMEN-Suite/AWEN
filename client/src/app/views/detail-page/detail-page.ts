@@ -9,7 +9,7 @@ import { DeleteEntity } from '../../delete-entity/delete-entity';
 import { Accordion, AccordionContent, AccordionHeader, AccordionPanel } from 'primeng/accordion';
 import { getKeyProperty } from '../../utils/entity.utils';
 import { EditEntity } from '../../edit-entity/edit-entity';
-import { EntityService } from './entity.service';
+import { EntityService } from '../../entity.service';
 import { ProgressSpinner } from 'primeng/progressspinner';
 
 interface AnnotationGroup {
@@ -19,7 +19,6 @@ interface AnnotationGroup {
 
 @Component({
   selector: 'app-detail-page',
-  providers: [EntityService],
   imports: [
     TableModule,
     Chip,

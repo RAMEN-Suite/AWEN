@@ -1,33 +1,20 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Menubar } from 'primeng/menubar';
 import { MenuItem } from 'primeng/api';
 import { BackButtonComponent } from '../utils/back-button.component';
-import { ActivatedRoute, isActive, NavigationEnd, Router } from '@angular/router';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { filter, map } from 'rxjs';
-import { Entity } from '../../interfaces';
+import { isActive, Router } from '@angular/router';
+import { EntityService } from '../entity.service';
 
 @Component({
   selector: 'app-navbar',
   imports: [Menubar, BackButtonComponent],
   templateUrl: './navbar.html',
 })
-export class Navbar implements OnInit {
+export class Navbar {
   private router = inject(Router);
-  private activatedRoute = inject(ActivatedRoute);
+  private readonly entityService = inject(EntityService);
 
-  ngOnInit() {
-    this.activatedRoute.data.subscribe(({ entity }) => {
-      console.log(entity);
-    });
-  }
-
-  entity = toSignal<Entity | undefined>(
-    this.router.events.pipe(
-      filter((e) => e instanceof NavigationEnd),
-      map(() => this.router.routerState.root.firstChild?.snapshot.data?.['entity']),
-    ),
-  );
+  entity = this.entityService.entity;
 
   isHomeRoute = isActive('/', this.router, {
     paths: 'exact',
