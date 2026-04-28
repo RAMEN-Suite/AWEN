@@ -25,6 +25,8 @@ import {
   COLLECTION_LABEL_NAME,
   ENTITY_LABEL_NAME,
   ENTITY_NAME_PROPERTY,
+  FROM_ANNOTATION_REL_TYPE,
+  TO_ANNOTATION_REL_TYPE,
 } from '../constants';
 import { EntityDto } from './dto/entity.dto';
 import { RAMENError } from '../schema/RAMENError';
@@ -299,9 +301,9 @@ export class EntityService {
     const aToC = new Cypher.Relationship();
 
     let newPattern: Pattern | PartialPattern = new Cypher.Pattern(eNode)
-      .related(eToA, { type: 'REFERS_TO', direction: 'left' })
+      .related(eToA, { type: FROM_ANNOTATION_REL_TYPE, direction: 'left' })
       .to(aNode, { labels: ANNOTATION_LABEL_NAME })
-      .related(aToC, { type: 'HAS_ANNOTATION', direction: 'left' });
+      .related(aToC, { type: TO_ANNOTATION_REL_TYPE, direction: 'left' });
 
     const collections: Map<string, Cypher.Node> = new Map<
       string,

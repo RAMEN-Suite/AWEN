@@ -3,6 +3,7 @@ import { Neo4jService } from '../neo4j/neo4j.service';
 import { GuidelinesService } from '../guidelines/guidelines.service';
 import Cypher, { With } from '@neo4j/cypher-builder';
 import { CollectionNameDto } from './dto/collection-name.dto';
+import { FROM_ANNOTATION_REL_TYPE, TO_ANNOTATION_REL_TYPE } from '../constants';
 
 @Injectable()
 export class CollectionService {
@@ -85,12 +86,12 @@ export class CollectionService {
       new Cypher.Pattern(entityNode)
         .related(new Cypher.Relationship(), {
           direction: 'left',
-          type: 'REFERS_TO',
+          type: FROM_ANNOTATION_REL_TYPE,
         })
         .to(ann)
         .related(new Cypher.Relationship(), {
           direction: 'left',
-          type: 'HAS_ANNOTATION',
+          type: TO_ANNOTATION_REL_TYPE,
         })
         .to(col),
     );
@@ -179,9 +180,12 @@ export class CollectionService {
 
     const matchCollections = new Cypher.Match(
       new Cypher.Pattern(entity)
-        .related(undefined, { direction: 'left', type: 'REFERS_TO' })
+        .related(undefined, {
+          direction: 'left',
+          type: FROM_ANNOTATION_REL_TYPE,
+        })
         .to(ann)
-        .related(undefined, { direction: 'left', type: 'HAS_ANNOTATION' })
+        .related(undefined, { direction: 'left', type: TO_ANNOTATION_REL_TYPE })
         .to(col),
     );
 

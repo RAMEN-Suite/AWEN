@@ -5,3 +5,5 @@ export const ANNOTATION_LABEL_NAME = 'Annotation';
 export const ANNOTATION_TYPE_NAME = 'type';
 export const CONTENT_LABEL_NAME = 'Text';
 export const BASE_DATA_TYPES = ['String', 'Boolean', 'Integer', 'Float'];
+export const TO_ANNOTATION_REL_TYPE = 'HAS_ANNOTATION';
+export const FROM_ANNOTATION_REL_TYPE = 'REFERS_TO';

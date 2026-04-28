@@ -9,6 +9,7 @@ import {
   COLLECTION_LABEL_NAME,
   CONTENT_LABEL_NAME,
   ENTITY_LABEL_NAME,
+  TO_ANNOTATION_REL_TYPE,
 } from '../constants';
 import Cypher, { eq, not } from '@neo4j/cypher-builder';
 import { Integer, Node, Relationship } from 'neo4j-driver';
@@ -37,16 +38,61 @@ export class AnnotationService {
       ANNOTATION_LABEL_NAME,
     );
     this.ENTITY_KEY_PROPERTY = this.model.getNodeKeyField(ENTITY_LABEL_NAME);
-    this.getAnnotationsOfEntity('fa3246bc-4ac9-4271-906d-3e4d768ccd5f').then(
-      () => {
-        this.logger.log('getAnnotationsOfEntity() is working!');
-      },
-    );
-    this.getAnnotationsWithReferencesOfContent(
-      'fa3246bc-4ac9-4271-906d-3e4d768ccd5f',
-    ).then(() => {
-      this.logger.log('getAnnotationsWithReferencesOfContent() is working!');
+  }
+
+  async createForEntity(entityId: string, properties: Record<string, unknown>) {
+    const type = ANNOTATION_LABEL_NAME; // TODO: type input zulassen.
+    const nodeType = this.model.getNodeType(type);
+
+    const [valid, message]: [valid: boolean, message: string[]] =
+      this.model.validateAttributes(nodeType, properties);
+
+    if (!valid) {
+      throw new Error('Invalid Attributes', { cause: message });
+    }
+
+    const key = this.model.getNodeKeyField(type);
+
+    const nodeLabels = Array.from(nodeType.superTypes.values());
+    nodeLabels.push(type);
+
+    const nodeProperties: Record<string, Cypher.Expr> = {};
+    Object.entries(properties).forEach(([key, value]) => {
+      nodeProperties[key] = new Cypher.Param(value);
     });
+    nodeProperties[key] = Cypher.randomUUID();
+
+    const entityNode = new Cypher.Node();
+    const annotationNode = new Cypher.Node();
+
+    const matchEntity = new Cypher.Match(
+      new Cypher.Pattern(entityNode, {
+        labels: ENTITY_LABEL_NAME,
+        properties: {
+          [this.ENTITY_KEY_PROPERTY]: new Cypher.Param(entityId),
+        },
+      }),
+    );
+
+    const createAnnotation = new Cypher.Create(
+      new Cypher.Pattern(annotationNode, {
+        labels: ANNOTATION_LABEL_NAME,
+        properties: nodeProperties,
+      })
+        .related(new Cypher.Relationship(), {
+          type: TO_ANNOTATION_REL_TYPE,
+          direction: 'left',
+        })
+        .to(entityNode),
+    );
+
+    const clause = matchEntity
+      .create(createAnnotation)
+      .return([annotationNode.property(key), 'id']);
+
+    const { cypher, params } = clause.build();
+    const res = await this.neo4jService.write<{ id: string }>(cypher, params);
+    return res.records[0].get('id');
   }
 
   async getAnnotationsOfEntity(entityId: string) {
