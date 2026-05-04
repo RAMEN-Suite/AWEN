@@ -11,6 +11,7 @@ import { getKeyProperty } from '../../utils/entity.utils';
 import { EditEntity } from '../../edit-entity/edit-entity';
 import { EntityService } from '../../entity.service';
 import { ProgressSpinner } from 'primeng/progressspinner';
+import { CreateAnnotation } from '../../create-annotation/create-annotation';
 
 interface AnnotationGroup {
   type: string;
@@ -31,6 +32,7 @@ interface AnnotationGroup {
     AccordionContent,
     EditEntity,
     ProgressSpinner,
+    CreateAnnotation,
   ],
   templateUrl: './detail-page.html',
   styles: `
