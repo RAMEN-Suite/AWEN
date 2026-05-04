@@ -289,7 +289,7 @@ export class AnnotationService {
               .flatMap((c) => {
                 const connectedGNode = this.model.getMostSpecificType(
                   c.node.labels,
-                ); // ✅ bereits drin
+                );
                 if (!connectedGNode) return [];
                 return [
                   transformConnectedNodeToDto(
@@ -312,6 +312,17 @@ export class AnnotationService {
       .filter((annotation) => !!annotation);
   }
 
-  //TODO: Implement
-  async delete(id: string) {}
+  async delete(id: string) {
+    const aNode = new Cypher.Node();
+    const pattern = new Cypher.Pattern(aNode, {
+      labels: ANNOTATION_LABEL_NAME,
+      properties: {
+        [this.ANNOTATION_KEY_PROPERTY]: new Cypher.Param(id),
+      },
+    });
+    const { cypher, params } = new Cypher.Match(pattern)
+      .detachDelete(aNode)
+      .build();
+    await this.neo4jService.write(cypher, params);
+  }
 }
