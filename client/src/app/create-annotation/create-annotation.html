@@ -1,1 +1,1 @@
-<p-button label="Annotation" (onClick)="clickCreate()" />
+<p-button label="Annotation" (onClick)="clickCreate()" [disabled]="!entityId()" severity="primary" [outlined]="true" />
