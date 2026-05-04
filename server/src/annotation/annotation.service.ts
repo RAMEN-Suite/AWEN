@@ -311,4 +311,7 @@ export class AnnotationService {
       )
       .filter((annotation) => !!annotation);
   }
+
+  //TODO: Implement
+  async delete(id: string) {}
 }

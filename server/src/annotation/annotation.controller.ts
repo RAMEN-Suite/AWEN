@@ -1,4 +1,11 @@
-import { BadRequestException, Body, Controller, Post } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Param,
+  Post,
+} from '@nestjs/common';
 import { AnnotationService } from './annotation.service';
 import { CreateAnnotationDto } from './dto/create-annotation.dto';
 import { EntityService } from '../entity/entity.service';
@@ -11,6 +18,11 @@ export class AnnotationController {
     private readonly annotationService: AnnotationService,
     private readonly entityService: EntityService,
   ) {}
+
+  @Delete(':id')
+  async delete(@Param('id') id: string): Promise<void> {
+    await this.annotationService.delete(id);
+  }
 
   @ApiResponse({ type: IdDto })
   @Post('entity')
