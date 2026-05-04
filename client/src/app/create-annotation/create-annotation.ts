@@ -6,6 +6,7 @@ import { CreateAnnotationForm } from './create-annotation-form/create-annotation
 
 @Component({
   selector: 'app-create-annotation',
+  providers: [DialogService, CreateAnnotationService],
   imports: [Button],
   templateUrl: './create-annotation.html',
 })
