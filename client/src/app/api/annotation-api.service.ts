@@ -40,4 +40,18 @@ export class AnnotationApiService {
     );
     return firstValueFrom(res);
   }
+
+  async delete(id: string) {
+    const res = this.http.delete<void>('/api/annotation/' + id).pipe(
+      catchError((err) => {
+        this.messageService.add({
+          severity: 'error',
+          detail: `Error while deleting Annotation with id ${id}. Try again later.`,
+        });
+        throw err;
+      }),
+    );
+    await firstValueFrom(res);
+    return;
+  }
 }
