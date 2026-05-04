@@ -55,8 +55,8 @@ export class DetailPage implements OnInit {
   private readonly entityService = inject(EntityService);
 
   entityId = input.required<string>();
-  annotations = input.required<Annotation[]>();
 
+  annotations = this.entityService.annotations;
   entity = this.entityService.entity;
 
   groupedAnnotations = computed<AnnotationGroup[]>(() => {

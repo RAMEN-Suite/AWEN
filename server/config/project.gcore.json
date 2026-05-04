@@ -186,7 +186,7 @@
         {
           "name": "value",
           "typeId": "String",
-          "bounds": { "lowerBound": 1, "upperBound": 1 }
+          "bounds": { "lowerBound": 0, "upperBound": 1 }
         }
       ],
       "constraints": [],

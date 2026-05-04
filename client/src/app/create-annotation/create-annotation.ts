@@ -11,7 +11,6 @@ import { CreateAnnotationForm } from './create-annotation-form/create-annotation
   templateUrl: './create-annotation.html',
 })
 export class CreateAnnotation {
-  private readonly createAnnotationService = inject(CreateAnnotationService);
   private readonly dialogService = inject(DialogService);
 
   entityId = input.required<string>();
@@ -27,6 +26,9 @@ export class CreateAnnotation {
       styleClass: 'w-11 md:w-9 lg:w-8',
       style: {
         'min-height': '20vh',
+      },
+      contentStyle: {
+        'padding-top': '0.5rem',
       },
       closable: true,
     });
