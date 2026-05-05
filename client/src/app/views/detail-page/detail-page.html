@@ -70,10 +70,10 @@
             <p-accordion-content>
               <div class="col-12 mx-0 flex flex-column gap-3">
                 @for (annotation of group.annotations; track $index) {
-                <div class="border-1 border-gray-200 border-round">
+                <div class="border-1 border-gray-200 border-round overflow-hidden">
                   <!-- Annotation Properties -->
                   @if (visibleProperties(annotation.properties).length > 0) {
-                  <div class="grid m-0">
+                  <div class="grid m-0 border-bottom-1 border-gray-200">
                     <div class="col-3 p-3 bg-gray-50 border-right-1 border-gray-200">
                       <span class="text-sm font-medium text-gray-500">Annotation</span>
                     </div>
@@ -98,7 +98,12 @@
 
                   <!-- Connected Nodes -->
                   @for (node of annotation.connectedNodes; track $index) {
-                  <div class="grid m-0" [class.border-top-1]="$index > 0" [class.border-gray-200]="$index > 0">
+                  <div
+                    class="grid m-0"
+                    [class.border-bottom-1]="$last"
+                    [class.border-top-1]="$index > 0"
+                    [class.border-gray-200]="$index > 0 || $last"
+                  >
                     <div class="col-3 p-3 bg-gray-50 border-right-1 border-gray-200 flex flex-column gap-2">
                       <p-tag
                         [value]="node.direction"
@@ -134,7 +139,7 @@
                     </div>
                   </div>
                   }
-                  <div class="flex justify-content-end border-top-1 border-gray-200">
+                  <div class="flex justify-content-end">
                     @if (keyProperty(annotation.properties)?.value; as annotationId) {
                     <!--                    <p-button-->
                     <!--                      icon="pi pi-pencil"-->

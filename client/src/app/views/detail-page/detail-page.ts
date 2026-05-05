@@ -106,7 +106,7 @@ export class DetailPage implements OnInit {
   protected async clickDeleteAnnotation(id: string, event: MouseEvent) {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
-      message: 'Do you want to delete this Annotation?',
+      message: `Are you sure you want to delete this annotation?\n Doing so will delete the annotation and disconnect all associated nodes.`,
       header: 'Danger Zone',
       icon: 'pi pi-info-circle',
       rejectButtonProps: {
@@ -115,7 +115,7 @@ export class DetailPage implements OnInit {
         outlined: true,
       },
       acceptButtonProps: {
-        label: 'Delete',
+        label: 'Delete Annotation',
         severity: 'danger',
       },
       accept: async () => {
