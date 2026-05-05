@@ -12,6 +12,9 @@ import { EditEntity } from '../../edit-entity/edit-entity';
 import { EntityService } from '../../entity.service';
 import { ProgressSpinner } from 'primeng/progressspinner';
 import { CreateAnnotation } from '../../create-annotation/create-annotation';
+import { Button } from 'primeng/button';
+import { AnnotationApiService } from '../../api/annotation-api.service';
+import { ConfirmationService, MessageService } from 'primeng/api';
 
 interface AnnotationGroup {
   type: string;
@@ -20,6 +23,7 @@ interface AnnotationGroup {
 
 @Component({
   selector: 'app-detail-page',
+  providers: [],
   imports: [
     TableModule,
     Chip,
@@ -33,6 +37,7 @@ interface AnnotationGroup {
     EditEntity,
     ProgressSpinner,
     CreateAnnotation,
+    Button,
   ],
   templateUrl: './detail-page.html',
   styles: `
@@ -53,6 +58,9 @@ interface AnnotationGroup {
 })
 export class DetailPage implements OnInit {
   private readonly entityService = inject(EntityService);
+  private readonly annotationApi = inject(AnnotationApiService);
+  private confirmationService = inject(ConfirmationService);
+  private messageService = inject(MessageService);
 
   entityId = input.required<string>();
 
@@ -92,5 +100,33 @@ export class DetailPage implements OnInit {
     return key ? `/entity/${key.value}` : null;
   }
 
+  private async deleteAnnotation(id: string) {
+    await this.annotationApi.delete(id);
+  }
+
+  protected async clickDeleteAnnotation(id: string, event: MouseEvent) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: 'Do you want to delete this Annotation?',
+      header: 'Danger Zone',
+      icon: 'pi pi-info-circle',
+      rejectButtonProps: {
+        label: 'Cancel',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'Delete',
+        severity: 'danger',
+      },
+      accept: async () => {
+        await this.deleteAnnotation(id);
+        this.messageService.add({ severity: 'info', summary: 'Confirmed', detail: 'Record deleted' });
+        await this.entityService.reloadEntity();
+      },
+    });
+  }
+
   protected readonly Array = Array;
+  protected readonly String = String;
 }
