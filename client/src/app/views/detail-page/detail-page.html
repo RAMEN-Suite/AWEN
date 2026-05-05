@@ -6,9 +6,9 @@
 <!--</div>-->
 @if (entity(); as entity) {
 <div class="grid flex justify-content-center pt-5">
-  <div class="col px-3 md:flex flex-order-0 md:flex-order-0"></div>
-  <div class="col px-3 flex gap-2 justify-content-end flex-order-1 md:flex-order-2">
-    <app-create-annotation [entityId]="entityId()" />
+  <div class="col px-3 md:flex flex-order-0 md:flex-order-0 align-self-start sticky top-0"></div>
+  <div class="col px-3 flex gap-2 justify-content-end flex-order-1 md:flex-order-2 align-self-start sticky top-0">
+    <app-create-annotation [entityId]="entityId()" label="Add Statement" />
     <app-edit-entity [entity]="entity" />
     <app-delete-entity [entityId]="entityId()" />
   </div>
