@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, OnInit } from '@angular/core';
+import { Component, computed, effect, inject, input } from '@angular/core';
 import { Annotation, ConnectedNodeDto, NodePropertyDto } from '../../../interfaces';
 import { TableModule } from 'primeng/table';
 import { Chip } from 'primeng/chip';
@@ -52,10 +52,15 @@ interface AnnotationGroup {
         top: 0;
         z-index: 10;
       }
+
+      p-motion[name='p-collapsible'] {
+        display: block;
+        overflow: hidden;
+      }
     }
   `,
 })
-export class DetailPage implements OnInit {
+export class DetailPage {
   private readonly entityService = inject(EntityService);
   private readonly annotationApi = inject(AnnotationApiService);
   private confirmationService = inject(ConfirmationService);
@@ -78,8 +83,11 @@ export class DetailPage implements OnInit {
     }));
   });
 
-  async ngOnInit(): Promise<void> {
-    await this.entityService.loadNewEntity(this.entityId());
+  constructor() {
+    effect(async () => {
+      const id = this.entityId(); // Signal wird getrackt
+      await this.entityService.loadNewEntity(id);
+    });
   }
 
   visibleProperties(properties: NodePropertyDto[]): NodePropertyDto[] {

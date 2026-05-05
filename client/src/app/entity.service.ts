@@ -31,6 +31,8 @@ export class EntityService {
   }
 
   private async loadAndSet(id: string) {
+    this._entity.set(undefined);
+    this._annotations.set([]);
     const entity = await this.entityApi.getById(id);
     const annotations = await this.entityApi.getAnnotationsWithConnectionsOf(id);
     this._entity.set(entity);
