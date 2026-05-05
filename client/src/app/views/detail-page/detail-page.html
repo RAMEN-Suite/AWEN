@@ -25,8 +25,8 @@
       <div class="col-12 flex flex-column gap-3">
         @for (property of visibleProperties(entity.properties); track $index) {
         <div class="col-12 mx-0">
-          <div class="border-1 border-gray-200 border-round">
-            <div class="grid m-0 border-bottom-1 border-round border-gray-200">
+          <div class="border-1 border-gray-200 border-round overflow-hidden">
+            <div class="grid m-0">
               <div class="col-3 p-3 bg-gray-50 border-right-1 border-gray-200">
                 <span class="">{{ property.name }}</span>
               </div>
