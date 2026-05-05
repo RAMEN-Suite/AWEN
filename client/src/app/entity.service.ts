@@ -14,9 +14,11 @@ export class EntityService {
   private _entity: WritableSignal<Entity | undefined> = signal<Entity | undefined>(undefined);
   private _annotations: WritableSignal<Annotation[]> = signal<Annotation[]>([]);
   private _entityId: WritableSignal<string | undefined> = signal<string | undefined>(undefined);
+  private _loading: WritableSignal<boolean> = signal<boolean>(false);
 
   public entity = this._entity.asReadonly();
   public annotations = this._annotations.asReadonly();
+  public loading = this._loading.asReadonly();
 
   async loadNewEntity(id: string) {
     await this.loadAndSet(id);
@@ -31,11 +33,17 @@ export class EntityService {
   }
 
   private async loadAndSet(id: string) {
-    this._entity.set(undefined);
-    this._annotations.set([]);
+    this._loading.set(true);
+    this.resetState();
     const entity = await this.entityApi.getById(id);
     const annotations = await this.entityApi.getAnnotationsWithConnectionsOf(id);
     this._entity.set(entity);
     this._annotations.set(annotations);
+    this._loading.set(false);
+  }
+
+  public resetState() {
+    this._entity.set(undefined);
+    this._annotations.set([]);
   }
 }

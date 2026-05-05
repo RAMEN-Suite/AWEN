@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, input } from '@angular/core';
+import { Component, computed, effect, inject, input, OnDestroy } from '@angular/core';
 import { Annotation, ConnectedNodeDto, NodePropertyDto } from '../../../interfaces';
 import { TableModule } from 'primeng/table';
 import { Chip } from 'primeng/chip';
@@ -60,7 +60,7 @@ interface AnnotationGroup {
     }
   `,
 })
-export class DetailPage {
+export class DetailPage implements OnDestroy {
   private readonly entityService = inject(EntityService);
   private readonly annotationApi = inject(AnnotationApiService);
   private confirmationService = inject(ConfirmationService);
@@ -88,6 +88,10 @@ export class DetailPage {
       const id = this.entityId(); // Signal wird getrackt
       await this.entityService.loadNewEntity(id);
     });
+  }
+
+  ngOnDestroy() {
+    this.entityService.resetState();
   }
 
   visibleProperties(properties: NodePropertyDto[]): NodePropertyDto[] {

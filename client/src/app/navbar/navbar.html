@@ -7,6 +7,8 @@
   <ng-template #end>
     @if (entity(); as entity) {
     <span class="text-2xl">{{ entity.label }}</span>
+    } @else if (entityLoading()) {
+    <p-skeleton width="5rem" height="1.5rem" />
     }
   </ng-template>
 </p-menubar>

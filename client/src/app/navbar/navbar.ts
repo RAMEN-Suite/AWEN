@@ -4,10 +4,11 @@ import { MenuItem } from 'primeng/api';
 import { BackButtonComponent } from '../utils/back-button.component';
 import { isActive, Router } from '@angular/router';
 import { EntityService } from '../entity.service';
+import { Skeleton } from 'primeng/skeleton';
 
 @Component({
   selector: 'app-navbar',
-  imports: [Menubar, BackButtonComponent],
+  imports: [Menubar, BackButtonComponent, Skeleton],
   templateUrl: './navbar.html',
 })
 export class Navbar {
@@ -15,6 +16,7 @@ export class Navbar {
   private readonly entityService = inject(EntityService);
 
   entity = this.entityService.entity;
+  entityLoading = this.entityService.loading;
 
   isHomeRoute = isActive('/', this.router, {
     paths: 'exact',
