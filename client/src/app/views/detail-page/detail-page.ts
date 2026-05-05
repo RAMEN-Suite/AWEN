@@ -23,7 +23,6 @@ interface AnnotationGroup {
 
 @Component({
   selector: 'app-detail-page',
-  providers: [],
   imports: [
     TableModule,
     Chip,
@@ -125,6 +124,10 @@ export class DetailPage implements OnInit {
         await this.entityService.reloadEntity();
       },
     });
+  }
+
+  protected clickEditAnnotation(id: string, event: MouseEvent) {
+    // TODO: Implement
   }
 
   protected readonly Array = Array;
