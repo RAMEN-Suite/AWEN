@@ -32,7 +32,7 @@ export class DeleteEntity {
         outlined: true,
       },
       acceptButtonProps: {
-        label: 'Delete',
+        label: 'Delete Entity',
         severity: 'danger',
       },
 
