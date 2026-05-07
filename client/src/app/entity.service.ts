@@ -21,8 +21,11 @@ export class EntityService {
   public loading = this._loading.asReadonly();
 
   async loadNewEntity(id: string) {
+    this._loading.set(true);
+    this.resetState();
     await this.loadAndSet(id);
     this._entityId.set(id);
+    this._loading.set(false);
   }
 
   async reloadEntity() {
@@ -33,13 +36,10 @@ export class EntityService {
   }
 
   private async loadAndSet(id: string) {
-    this._loading.set(true);
-    this.resetState();
     const entity = await this.entityApi.getById(id);
     const annotations = await this.entityApi.getAnnotationsWithConnectionsOf(id);
     this._entity.set(entity);
     this._annotations.set(annotations);
-    this._loading.set(false);
   }
 
   public resetState() {
