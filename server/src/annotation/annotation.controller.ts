@@ -10,7 +10,8 @@ import { AnnotationService } from './annotation.service';
 import { CreateAnnotationDto } from './dto/create-annotation.dto';
 import { EntityService } from '../entity/entity.service';
 import { ApiResponse } from '@nestjs/swagger';
-import { IdDto } from '../entity/dto/id.dto';
+import { IdDto } from '../dto/id.dto';
+import { DeleteAnnotationConnectionReqDto } from './dto/delete-annotation-connection.req.dto';
 
 @Controller('annotation')
 export class AnnotationController {
@@ -20,8 +21,17 @@ export class AnnotationController {
   ) {}
 
   @Delete(':id')
-  async delete(@Param('id') id: string): Promise<void> {
+  async delete(@Param() params: IdDto): Promise<void> {
+    const { id } = params;
     await this.annotationService.delete(id);
+  }
+
+  @Delete(':id/connection/:connectedId')
+  async deleteConnection(
+    @Param() params: DeleteAnnotationConnectionReqDto,
+  ): Promise<void> {
+    const { id, connectedId } = params;
+    await this.annotationService.deleteConnection(id, connectedId);
   }
 
   @ApiResponse({ type: IdDto })

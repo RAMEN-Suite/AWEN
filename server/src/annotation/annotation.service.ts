@@ -9,9 +9,10 @@ import {
   COLLECTION_LABEL_NAME,
   CONTENT_LABEL_NAME,
   ENTITY_LABEL_NAME,
+  FROM_ANNOTATION_REL_TYPE,
   TO_ANNOTATION_REL_TYPE,
 } from '../constants';
-import Cypher, { eq, not } from '@neo4j/cypher-builder';
+import Cypher, { and, eq, not, or } from '@neo4j/cypher-builder';
 import { Integer, Node, Relationship } from 'neo4j-driver';
 import {
   transformConnectedNodeToDto,
@@ -26,6 +27,7 @@ export class AnnotationService {
 
   ANNOTATION_KEY_PROPERTY!: string;
   ENTITY_KEY_PROPERTY!: string;
+  CONTENT_KEY_PROPERTY!: string;
 
   constructor(
     private readonly neo4jService: Neo4jService,
@@ -38,6 +40,7 @@ export class AnnotationService {
       ANNOTATION_LABEL_NAME,
     );
     this.ENTITY_KEY_PROPERTY = this.model.getNodeKeyField(ENTITY_LABEL_NAME);
+    this.CONTENT_KEY_PROPERTY = this.model.getNodeKeyField(CONTENT_LABEL_NAME);
   }
 
   async createForEntity(entityId: string, properties: Record<string, unknown>) {
@@ -323,6 +326,52 @@ export class AnnotationService {
     const { cypher, params } = new Cypher.Match(pattern)
       .detachDelete(aNode)
       .build();
+    await this.neo4jService.write(cypher, params);
+  }
+
+  async deleteConnection(id: string, connectedNodeId: string) {
+    const aNode = new Cypher.Node();
+    const connectedNode = new Cypher.Node();
+    const relation = new Cypher.Relationship();
+    const pattern = new Cypher.Pattern(aNode, {
+      labels: ANNOTATION_LABEL_NAME,
+      properties: {
+        [this.ANNOTATION_KEY_PROPERTY]: new Cypher.Param(id),
+      },
+    })
+      .related(relation, {
+        direction: 'right',
+        type: FROM_ANNOTATION_REL_TYPE,
+      })
+      .to(connectedNode)
+      .where(
+        and(
+          or(
+            connectedNode.hasLabels(ANNOTATION_LABEL_NAME),
+            connectedNode.hasLabels(CONTENT_LABEL_NAME),
+            connectedNode.hasLabels(ENTITY_LABEL_NAME),
+          ),
+          or(
+            eq(
+              connectedNode.property(this.ANNOTATION_KEY_PROPERTY),
+              new Cypher.Param(connectedNodeId),
+            ),
+            eq(
+              connectedNode.property(this.ENTITY_KEY_PROPERTY),
+              new Cypher.Param(connectedNodeId),
+            ),
+            eq(
+              connectedNode.property(this.CONTENT_KEY_PROPERTY),
+              new Cypher.Param(connectedNodeId),
+            ),
+          ),
+        ),
+      );
+    this.logger.log(pattern.toString());
+    const { cypher, params } = new Cypher.Match(pattern)
+      .delete(relation)
+      .build();
+    this.logger.log(cypher);
     await this.neo4jService.write(cypher, params);
   }
 }

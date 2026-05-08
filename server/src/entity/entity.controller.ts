@@ -12,7 +12,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { EntityService } from './entity.service';
-import { IdDto } from './dto/id.dto';
+import { IdDto } from '../dto/id.dto';
 import { LabelDto } from './dto/label.dto';
 import { OldEntityDto } from './dto/old-entity.dto';
 import { EntityNamesDto } from './dto/entity-names.dto';
