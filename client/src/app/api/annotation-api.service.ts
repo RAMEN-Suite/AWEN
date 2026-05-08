@@ -54,4 +54,18 @@ export class AnnotationApiService {
     await firstValueFrom(res);
     return;
   }
+
+  async deleteOutgoingRelation(id: string, connectedNodeId: string) {
+    const res = this.http.delete<void>(`/api/annotation/${id}/connection/${connectedNodeId}`).pipe(
+      catchError((err) => {
+        this.messageService.add({
+          severity: 'error',
+          detail: `Error while deleting Annotation-Relation. Try again later.`,
+        });
+        throw err;
+      }),
+    );
+    await firstValueFrom(res);
+    return;
+  }
 }
