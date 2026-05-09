@@ -368,11 +368,9 @@ export class AnnotationService {
           ),
         ),
       );
-    this.logger.log(pattern.toString());
     const { cypher, params } = new Cypher.Match(pattern)
       .delete(relation)
       .build();
-    this.logger.log(cypher);
     await this.neo4jService.write(cypher, params);
   }
 }
