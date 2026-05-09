@@ -132,7 +132,34 @@ export class DetailPage implements OnDestroy {
       },
       accept: async () => {
         await this.deleteAnnotation(id);
-        this.messageService.add({ severity: 'info', summary: 'Confirmed', detail: 'Record deleted' });
+        this.messageService.add({ severity: 'success', summary: 'Annotation deleted' });
+        await this.entityService.reloadEntity();
+      },
+    });
+  }
+
+  private async deleteAnnotationRelation(id: string, connectedNodeId: string) {
+    await this.annotationApi.deleteOutgoingRelation(id, connectedNodeId);
+  }
+
+  protected async clickDeleteAnnotationRelation(id: string, connectedNodeId: string, event: MouseEvent) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: `Are you sure you want to delete the relation to this annotation?`,
+      header: 'Danger Zone',
+      icon: 'pi pi-info-circle',
+      rejectButtonProps: {
+        label: 'Cancel',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'Delete Relation',
+        severity: 'danger',
+      },
+      accept: async () => {
+        await this.deleteAnnotationRelation(id, connectedNodeId);
+        this.messageService.add({ severity: 'success', summary: 'Relation deleted' });
         await this.entityService.reloadEntity();
       },
     });

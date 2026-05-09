@@ -350,6 +350,7 @@ export class AnnotationService {
             connectedNode.hasLabels(ANNOTATION_LABEL_NAME),
             connectedNode.hasLabels(CONTENT_LABEL_NAME),
             connectedNode.hasLabels(ENTITY_LABEL_NAME),
+            connectedNode.hasLabels(COLLECTION_LABEL_NAME),
           ),
           or(
             eq(
