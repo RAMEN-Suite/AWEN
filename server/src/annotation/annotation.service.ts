@@ -12,7 +12,7 @@ import {
   FROM_ANNOTATION_REL_TYPE,
   TO_ANNOTATION_REL_TYPE,
 } from '../constants';
-import Cypher, { and, eq, not, or } from '@neo4j/cypher-builder';
+import Cypher, { and, eq, not, or, type SetParam } from '@neo4j/cypher-builder';
 import { Integer, Node, Relationship } from 'neo4j-driver';
 import {
   transformConnectedNodeToDto,
@@ -20,6 +20,7 @@ import {
   transformNodeToAnnotationWithContentDTO,
 } from '../utils/node-transformers';
 import { ConnectedNodeDto } from './dto/connected-node.dto';
+import { metadataForNewNode, metadataForUpdateNode } from '../utils/utils';
 
 @Injectable()
 export class AnnotationService {
@@ -91,9 +92,51 @@ export class AnnotationService {
 
     const clause = matchEntity
       .create(createAnnotation)
+      .set(...metadataForNewNode(annotationNode))
       .return([annotationNode.property(key), 'id']);
 
     const { cypher, params } = clause.build();
+    const res = await this.neo4jService.write<{ id: string }>(cypher, params);
+    return res.records[0].get('id');
+  }
+
+  async update(id: string, properties: Record<string, unknown>) {
+    const annotation = await this.nodes.getById(id, {
+      labels: ANNOTATION_LABEL_NAME,
+    });
+
+    if (!annotation) {
+      throw new Error('There is no annotation with the given Id.');
+    }
+
+    const nodeType = this.model.getMostSpecificType(annotation.labels);
+
+    const [valid, message]: [valid: boolean, message: string[]] =
+      this.model.validateAttributes(nodeType, properties);
+
+    if (!valid) {
+      throw new Error('Invalid Attributes', { cause: message });
+    }
+
+    const key = this.model.getNodeKeyField(nodeType.name);
+
+    const aNode = new Cypher.Node();
+
+    const nodeProperties: SetParam[] = [];
+    Object.entries(properties).forEach(([key, value]) => {
+      nodeProperties.push([aNode.property(key), new Cypher.Param(value)]);
+    });
+
+    const pattern = new Cypher.Pattern(aNode, {
+      properties: {
+        [key]: new Cypher.Param(id),
+      },
+    });
+    const { cypher, params } = new Cypher.Match(pattern)
+      .set(...nodeProperties)
+      .set(...metadataForUpdateNode(aNode))
+      .return([aNode.property(key), 'id'])
+      .build();
     const res = await this.neo4jService.write<{ id: string }>(cypher, params);
     return res.records[0].get('id');
   }
