@@ -16,6 +16,7 @@ import { IdDto } from '../dto/id.dto';
 import { DeleteAnnotationConnectionReqDto } from './dto/delete-annotation-connection.req.dto';
 import { RAMENError } from '../schema/RAMENError';
 import { UpdateAnnotationDto } from './dto/update-annotation';
+import { CreateAnnotationConnectionReqDto } from './dto/create-annotation-connection.req.dto';
 
 @Controller('annotation')
 export class AnnotationController {
@@ -44,6 +45,16 @@ export class AnnotationController {
       }
       throw error;
     }
+  }
+
+  @Post(':id/connection')
+  async createConnection(
+    @Param() params: IdDto,
+    @Body() body: CreateAnnotationConnectionReqDto,
+  ): Promise<void> {
+    const { id } = params;
+    const { connectionId } = body;
+    await this.annotationService.createConnection(id, connectionId);
   }
 
   @Delete(':id/connection/:connectedId')

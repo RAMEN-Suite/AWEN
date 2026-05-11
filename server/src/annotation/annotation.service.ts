@@ -101,13 +101,7 @@ export class AnnotationService {
   }
 
   async update(id: string, properties: Record<string, unknown>) {
-    const annotation = await this.nodes.getById(id, {
-      labels: ANNOTATION_LABEL_NAME,
-    });
-
-    if (!annotation) {
-      throw new Error('There is no annotation with the given Id.');
-    }
+    const annotation = await this.getNode(id);
 
     const nodeType = this.model.getMostSpecificType(annotation.labels);
 
@@ -415,5 +409,74 @@ export class AnnotationService {
       .delete(relation)
       .build();
     await this.neo4jService.write(cypher, params);
+  }
+
+  async createConnection(id: string, connectedNodeId: string) {
+    // Throws exception if Annotation does not exist
+    await this.getNode(id);
+
+    const aNode = new Cypher.Node();
+    const connectedNode = new Cypher.Node();
+    const relation = new Cypher.Relationship();
+    const matchAnnotation = new Cypher.Pattern(aNode, {
+      labels: ANNOTATION_LABEL_NAME,
+      properties: {
+        [this.ANNOTATION_KEY_PROPERTY]: new Cypher.Param(id),
+      },
+    });
+    const matchConnectedNode = new Cypher.Pattern(connectedNode).where(
+      and(
+        or(
+          connectedNode.hasLabels(ANNOTATION_LABEL_NAME),
+          connectedNode.hasLabels(CONTENT_LABEL_NAME),
+          connectedNode.hasLabels(ENTITY_LABEL_NAME),
+          connectedNode.hasLabels(COLLECTION_LABEL_NAME),
+        ),
+        or(
+          eq(
+            connectedNode.property(this.ANNOTATION_KEY_PROPERTY),
+            new Cypher.Param(connectedNodeId),
+          ),
+          eq(
+            connectedNode.property(this.ENTITY_KEY_PROPERTY),
+            new Cypher.Param(connectedNodeId),
+          ),
+          eq(
+            connectedNode.property(this.CONTENT_KEY_PROPERTY),
+            new Cypher.Param(connectedNodeId),
+          ),
+        ),
+      ),
+    );
+
+    const mergePattern = new Cypher.Pattern(aNode)
+      .related(relation, {
+        direction: 'right',
+        type: FROM_ANNOTATION_REL_TYPE,
+      })
+      .to(connectedNode);
+
+    const { cypher, params } = new Cypher.Match(matchAnnotation)
+      .match(matchConnectedNode)
+      .merge(mergePattern)
+      .build();
+    this.logger.log(cypher);
+    await this.neo4jService.write(cypher, params);
+  }
+
+  /**
+   * Returns an Annotation Node with the given id
+   * @param id The annotations key
+   * @throws Error If there is no annotation with the given id
+   */
+  async getNode(id: string) {
+    const annotation = await this.nodes.getById(id, {
+      labels: ANNOTATION_LABEL_NAME,
+    });
+
+    if (!annotation) {
+      throw new Error('There is no annotation with the given id.');
+    }
+    return annotation;
   }
 }
