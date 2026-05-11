@@ -3,8 +3,10 @@ import {
   Body,
   Controller,
   Delete,
+  InternalServerErrorException,
   Param,
   Post,
+  Put,
 } from '@nestjs/common';
 import { AnnotationService } from './annotation.service';
 import { CreateAnnotationDto } from './dto/create-annotation.dto';
@@ -12,6 +14,8 @@ import { EntityService } from '../entity/entity.service';
 import { ApiResponse } from '@nestjs/swagger';
 import { IdDto } from '../dto/id.dto';
 import { DeleteAnnotationConnectionReqDto } from './dto/delete-annotation-connection.req.dto';
+import { RAMENError } from '../schema/RAMENError';
+import { UpdateAnnotationDto } from './dto/update-annotation';
 
 @Controller('annotation')
 export class AnnotationController {
@@ -24,6 +28,22 @@ export class AnnotationController {
   async delete(@Param() params: IdDto): Promise<void> {
     const { id } = params;
     await this.annotationService.delete(id);
+  }
+
+  @Put(':id')
+  async put(
+    @Param() params: IdDto,
+    @Body() body: UpdateAnnotationDto,
+  ): Promise<void> {
+    const { id } = params;
+    try {
+      await this.annotationService.update(id, body.properties);
+    } catch (error) {
+      if (!(error instanceof RAMENError)) {
+        throw new InternalServerErrorException('Could not delete entity');
+      }
+      throw error;
+    }
   }
 
   @Delete(':id/connection/:connectedId')
