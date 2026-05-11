@@ -1,0 +1,33 @@
+<form (submit)="onSubmit($event)">
+  <div class="field">
+    <p-floatlabel variant="on">
+      <input pInputText [formField]="updateAnnotationForm.type" id="create-annotation_type-input" autocomplete="off" fluid />
+      <label for="create-annotation_type-input">Type</label>
+    </p-floatlabel>
+    @if (updateAnnotationForm.type().touched() && updateAnnotationForm.type().invalid()) {
+    <small class="text-red-400">
+      @for (error of updateAnnotationForm.type().errors(); track error) {
+      <p>{{ error.message }}</p>
+      }
+    </small>
+    }
+  </div>
+  <div class="field">
+    <p-floatlabel variant="on">
+      <input pInputText [formField]="updateAnnotationForm.value" id="create-annotation_value-input" autocomplete="off" fluid />
+      <label for="create-annotation_value-input">Value</label>
+    </p-floatlabel>
+    @if (updateAnnotationForm.value().touched() && updateAnnotationForm.value().invalid()) {
+    <small class="text-red-400">
+      @for (error of updateAnnotationForm.value().errors(); track error) {
+      <p>{{ error.message }}</p>
+      }
+    </small>
+    }
+  </div>
+  <div class="field justify-content-end flex">
+    <button pButton type="submit" size="large" [disabled]="updateAnnotationForm().invalid()" [loading]="loading()">
+      Update Annotation
+    </button>
+  </div>
+</form>

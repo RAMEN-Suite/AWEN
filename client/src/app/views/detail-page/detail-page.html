@@ -154,14 +154,7 @@
                   }
                   <div class="flex justify-content-end p-1">
                     @if (keyProperty(annotation.properties)?.value; as annotationId) {
-                    <!--                    <p-button-->
-                    <!--                      icon="pi pi-pencil"-->
-                    <!--                      severity="secondary"-->
-                    <!--                      text-->
-                    <!--                      rounded-->
-                    <!--                      size="small"-->
-                    <!--                      (onClick)="clickEditAnnotation(String(annotationId), $event)"-->
-                    <!--                    />-->
+                    <app-update-annotation [annotation]="annotation" />
                     <p-button
                       icon="pi pi-trash"
                       severity="danger"

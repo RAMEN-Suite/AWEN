@@ -3,7 +3,7 @@ import { CreateAnnotationService } from '../create-annotation.service';
 import { FloatLabel } from 'primeng/floatlabel';
 import { FormsModule } from '@angular/forms';
 import { InputText } from 'primeng/inputtext';
-import { form, FormField, pattern, required } from '@angular/forms/signals';
+import { disabled, form, FormField, pattern, required } from '@angular/forms/signals';
 import { ButtonDirective } from 'primeng/button';
 import { DynamicDialogRef } from 'primeng/dynamicdialog';
 
@@ -31,6 +31,7 @@ export class CreateAnnotationForm {
   });
 
   protected createAnnotationForm = form(this.annotationModel, (schemaPath) => {
+    disabled(schemaPath, () => this.loading());
     required(schemaPath.value, { message: 'Please enter a value.' });
     required(schemaPath.type, { message: 'Please enter a type.' });
     pattern(schemaPath.type, new RegExp('^[a-z_][A-Za-z0-9_\\-]*:[a-z_][A-Za-z0-9_\\-:.]*$'), {

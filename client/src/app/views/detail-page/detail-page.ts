@@ -11,10 +11,11 @@ import { getKeyProperty } from '../../utils/entity.utils';
 import { EditEntity } from '../../edit-entity/edit-entity';
 import { EntityService } from '../../entity.service';
 import { ProgressSpinner } from 'primeng/progressspinner';
-import { CreateAnnotation } from '../../create-annotation/create-annotation';
+import { UpdateAnnotation } from '../../update-annotation/update-annotation';
 import { Button } from 'primeng/button';
 import { AnnotationApiService } from '../../api/annotation-api.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { CreateAnnotation } from '../../create-annotation/create-annotation';
 
 interface AnnotationGroup {
   type: string;
@@ -35,8 +36,9 @@ interface AnnotationGroup {
     AccordionContent,
     EditEntity,
     ProgressSpinner,
-    CreateAnnotation,
+    UpdateAnnotation,
     Button,
+    CreateAnnotation,
   ],
   templateUrl: './detail-page.html',
   styles: `
@@ -163,10 +165,6 @@ export class DetailPage implements OnDestroy {
         await this.entityService.reloadEntity();
       },
     });
-  }
-
-  protected clickEditAnnotation(id: string, event: MouseEvent) {
-    // TODO: Implement
   }
 
   protected readonly Array = Array;
