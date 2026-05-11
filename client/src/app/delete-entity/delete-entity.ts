@@ -19,7 +19,6 @@ export class DeleteEntity {
   protected loading = signal(false);
 
   protected clickDeleteBtn(event: PointerEvent) {
-    console.log(event);
     this.confirmationService.confirm({
       target: event.target as EventTarget,
       message: 'Do you want to delete this Entity?',

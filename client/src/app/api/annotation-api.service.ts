@@ -73,7 +73,7 @@ export class AnnotationApiService {
     const body = {
       connectionId: connectedNodeId,
     };
-    const res = this.http.post<void>(`/api/annotation/${id}/connection}`, body).pipe(
+    const res = this.http.post<void>(`/api/annotation/${id}/connection`, body).pipe(
       catchError((err) => {
         this.messageService.add({
           severity: 'error',

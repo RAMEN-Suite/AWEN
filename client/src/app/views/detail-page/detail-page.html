@@ -154,6 +154,14 @@
                   }
                   <div class="flex justify-content-end p-1">
                     @if (keyProperty(annotation.properties)?.value; as annotationId) {
+                    <p-button
+                      icon="pi pi-plus-circle"
+                      severity="primary"
+                      text
+                      rounded
+                      size="small"
+                      (onClick)="clickCreateAnnotationConnection(annotation)"
+                    />
                     <app-update-annotation [annotation]="annotation" />
                     <p-button
                       icon="pi pi-trash"

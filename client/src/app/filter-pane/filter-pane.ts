@@ -1,8 +1,8 @@
-import { Component, DestroyRef, effect, inject, signal } from '@angular/core';
+import { Component, DestroyRef, effect, inject, input, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AutoCompleteCompleteEvent, AutoCompleteModule, AutoCompleteSelectEvent } from 'primeng/autocomplete';
 import { Message } from 'primeng/message';
-import { SearchService } from '../views/searchPage/search.service';
+import { SearchEntityService } from '../search-entity.service';
 import { Button } from 'primeng/button';
 import { CollectionName, EntityAutocompleteQuery, EntityNames, EntitySearchQuery } from '../../interfaces';
 import { CollectionService } from '../api/collection.service';
@@ -27,10 +27,13 @@ interface CFOption {
 export class FilterPane {
   private destroyRef = inject(DestroyRef);
 
-  searchService = inject(SearchService);
+  searchService = inject(SearchEntityService);
   collectionService = inject(CollectionService);
   configService = inject(ConfigService);
   private queryParamService = inject(QueryParamsService);
+
+  openLinkInNewTab = input<boolean>(false);
+  setQueryParams = input<boolean>(false);
 
   remoteConfig = this.configService.getRemoteConfig();
   config = this.configService.getConfig();
@@ -161,8 +164,10 @@ export class FilterPane {
     }
 
     await this.searchService.searchEntities(query);
-    const queryParams = this.queryParamService.transformQueryParams(this.form.value);
-    await this.queryParamService.setQueryParams(queryParams);
+    if (this.setQueryParams()) {
+      const queryParams = this.queryParamService.transformQueryParams(this.form.value);
+      await this.queryParamService.setQueryParams(queryParams);
+    }
   }
 
   private calcShowEmptyMessage() {

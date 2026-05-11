@@ -16,6 +16,8 @@ import { Button } from 'primeng/button';
 import { AnnotationApiService } from '../../api/annotation-api.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { CreateAnnotation } from '../../create-annotation/create-annotation';
+import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { CreateAnnotationConnection } from '../../create-annotation-connection/create-annotation-connection';
 
 interface AnnotationGroup {
   type: string;
@@ -24,6 +26,7 @@ interface AnnotationGroup {
 
 @Component({
   selector: 'app-detail-page',
+  providers: [DialogService],
   imports: [
     TableModule,
     Chip,
@@ -67,6 +70,8 @@ export class DetailPage implements OnDestroy {
   private readonly annotationApi = inject(AnnotationApiService);
   private confirmationService = inject(ConfirmationService);
   private messageService = inject(MessageService);
+  private readonly dialogService = inject(DialogService);
+  private createAnnotationConnectionDialogRef: DynamicDialogRef<CreateAnnotationConnection> | null = null;
 
   entityId = input.required<string>();
 
@@ -164,6 +169,23 @@ export class DetailPage implements OnDestroy {
         this.messageService.add({ severity: 'success', summary: 'Relation deleted' });
         await this.entityService.reloadEntity();
       },
+    });
+  }
+
+  protected clickCreateAnnotationConnection(annotation: Annotation) {
+    this.createAnnotationConnectionDialogRef = this.dialogService.open(CreateAnnotationConnection, {
+      inputValues: {
+        annotation: annotation,
+      },
+      header: 'Create Annotation Connection',
+      styleClass: 'w-11 md:w-9 lg:w-8',
+      style: {
+        'min-height': '50vh',
+      },
+      contentStyle: {
+        'padding-top': '0.5rem',
+      },
+      closable: true,
     });
   }
 

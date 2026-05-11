@@ -5,13 +5,12 @@ import { NgClass } from '@angular/common';
 import { MessageService, PrimeTemplate } from 'primeng/api';
 import { ProgressSpinner } from 'primeng/progressspinner';
 import { Chip } from 'primeng/chip';
-import { RouterLink } from '@angular/router';
 import { Button } from 'primeng/button';
 import { Tooltip } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-entity-list',
-  imports: [Scroller, NgClass, PrimeTemplate, ProgressSpinner, Chip, RouterLink, Button, Tooltip],
+  imports: [Scroller, NgClass, PrimeTemplate, ProgressSpinner, Chip, Button, Tooltip],
   templateUrl: './entity-list.html',
   styles: `
     :host {
@@ -30,7 +29,11 @@ export class EntityList {
 
   entities = input.required<OldEntity[]>();
   entitiesLoading = input.required<boolean>();
+  onSelect = input.required<(entity: OldEntity) => void>();
 
+  selectEntity(entity: OldEntity) {
+    this.onSelect()(entity);
+  }
   async copyToClipboard(id: string) {
     await navigator.clipboard.writeText(id);
     this.messageService.add({

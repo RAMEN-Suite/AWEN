@@ -33,8 +33,12 @@
       <div class="flex flex-row justify-content-between">
         <div class="flex col">
           <a
-            [routerLink]="['entity', item.id ]"
             class="text-lg font-medium text-900 mt-2 cursor-pointer no-underline hover:underline focus:underline"
+            role="button"
+            tabindex="0"
+            (click)="selectEntity(item)"
+            (keydown.enter)="selectEntity(item)"
+            (keydown.space)="selectEntity(item)"
           >
             {{ item.label }}
           </a>

@@ -1,18 +1,18 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { EntityApiService } from '../../api/entity-api.service';
-import { OldEntity, EntityAutocompleteQuery, EntitySearchQuery } from '../../../interfaces';
+import { EntityApiService } from './api/entity-api.service';
+import { OldEntity, EntityAutocompleteQuery, EntitySearchQuery } from '../interfaces';
 
 @Injectable({
   providedIn: 'root',
 })
-export class SearchService {
-  entityService = inject(EntityApiService);
+export class SearchEntityService {
+  entityApi = inject(EntityApiService);
 
   private entities = signal<OldEntity[]>([]);
   private entitiesLoading = signal<boolean>(false);
 
   async getSuggestions(search: string, query: EntityAutocompleteQuery) {
-    return await this.entityService.getAutocomplete(search, query);
+    return await this.entityApi.getAutocomplete(search, query);
   }
 
   getEntitiesLoading() {
@@ -29,7 +29,7 @@ export class SearchService {
 
   async searchEntities(query: EntitySearchQuery) {
     this.entitiesLoading.set(true);
-    const entities = await this.entityService.searchEntities(query);
+    const entities = await this.entityApi.searchEntities(query);
     if (Array.isArray(entities)) {
       this.entities.set(entities);
     } else {
