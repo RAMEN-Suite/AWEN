@@ -69,6 +69,23 @@ export class AnnotationApiService {
     return;
   }
 
+  async createOutgoingRelation(id: string, connectedNodeId: string) {
+    const body = {
+      connectionId: connectedNodeId,
+    };
+    const res = this.http.post<void>(`/api/annotation/${id}/connection}`, body).pipe(
+      catchError((err) => {
+        this.messageService.add({
+          severity: 'error',
+          detail: `Error while creating Annotation-Relation. Try again later.`,
+        });
+        throw err;
+      }),
+    );
+    await firstValueFrom(res);
+    return;
+  }
+
   async update(annotationId: string, payload: Record<string, unknown>) {
     const body = {
       properties: payload,
