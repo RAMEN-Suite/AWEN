@@ -68,4 +68,32 @@ export class AnnotationApiService {
     await firstValueFrom(res);
     return;
   }
+
+  async update(annotationId: string, payload: Record<string, unknown>) {
+    const body = {
+      properties: payload,
+    };
+
+    const res = this.http.put<void>(`/api/annotation/${annotationId}`, body).pipe(
+      catchError((err) => {
+        if (err.error.statusCode === 400) {
+          this.messageService.add({
+            severity: 'error',
+            summary: `Error while updating an annotation. Please try again.`,
+            detail: Array.isArray(err.error.message) ? err.error.message.join('\n') : err.error.message,
+            closable: true,
+            sticky: true,
+          });
+        } else {
+          this.messageService.add({
+            severity: 'error',
+            summary: `Error while updating an annotation. Please try again.`,
+          });
+        }
+        throw err;
+      }),
+    );
+    await firstValueFrom(res);
+    return;
+  }
 }
