@@ -11,7 +11,7 @@ import { getKeyProperty } from '../../utils/entity.utils';
 import { EditEntity } from '../../edit-entity/edit-entity';
 import { EntityService } from '../../entity.service';
 import { ProgressSpinner } from 'primeng/progressspinner';
-import { UpdateAnnotation } from '../../update-annotation/update-annotation';
+import { UpdateAnnotation } from '../../edit-annotation/update-annotation';
 import { Button } from 'primeng/button';
 import { AnnotationApiService } from '../../api/annotation-api.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
