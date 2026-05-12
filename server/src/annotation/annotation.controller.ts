@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   InternalServerErrorException,
   Param,
   Post,
@@ -24,6 +25,12 @@ export class AnnotationController {
     private readonly annotationService: AnnotationService,
     private readonly entityService: EntityService,
   ) {}
+
+  @Get(':id')
+  async get(@Param() params: IdDto) {
+    const { id } = params;
+    return await this.annotationService.get(id);
+  }
 
   @Delete(':id')
   async delete(@Param() params: IdDto): Promise<void> {

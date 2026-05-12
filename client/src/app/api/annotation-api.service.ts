@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { MessageService } from 'primeng/api';
 import { catchError, firstValueFrom, map } from 'rxjs';
+import { Annotation } from '../../interfaces';
 
 @Injectable({
   providedIn: 'root',
@@ -9,6 +10,19 @@ import { catchError, firstValueFrom, map } from 'rxjs';
 export class AnnotationApiService {
   private readonly http = inject(HttpClient);
   private readonly messageService = inject(MessageService);
+
+  async get(id: string) {
+    const res = this.http.get<Annotation>('/api/annotation/' + id).pipe(
+      catchError((err) => {
+        this.messageService.add({
+          severity: 'error',
+          detail: `Error while getting Annotation with id ${id}. Try again later.`,
+        });
+        throw err;
+      }),
+    );
+    return await firstValueFrom(res);
+  }
 
   async createAnnotationForEntity(entityId: string, payload: Record<string, unknown>) {
     const body = {

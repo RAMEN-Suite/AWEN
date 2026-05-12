@@ -39,12 +39,18 @@
         {
           "name": "url",
           "typeId": "String",
-          "bounds": { "lowerBound": 1, "upperBound": 1 }
+          "bounds": {
+            "lowerBound": 1,
+            "upperBound": 1
+          }
         },
         {
           "name": "date",
           "typeId": "String",
-          "bounds": { "lowerBound": 1, "upperBound": 1 }
+          "bounds": {
+            "lowerBound": 1,
+            "upperBound": 1
+          }
         }
       ],
       "constraints": [],
@@ -104,32 +110,50 @@
         {
           "name": "fun facts",
           "typeId": "String",
-          "bounds": { "lowerBound": 0, "upperBound": 4 }
+          "bounds": {
+            "lowerBound": 0,
+            "upperBound": 4
+          }
         },
         {
           "name": "age",
           "typeId": "Integer",
-          "bounds": { "lowerBound": 0, "upperBound": 1 }
+          "bounds": {
+            "lowerBound": 0,
+            "upperBound": 1
+          }
         },
         {
           "name": "age mult",
           "typeId": "Integer",
-          "bounds": { "lowerBound": 2, "upperBound": -1 }
+          "bounds": {
+            "lowerBound": 2,
+            "upperBound": -1
+          }
         },
         {
           "name": "float test",
           "typeId": "Float",
-          "bounds": { "lowerBound": 1, "upperBound": 1 }
+          "bounds": {
+            "lowerBound": 1,
+            "upperBound": 1
+          }
         },
         {
           "name": "float mult test",
           "typeId": "Float",
-          "bounds": { "lowerBound": 0, "upperBound": -1 }
+          "bounds": {
+            "lowerBound": 0,
+            "upperBound": -1
+          }
         },
         {
           "name": "male",
           "typeId": "Boolean",
-          "bounds": { "lowerBound": 1, "upperBound": 1 }
+          "bounds": {
+            "lowerBound": 1,
+            "upperBound": 1
+          }
         }
       ],
       "constraints": [],
@@ -144,7 +168,10 @@
         {
           "name": "test",
           "typeId": "String",
-          "bounds": { "lowerBound": 1, "upperBound": 1 }
+          "bounds": {
+            "lowerBound": 1,
+            "upperBound": 1
+          }
         }
       ],
       "constraints": [],
@@ -186,7 +213,18 @@
         {
           "name": "value",
           "typeId": "String",
-          "bounds": { "lowerBound": 1, "upperBound": 1 }
+          "bounds": {
+            "lowerBound": 1,
+            "upperBound": 1
+          }
+        },
+        {
+          "name": "url_test",
+          "typeId": "String",
+          "bounds": {
+            "lowerBound": 0,
+            "upperBound": 1
+          }
         }
       ],
       "constraints": [],
@@ -206,7 +244,50 @@
       "id": "WFmBcuT2XyQByyoj",
       "name": "RegestaAnnotation",
       "superTypes": ["lW611f30a2ky4276g3l8N:m2Xv8qL0sP6tN1yK7rB3"],
-      "attributes": [],
+      "attributes": [
+        {
+          "name": "url",
+          "typeId": "String",
+          "bounds": {
+            "lowerBound": 0,
+            "upperBound": 1
+          },
+          "isKey": false,
+          "isReadOnly": false,
+          "isUnique": false,
+          "isOrdered": false,
+          "constraints": [],
+          "ext": {}
+        },
+        {
+          "name": "url_title",
+          "typeId": "String",
+          "bounds": {
+            "lowerBound": 0,
+            "upperBound": 1
+          },
+          "isKey": false,
+          "isReadOnly": false,
+          "isUnique": false,
+          "isOrdered": false,
+          "constraints": [],
+          "ext": {}
+        },
+        {
+          "name": "url_label",
+          "typeId": "String",
+          "bounds": {
+            "lowerBound": 0,
+            "upperBound": 1
+          },
+          "isKey": false,
+          "isReadOnly": false,
+          "isUnique": false,
+          "isOrdered": false,
+          "constraints": [],
+          "ext": {}
+        }
+      ],
       "constraints": [],
       "ext": {}
     }

@@ -21,6 +21,7 @@ import {
 } from '../utils/node-transformers';
 import { ConnectedNodeDto } from './dto/connected-node.dto';
 import { metadataForNewNode, metadataForUpdateNode } from '../utils/utils';
+import { AnnotationDto } from './dto/annotation.dto';
 
 @Injectable()
 export class AnnotationService {
@@ -42,6 +43,12 @@ export class AnnotationService {
     );
     this.ENTITY_KEY_PROPERTY = this.model.getNodeKeyField(ENTITY_LABEL_NAME);
     this.CONTENT_KEY_PROPERTY = this.model.getNodeKeyField(CONTENT_LABEL_NAME);
+  }
+
+  async get(id: string): Promise<AnnotationDto> {
+    const annotationNode = await this.getNode(id);
+    const gNode = this.model.getMostSpecificType(annotationNode.labels);
+    return transformNodeToAnnotationDTO(annotationNode, gNode);
   }
 
   async createForEntity(entityId: string, properties: Record<string, unknown>) {

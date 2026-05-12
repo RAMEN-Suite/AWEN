@@ -1,12 +1,11 @@
 import { Component, inject, input } from '@angular/core';
 import { Button } from 'primeng/button';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { CreateAnnotationService } from './create-annotation.service';
 import { CreateAnnotationForm } from './create-annotation-form/create-annotation-form';
 
 @Component({
   selector: 'app-create-annotation',
-  providers: [DialogService, CreateAnnotationService],
+  providers: [DialogService],
   imports: [Button],
   templateUrl: './create-annotation.html',
 })
