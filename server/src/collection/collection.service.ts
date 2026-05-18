@@ -3,7 +3,11 @@ import { Neo4jService } from '../neo4j/neo4j.service';
 import { GuidelinesService } from '../guidelines/guidelines.service';
 import Cypher, { With } from '@neo4j/cypher-builder';
 import { CollectionNameDto } from './dto/collection-name.dto';
-import { FROM_ANNOTATION_REL_TYPE, TO_ANNOTATION_REL_TYPE } from '../constants';
+import {
+  COLLECTION_LABEL_NAME,
+  FROM_ANNOTATION_REL_TYPE,
+  TO_ANNOTATION_REL_TYPE,
+} from '../constants';
 
 @Injectable()
 export class CollectionService {
@@ -89,21 +93,25 @@ export class CollectionService {
           type: FROM_ANNOTATION_REL_TYPE,
         })
         .to(ann)
-        .related(new Cypher.Relationship(), {
+        .related({
           direction: 'left',
           type: TO_ANNOTATION_REL_TYPE,
         })
-        .to(col),
+        .to(col, {
+          labels: COLLECTION_LABEL_NAME,
+        }),
     );
 
     const optionalParents = new Cypher.OptionalMatch(
       new Cypher.Pattern(col)
-        .related(undefined, {
+        .related({
           direction: 'right',
           type: 'PART_OF',
           length: '*',
         })
-        .to(parentCol),
+        .to(parentCol, {
+          labels: COLLECTION_LABEL_NAME,
+        }),
     );
 
     const withEntityCol = new Cypher.With(entityNode, col, parentCol);
@@ -141,7 +149,12 @@ export class CollectionService {
     );
 
     const withDistinctC = new Cypher.With(entityNode, [
-      Cypher.collect(collectionMap).distinct(),
+      Cypher.collect(
+        new Cypher.Case(undefined)
+          .when(Cypher.not(Cypher.isNull(c)))
+          .then(collectionMap)
+          .else(Cypher.Null),
+      ).distinct(),
       collections,
     ]).distinct();
 
