@@ -18,6 +18,19 @@ export class RamenModelService {
     return type;
   }
 
+  getNodeTypeById(id: string) {
+    const type = this.schema.getRegistry().getNodeTypeById(id);
+    if (!type) {
+      this.logger.error(`There is no node with the id "${id}".`);
+      throw new RAMENError(`There is no node with the id "${id}".`);
+    }
+    return type;
+  }
+
+  isSubtypeOf(typeName: string, baseName: string): boolean {
+    return this.schema.getRegistry().isSubtypeOf(typeName, baseName);
+  }
+
   getSuperNodes(name: string) {
     return this.schema.getRegistry().getSuperNodes(name);
   }
@@ -70,6 +83,10 @@ export class RamenModelService {
 
   getSubtypes(name: string) {
     return this.schema.getRegistry().getTypes(name);
+  }
+
+  getRelationTypesOfNode(nodeType: string) {
+    return this.schema.getRegistry().getRelationTypesOfNode(nodeType);
   }
 
   validateAttributes(

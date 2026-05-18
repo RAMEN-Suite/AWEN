@@ -108,12 +108,24 @@ export class ModelRegistry {
     return this.allNodes.find((node) => node.name === name);
   }
 
+  getNodeTypeById(id: string) {
+    return this.nodes.get(id);
+  }
+
   hasNodeType(name: string) {
     return !!this.getNodeType(name);
   }
 
   getRelationTypesByName(name: string): RelationType[] {
     return this.allRelations.filter((r) => r.name === name);
+  }
+
+  getRelationTypesOfNode(nodeType: string) {
+    const type = this.getNodeType(nodeType);
+    if (!type) return [];
+    return this.allRelations.filter((r) => {
+      return r.from.nodeId === type.id || r.to.nodeId === type.id;
+    });
   }
 
   resolveNodeNameFromRef(ref: string): string | undefined {

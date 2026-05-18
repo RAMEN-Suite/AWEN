@@ -12,7 +12,7 @@ export class ConfigService {
   private readonly store = inject(LocalStoreService);
   private readonly guidelines = inject(GuidelinesService);
 
-  private readonly _remoteConfig = signal<EmConfigRemote>({ collectionChains: [], entityTypes: [], dataTypes: [] });
+  private readonly _remoteConfig = signal<EmConfigRemote>({ collectionChains: [], entityTypes: [], annotationTypes: [], dataTypes: [] });
   private readonly _config = signal<EmConfig>({ selectedCollectionChain: [], filterableCollections: [], entityTypes: [] });
   private readonly _loaded = signal(false);
 
@@ -27,6 +27,12 @@ export class ConfigService {
   getDataTypes() {
     return computed(() => {
       return this._remoteConfig().dataTypes;
+    });
+  }
+
+  getAnnotationTypes() {
+    return computed(() => {
+      return this._remoteConfig().annotationTypes;
     });
   }
 
