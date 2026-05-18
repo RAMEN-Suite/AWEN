@@ -31,7 +31,8 @@ export class GuidelinesService {
   }
 
   /**
-   *  TODO: Aufgrund der funktionsweise von "getRelationTypesOfNode()" bekommt man hier aktuell nur die Relation Types von der obersten Annotation Node. und nicht von allen Subtypes. Das ist aber eigentlich gewünscht
+   *  TODO: Aufgrund der funktionsweise von "getRelationTypesOfNode()" bekommt man hier aktuell nur die Relation Types von der obersten Annotation Node. und nicht von allen Subtypes. Das ist aber eigentlich gewünscht.
+   *  TASK: add all subannotation types which are connected to any other entity or sub entity type
    */
   private getAnnotationTypes(): string[] {
     const annotationType = this.model.getNodeType(ANNOTATION_LABEL_NAME);
