@@ -89,11 +89,31 @@ export class RamenModelService {
     return this.schema.getRegistry().getRelationTypesOfNode(nodeType);
   }
 
+  private validateForUnknownAttributes(
+    type: NodeType,
+    attributes: Record<string, unknown>,
+    ret: [valid: boolean, message: string[]],
+  ): void {
+    const allowedAttributeNames = new Set(
+      type.attributes.map((attribute) => attribute.name),
+    );
+
+    for (const key of Object.keys(attributes)) {
+      if (!allowedAttributeNames.has(key)) {
+        ret[0] = false;
+        ret[1].push(`Attribute "${key}" is not valid for a ${type.name}`);
+      }
+    }
+  }
+
   validateAttributes(
     type: NodeType,
     attributes: Record<string, unknown>,
   ): [valid: boolean, message: string[]] {
     const ret: [valid: boolean, message: string[]] = [true, []];
+
+    this.validateForUnknownAttributes(type, attributes, ret);
+
     for (const attribute of type.attributes) {
       const key = attribute.name;
       this.validateAttribute(type, key, attributes[key], ret);
