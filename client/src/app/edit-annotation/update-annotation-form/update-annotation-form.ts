@@ -1,38 +1,32 @@
-import { Component, computed, inject, input, OnInit, Signal, signal } from '@angular/core';
+import { Component, computed, inject, input, Signal, signal, viewChild } from '@angular/core';
 import { UpdateAnnotationService } from '../update-annotation.service';
-import { FloatLabel } from 'primeng/floatlabel';
 import { FormsModule } from '@angular/forms';
-import { InputText } from 'primeng/inputtext';
-import { disabled, form, FormField, pattern, required } from '@angular/forms/signals';
 import { ButtonDirective } from 'primeng/button';
 import { DynamicDialogRef } from 'primeng/dynamicdialog';
-import { Annotation } from '../../../interfaces';
+import { Annotation, EntityPropertyDto, GAttribute } from '../../../interfaces';
 import { getKeyProperty } from '../../utils/entity.utils';
 import { MessageService } from 'primeng/api';
+import { AttributeForm } from '../../utils/attribute-form/attribute-form';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { from, map, switchMap } from 'rxjs';
+import { ANNOTATION_TYPE_NAME, ENTITY_NAME_PROPERTY } from '../../../constants';
+import { UtilsService } from '../../utils/utils.service';
 
-interface AnnotationUpdateData extends Record<string, unknown> {
-  type: string;
-  value: string;
-}
+interface AttributeWithOptValue extends Omit<EntityPropertyDto, 'value'>, Partial<Pick<EntityPropertyDto, 'value'>> {}
 
-// Using experimental Signal Form. Cause why not
 @Component({
   selector: 'app-update-annotation-form',
-  imports: [FloatLabel, FormsModule, InputText, FormField, ButtonDirective],
+  imports: [FormsModule, ButtonDirective, AttributeForm],
   templateUrl: './update-annotation-form.html',
 })
-export class UpdateAnnotationForm implements OnInit {
+export class UpdateAnnotationForm {
   private readonly updateAnnotationService = inject(UpdateAnnotationService);
   private readonly dialogRef = inject(DynamicDialogRef);
   private messageService = inject(MessageService);
+  private readonly utilService = inject(UtilsService);
 
   annotation = input.required<Annotation>();
   protected loading = signal<boolean>(false);
-
-  private annotationModel = signal<AnnotationUpdateData>({
-    type: '',
-    value: '',
-  });
 
   private annotationId: Signal<string | null> = computed(() => {
     const keyProp = getKeyProperty(this.annotation().properties);
@@ -42,23 +36,38 @@ export class UpdateAnnotationForm implements OnInit {
     return null;
   });
 
-  protected updateAnnotationForm = form(this.annotationModel, (schemaPath) => {
-    disabled(schemaPath, () => this.loading());
-    required(schemaPath.value, { message: 'Please enter a value.' });
-    required(schemaPath.type, { message: 'Please enter a type.' });
-    pattern(schemaPath.type, new RegExp('^[a-z_][A-Za-z0-9_\\-]*:[a-z_][A-Za-z0-9_\\-:.]*$'), {
-      message: 'The type must be a valid dictionary type.',
-    });
-  });
+  readonly properties: Signal<(GAttribute | EntityPropertyDto)[]> = toSignal(
+    toObservable(this.annotation).pipe(
+      switchMap((annotation) => from(this.updateAnnotationService.getAnnotationProperties(annotation.types[annotation.types.length - 1]))),
+      map((attributes) => this.mergePropArrays(this.annotation().properties, attributes)),
+    ),
+    { initialValue: [] },
+  );
 
-  ngOnInit() {
-    this.loading.set(true);
-    const value = this.annotation().properties.find((p) => p.name === 'value');
-    this.annotationModel.set({
-      type: this.annotation().type,
-      value: value?.value ? (value?.value as string) : '',
+  attributeForm = viewChild.required<AttributeForm>(AttributeForm);
+
+  propertiesForm = computed(() => this.attributeForm().propertiesForm());
+
+  private mergePropArrays(props: EntityPropertyDto[], attributes: AttributeWithOptValue[]) {
+    const arr: AttributeWithOptValue[] = [...props];
+    let nameAttribute: AttributeWithOptValue | undefined;
+
+    attributes.forEach((attribute) => {
+      if (attribute.name === ANNOTATION_TYPE_NAME) {
+        attribute.value = this.annotation().type;
+        nameAttribute = attribute;
+      }
+      const included = arr.find((prop) => attribute.name === prop.name);
+      if (!included) arr.push(attribute);
     });
-    this.loading.set(false);
+
+    if (nameAttribute) {
+      const index = arr.indexOf(nameAttribute);
+      if (index > -1) arr.splice(index, 1);
+      arr.unshift(nameAttribute);
+    }
+
+    return arr;
   }
 
   protected async onSubmit(event: Event) {
@@ -74,7 +83,7 @@ export class UpdateAnnotationForm implements OnInit {
     }
     try {
       this.loading.set(true);
-      const payload = this.annotationModel();
+      const payload = this.utilService.createPayload(this.propertiesForm().value, this.properties());
       await this.updateAnnotationService.update(annotationId, payload);
       this.dialogRef.close();
     } finally {
