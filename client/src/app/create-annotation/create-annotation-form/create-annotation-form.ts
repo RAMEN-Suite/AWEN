@@ -1,59 +1,80 @@
-import { Component, inject, input, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, Signal, signal, viewChild, WritableSignal } from '@angular/core';
 import { CreateAnnotationService } from '../create-annotation.service';
 import { FloatLabel } from 'primeng/floatlabel';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { InputText } from 'primeng/inputtext';
-import { disabled, form, FormField, pattern, required } from '@angular/forms/signals';
 import { ButtonDirective } from 'primeng/button';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { Annotation } from '../../../interfaces';
+import { Annotation, GAttribute } from '../../../interfaces';
 import { CreateAnnotationConnection } from '../../create-annotation-connection/create-annotation-connection';
 import { ConfirmationService } from 'primeng/api';
 import { AnnotationApiService } from '../../api/annotation-api.service';
-
-interface AnnotationCreationData extends Record<string, unknown> {
-  type: string;
-  value: string;
-}
+import { Select } from 'primeng/select';
+import { AttributeForm } from '../../utils/attribute-form/attribute-form';
+import { UtilsService } from '../../utils/utils.service';
 
 // Using experimental Signal Form. Cause why not
 @Component({
   selector: 'app-create-annotation-form',
   providers: [CreateAnnotationService],
-  imports: [FloatLabel, FormsModule, InputText, FormField, ButtonDirective],
+  imports: [FloatLabel, FormsModule, InputText, ButtonDirective, Select, ReactiveFormsModule, AttributeForm],
   templateUrl: './create-annotation-form.html',
 })
 export class CreateAnnotationForm {
   private readonly annotationApi = inject(AnnotationApiService);
   private readonly dialogService = inject(DialogService);
   private confirmationService = inject(ConfirmationService);
+  private readonly utilService = inject(UtilsService);
   private readonly createAnnotationService = inject(CreateAnnotationService);
   private readonly dialogRef = inject(DynamicDialogRef);
   private createAnnotationConnectionDialogRef: DynamicDialogRef<CreateAnnotationConnection> | null = null;
 
+  protected readonly types: Signal<string[]> = this.createAnnotationService.getAnnotationTypes();
   entityId = input.required<string>();
+  readonly properties: WritableSignal<GAttribute[]> = signal<GAttribute[]>([]);
   protected loading = signal<boolean>(false);
+  readonly propertiesLoaded: WritableSignal<boolean> = signal<boolean>(true); // TODO: UI Loading state
+  readonly typesLoaded: Signal<boolean> = this.createAnnotationService.geAnnotationTypesLoaded();
 
-  private annotationModel = signal<AnnotationCreationData>({
-    type: '',
-    value: '',
-  });
+  attributeForm = viewChild.required<AttributeForm>(AttributeForm);
 
-  protected createAnnotationForm = form(this.annotationModel, (schemaPath) => {
-    disabled(schemaPath, () => this.loading());
-    required(schemaPath.value, { message: 'Please enter a value.' });
-    required(schemaPath.type, { message: 'Please enter a type.' });
-    pattern(schemaPath.type, new RegExp('^[a-z_][A-Za-z0-9_\\-]*:[a-z_][A-Za-z0-9_\\-:.]*$'), {
-      message: 'The type must be a valid dictionary type.',
+  typeInput = new FormControl('', { nonNullable: true });
+
+  propertiesForm = computed(() => this.attributeForm().propertiesForm());
+
+  constructor() {
+    // effect(async () => {
+    //   const type = this.preselectedType();
+    //   if (type) {
+    //     this.typeInput.setValue(type, { emitEvent: false });
+    //     await this.loadAndDisplayPropertyInputs(type);
+    //   }
+    // });
+    effect(async () => {
+      const types = this.types();
+      if (types[0]) {
+        this.typeInput.setValue(types[0], { emitEvent: false });
+        await this.loadAndDisplayPropertyInputs(types[0]);
+      }
     });
-  });
+    this.typeInput.valueChanges.subscribe(async (value) => {
+      await this.loadAndDisplayPropertyInputs(value);
+    });
+  }
+
+  private async loadAndDisplayPropertyInputs(type: string) {
+    this.propertiesLoaded.set(false);
+    const props: GAttribute[] = await this.createAnnotationService.getAnnotationProperties(type);
+    this.properties.set(props);
+    this.propertiesLoaded.set(true);
+  }
 
   protected async onSubmit(event: Event) {
     event.preventDefault();
     try {
       this.loading.set(true);
-      const payload = this.annotationModel();
-      const annotationId = await this.createAnnotationService.createAnnotationForEntity(this.entityId(), payload);
+      const payload = this.utilService.createPayload(this.propertiesForm().value, this.properties());
+      const annotationId = await this.createAnnotationService.createAnnotationForEntity(this.entityId(), this.typeInput.value, payload);
       console.log(`Created Annotation ${annotationId}`);
       this.confirmationService.confirm({
         target: event.target as EventTarget,

@@ -25,7 +25,7 @@ export class GuidelinesController {
     return new EmConfigDto(config);
   }
 
-  @Get('config/entity/properties/:type')
+  @Get('config/node/properties/:type')
   getEntityProperties(@Param('type') type: string) {
     const types = this.guidelinesService.getEntityProperties(type);
     return types;

@@ -1,31 +1,20 @@
 <form (submit)="onSubmit($event)">
-  <div class="field">
-    <p-floatlabel variant="on">
-      <input pInputText [formField]="createAnnotationForm.type" id="create-annotation_type-input" autocomplete="off" fluid />
-      <label for="create-annotation_type-input">Type</label>
-    </p-floatlabel>
-    @if (createAnnotationForm.type().touched() && createAnnotationForm.type().invalid()) {
-    <small class="text-red-400">
-      @for (error of createAnnotationForm.type().errors(); track error) {
-      <p>{{ error.message }}</p>
-      }
-    </small>
-    }
-  </div>
-  <div class="field">
-    <p-floatlabel variant="on">
-      <input pInputText [formField]="createAnnotationForm.value" id="create-annotation_value-input" autocomplete="off" fluid />
-      <label for="create-annotation_value-input">Value</label>
-    </p-floatlabel>
-    @if (createAnnotationForm.value().touched() && createAnnotationForm.value().invalid()) {
-    <small class="text-red-400">
-      @for (error of createAnnotationForm.value().errors(); track error) {
-      <p>{{ error.message }}</p>
-      }
-    </small>
-    }
-  </div>
-  <div class="field justify-content-end flex">
-    <button pButton type="submit" size="large" [disabled]="createAnnotationForm().invalid()" [loading]="loading()">Create</button>
+  <p-floatlabel variant="on" class="field">
+    <p-select
+      appendTo="body"
+      [formControl]="typeInput"
+      [options]="types()"
+      [filter]="true"
+      [showClear]="true"
+      [loading]="!typesLoaded()"
+      fluid
+      style="min-width: 12rem"
+      id="create-entity-form_type-input"
+    />
+    <label for="create-entity-form_type-input">Annotation-Type</label>
+  </p-floatlabel>
+  <app-attribute-form [formName]="typeInput.value" [properties]="properties()" [enableCheckForSimilarLabels]="true" />
+  <div class="field justify-content-end flex" [class]="typeInput.value === '' ? 'hidden':''">
+    <button pButton type="submit" size="large" [disabled]="propertiesForm().invalid">Create Statement</button>
   </div>
 </form>

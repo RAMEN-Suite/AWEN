@@ -38,12 +38,13 @@ export class GuidelinesService {
     const annotationType = this.model.getNodeType(ANNOTATION_LABEL_NAME);
     const entityType = this.model.getNodeType(ENTITY_LABEL_NAME);
 
-    return this.model
+    const types = this.model
       .getRelationTypesOfNode(ANNOTATION_LABEL_NAME)
       .filter((relation) =>
         this.isEntityAnnotationRelation(relation, entityType),
       )
       .map((relation) => this.getAnnotationTypeName(relation, annotationType));
+    return [...new Set(types)];
   }
 
   private isEntityAnnotationRelation(

@@ -10,7 +10,7 @@ export class EditEntityService {
   entityAPI = inject(EntityApiService);
 
   async getEntityProperties(type: string) {
-    return this.guidelineAPI.getEntityProperties(type);
+    return this.guidelineAPI.getNodeProperties(type);
   }
 
   async updateEntity(id: string, payload: Record<string, unknown>) {

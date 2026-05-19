@@ -24,9 +24,10 @@ export class AnnotationApiService {
     return await firstValueFrom(res);
   }
 
-  async createAnnotationForEntity(entityId: string, payload: Record<string, unknown>) {
+  async createAnnotationForEntity(entityId: string, type: string, payload: Record<string, unknown>) {
     const body = {
       entityId: entityId,
+      type: type,
       properties: payload,
     };
 

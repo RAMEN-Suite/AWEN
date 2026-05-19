@@ -75,7 +75,7 @@ export class AnnotationController {
   @ApiResponse({ type: IdDto })
   @Post('entity')
   async create(@Body() annotationDto: CreateAnnotationDto): Promise<IdDto> {
-    const { entityId, properties } = annotationDto;
+    const { entityId, type, properties } = annotationDto;
     const entity = await this.entityService.getById(entityId);
     if (!entity) {
       throw new BadRequestException('There is no entity with the given id.');
@@ -83,6 +83,7 @@ export class AnnotationController {
     try {
       const annotationId = await this.annotationService.createForEntity(
         entityId,
+        type,
         properties,
       );
       return {

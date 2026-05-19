@@ -25,7 +25,7 @@ export class CreateEntityService {
   }
 
   async getEntityProperties(type: string) {
-    return this.guidelineAPI.getEntityProperties(type);
+    return this.guidelineAPI.getNodeProperties(type);
   }
 
   async createEntity(type: string, payload: Record<string, unknown>) {

@@ -12,7 +12,7 @@
       panelStyleClass="w-30rem"
     >
       <ng-template let-entity #item>
-        <a [routerLink]="['entity', entity.id]" [target]="openLinkInNewTab()?'_blank':''" class="flex items-center gap-2">
+        <a [routerLink]="['/','entity', entity.id]" [target]="openLinkInNewTab()?'_blank':''" class="flex items-center gap-2">
           <span class="text-black-alpha-90">{{ entity.label }}</span>
         </a>
       </ng-template>

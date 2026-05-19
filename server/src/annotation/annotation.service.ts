@@ -51,8 +51,11 @@ export class AnnotationService {
     return transformNodeToAnnotationDTO(annotationNode, gNode);
   }
 
-  async createForEntity(entityId: string, properties: Record<string, unknown>) {
-    const type = ANNOTATION_LABEL_NAME; // TODO: type input zulassen.
+  async createForEntity(
+    entityId: string,
+    type: string,
+    properties: Record<string, unknown>,
+  ) {
     const nodeType = this.model.getNodeType(type);
 
     const [valid, message]: [valid: boolean, message: string[]] =
