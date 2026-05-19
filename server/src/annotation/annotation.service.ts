@@ -470,7 +470,6 @@ export class AnnotationService {
       .match(matchConnectedNode)
       .merge(mergePattern)
       .build();
-    this.logger.log(cypher);
     await this.neo4jService.write(cypher, params);
   }
 
