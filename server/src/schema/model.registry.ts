@@ -105,7 +105,19 @@ export class ModelRegistry {
   }
 
   getNodeType(name: string) {
-    return this.allNodes.find((node) => node.name === name);
+    let type: NodeType | undefined = undefined;
+    for (const node of this.allNodes) {
+      if (node.name !== name) {
+        continue;
+      }
+      if (!type) {
+        type = node;
+      }
+      if (node.superTypes.size > type.superTypes.size) {
+        type = node;
+      }
+    }
+    return type;
   }
 
   getNodeTypeById(id: string) {
