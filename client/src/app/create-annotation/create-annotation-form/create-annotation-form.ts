@@ -2,7 +2,6 @@ import { Component, computed, effect, inject, input, Signal, signal, viewChild, 
 import { CreateAnnotationService } from '../create-annotation.service';
 import { FloatLabel } from 'primeng/floatlabel';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { InputText } from 'primeng/inputtext';
 import { ButtonDirective } from 'primeng/button';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { Annotation, GAttribute } from '../../../interfaces';
@@ -17,7 +16,7 @@ import { UtilsService } from '../../utils/utils.service';
 @Component({
   selector: 'app-create-annotation-form',
   providers: [CreateAnnotationService],
-  imports: [FloatLabel, FormsModule, InputText, ButtonDirective, Select, ReactiveFormsModule, AttributeForm],
+  imports: [FloatLabel, FormsModule, ButtonDirective, Select, ReactiveFormsModule, AttributeForm],
   templateUrl: './create-annotation-form.html',
 })
 export class CreateAnnotationForm {
