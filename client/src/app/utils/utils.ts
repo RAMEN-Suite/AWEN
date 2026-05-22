@@ -1,3 +1,5 @@
+import { NodePropertyDto } from '../../interfaces';
+
 const castValues = <T extends number | string | boolean>(value: unknown[], dataTypeName: string): T[] => {
   return value.map((v) => castValue(v, dataTypeName));
 };
@@ -16,4 +18,8 @@ const castValue = <T extends number | string | boolean>(value: unknown, dataType
   }
 };
 
-export { castValue, castValues };
+const visibleProperties = (properties: NodePropertyDto[]): NodePropertyDto[] => {
+  return properties.filter((p) => !p.isKey && p.value !== '');
+};
+
+export { castValue, castValues, visibleProperties };
