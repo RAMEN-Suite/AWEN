@@ -24,6 +24,10 @@ export class DetailPage implements OnDestroy {
   annotations = this.entityService.annotations;
   entity = this.entityService.entity;
 
+  protected readonly visibleProperties = visibleProperties;
+  protected readonly Array = Array;
+  protected readonly String = String;
+
   constructor() {
     effect(async () => {
       const id = this.entityId(); // Signal wird getrackt
@@ -34,8 +38,4 @@ export class DetailPage implements OnDestroy {
   ngOnDestroy() {
     this.entityService.resetState();
   }
-
-  protected readonly visibleProperties = visibleProperties;
-  protected readonly Array = Array;
-  protected readonly String = String;
 }
