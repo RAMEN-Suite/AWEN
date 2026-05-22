@@ -15,11 +15,7 @@
   <div class="col-11 mb-8 md:col-9 md:mb-8 lg:col-7 lg:mb-5 flex-order-2 md:flex-order-1 grid gap-3">
     <div class="col-12">
       <span class="text-4xl font-bold"> {{ entity.label }} </span>
-      <div class="flex gap-2">
-        @for (type of entity.types; track $index) {
-        <p-chip class="py-1" [label]="type" />
-        }
-      </div>
+      <app-node-types [nodeTypes]="entity.types" asChips class="flex gap-2" />
     </div>
     <div class="col-12 grid">
       <div class="col-12 flex flex-column gap-3">

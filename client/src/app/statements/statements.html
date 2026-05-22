@@ -18,7 +18,7 @@
           @if (visibleProperties(annotation.properties).length > 0) {
           <div class="grid m-0 border-bottom-1 border-gray-200">
             <div class="col-3 p-3 bg-gray-50 border-right-1 border-gray-200">
-              <span class="text-sm font-medium text-gray-500">Annotation</span>
+              <app-node-types [nodeTypes]="annotation.types" class="flex flex-column gap-2" />
             </div>
             <div class="col p-3 flex flex-column gap-2">
               <app-property-list [properties]="annotation.properties" />
@@ -36,9 +36,7 @@
           >
             <div class="col-3 p-3 bg-gray-50 border-right-1 border-gray-200 flex flex-column gap-2">
               <p-tag [value]="node.direction" [severity]="node.direction === 'OUTGOING' ? 'success' : 'info'" styleClass="text-xs w-fit" />
-              @for (type of node.types; track type) {
-              <span class="text-sm font-medium">{{ type }}</span>
-              }
+              <app-node-types [nodeTypes]="node.types" class="flex flex-column gap-2" />
 
               <!-- Key Property – mit Link wenn Entity -->
               @if (keyProperty(node.properties); as key) { @if (isEntity(node) && entityRouterLink(node); as link) {

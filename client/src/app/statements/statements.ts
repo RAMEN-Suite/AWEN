@@ -15,6 +15,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { getKeyProperty } from '../utils/entity.utils';
 import { EntityService } from '../entity.service';
 import { PropertyList } from './property-list/property-list';
+import { NodeTypes } from './node-types/node-types';
 
 interface AnnotationGroup {
   type: string;
@@ -23,7 +24,19 @@ interface AnnotationGroup {
 
 @Component({
   selector: 'app-statements',
-  imports: [Accordion, AccordionContent, AccordionHeader, AccordionPanel, Button, Chip, Tag, UpdateAnnotation, RouterLink, PropertyList],
+  imports: [
+    Accordion,
+    AccordionContent,
+    AccordionHeader,
+    AccordionPanel,
+    Button,
+    Chip,
+    Tag,
+    UpdateAnnotation,
+    RouterLink,
+    PropertyList,
+    NodeTypes,
+  ],
   templateUrl: './statements.html',
   styles: `
     :host ::ng-deep {
