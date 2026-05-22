@@ -57,7 +57,7 @@ export class AnnotationService {
     properties: Record<string, unknown>,
   ) {
     const nodeType = this.model.getNodeType(type);
-
+    this.logger.debug('got ' + nodeType.name);
     const [valid, message]: [valid: boolean, message: string[]] =
       this.model.validateAttributes(nodeType, properties);
 
@@ -69,6 +69,7 @@ export class AnnotationService {
 
     const nodeLabels = Array.from(nodeType.superTypes.values());
     nodeLabels.push(type);
+    this.logger.debug('created ' + nodeLabels.join(', '));
 
     const nodeProperties: Record<string, Cypher.Expr> = {};
     Object.entries(properties).forEach(([key, value]) => {
@@ -90,7 +91,7 @@ export class AnnotationService {
 
     const createAnnotation = new Cypher.Create(
       new Cypher.Pattern(annotationNode, {
-        labels: ANNOTATION_LABEL_NAME,
+        labels: [ANNOTATION_LABEL_NAME, ...nodeLabels],
         properties: nodeProperties,
       })
         .related(new Cypher.Relationship(), {
