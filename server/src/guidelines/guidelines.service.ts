@@ -35,15 +35,21 @@ export class GuidelinesService {
    *  TASK: add all subannotation types which are connected to any other entity or sub entity type
    */
   private getAnnotationTypes(): string[] {
-    const annotationType = this.model.getNodeType(ANNOTATION_LABEL_NAME);
+    const annotationTypes = this.model.getSubtypes(ANNOTATION_LABEL_NAME);
     const entityType = this.model.getNodeType(ENTITY_LABEL_NAME);
 
-    const types = this.model
-      .getRelationTypesOfNode(ANNOTATION_LABEL_NAME)
-      .filter((relation) =>
-        this.isEntityAnnotationRelation(relation, entityType),
-      )
-      .map((relation) => this.getAnnotationTypeName(relation, annotationType));
+    let types: string[] = [];
+    annotationTypes.forEach((type) => {
+      const newTypes = this.model
+        .getRelationTypesOfNode(type)
+        .filter((relation) =>
+          this.isEntityAnnotationRelation(relation, entityType),
+        )
+        .map((relation) =>
+          this.getAnnotationTypeName(relation, this.model.getNodeType(type)),
+        );
+      types = types.concat(newTypes);
+    });
     return [...new Set(types)];
   }
 
