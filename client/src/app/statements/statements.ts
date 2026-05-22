@@ -48,12 +48,13 @@ interface AnnotationGroup {
 export class Statements {
   private readonly entityService = inject(EntityService);
   private readonly dialogService = inject(DialogService);
-  private createAnnotationConnectionDialogRef: DynamicDialogRef<CreateAnnotationConnection> | null = null;
   private readonly annotationApi = inject(AnnotationApiService);
-  private confirmationService = inject(ConfirmationService);
-  private messageService = inject(MessageService);
+  private readonly confirmationService = inject(ConfirmationService);
+  private readonly messageService = inject(MessageService);
 
   annotations = input.required<Annotation[]>();
+
+  private createAnnotationConnectionDialogRef: DynamicDialogRef<CreateAnnotationConnection> | null = null;
 
   groupedAnnotations = computed<AnnotationGroup[]>(() => {
     const groups = new Map<string, Annotation[]>();
@@ -69,12 +70,13 @@ export class Statements {
 
   protected readonly visibleProperties = visibleProperties;
   protected readonly keyProperty = getKeyProperty;
+  protected readonly String = String;
 
-  isEntity(node: ConnectedNodeDto): boolean {
+  protected isEntity(node: ConnectedNodeDto): boolean {
     return node.types.includes(ENTITY_LABEL_NAME);
   }
 
-  entityRouterLink(node: ConnectedNodeDto): string | null {
+  protected entityRouterLink(node: ConnectedNodeDto): string | null {
     const key = this.keyProperty(node.properties);
     return key ? `/entity/${key.value}` : null;
   }
@@ -94,10 +96,6 @@ export class Statements {
       },
       closable: true,
     });
-  }
-
-  private async deleteAnnotation(id: string) {
-    await this.annotationApi.delete(id);
   }
 
   protected async clickDeleteAnnotation(id: string, event: MouseEvent) {
@@ -123,10 +121,6 @@ export class Statements {
     });
   }
 
-  private async deleteAnnotationRelation(id: string, connectedNodeId: string) {
-    await this.annotationApi.deleteOutgoingRelation(id, connectedNodeId);
-  }
-
   protected async clickDeleteAnnotationRelation(id: string, connectedNodeId: string, event: MouseEvent) {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
@@ -150,5 +144,11 @@ export class Statements {
     });
   }
 
-  protected readonly String = String;
+  private async deleteAnnotation(id: string) {
+    await this.annotationApi.delete(id);
+  }
+
+  private async deleteAnnotationRelation(id: string, connectedNodeId: string) {
+    await this.annotationApi.deleteOutgoingRelation(id, connectedNodeId);
+  }
 }
