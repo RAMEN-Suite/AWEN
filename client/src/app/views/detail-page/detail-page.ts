@@ -1,13 +1,10 @@
 import { Component, effect, inject, input, OnDestroy } from '@angular/core';
-import { Annotation, ConnectedNodeDto, NodePropertyDto } from '../../../interfaces';
 import { TableModule } from 'primeng/table';
 import { Chip } from 'primeng/chip';
 import { DeleteEntity } from '../../delete-entity/delete-entity';
 import { EditEntity } from '../../edit-entity/edit-entity';
 import { EntityService } from '../../entity.service';
 import { ProgressSpinner } from 'primeng/progressspinner';
-import { AnnotationApiService } from '../../api/annotation-api.service';
-import { ConfirmationService, MessageService } from 'primeng/api';
 import { CreateAnnotation } from '../../create-annotation/create-annotation';
 import { DialogService } from 'primeng/dynamicdialog';
 import { Statements } from '../../statements/statements';
