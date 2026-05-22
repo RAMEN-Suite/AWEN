@@ -21,20 +21,7 @@
               <span class="text-sm font-medium text-gray-500">Annotation</span>
             </div>
             <div class="col p-3 flex flex-column gap-2">
-              @for (property of visibleProperties(annotation.properties); track property.name) {
-              <div class="flex flex-column gap-1">
-                <span class="text-xs text-gray-400">{{ property.name }}</span>
-                @if (property.typeId === 'Array') {
-                <div class="flex flex-wrap gap-1">
-                  @for (val of $any(property.value); track $index) {
-                  <p-chip [label]="val" />
-                  }
-                </div>
-                } @else {
-                <span>{{ property.value }}</span>
-                }
-              </div>
-              }
+              <app-property-list [properties]="annotation.properties" />
             </div>
           </div>
           }
@@ -61,20 +48,7 @@
               } }
             </div>
             <div class="col p-3 flex flex-column gap-2">
-              @for (property of visibleProperties(node.properties); track property.name) {
-              <div class="flex flex-column gap-1">
-                <span class="text-xs text-gray-400">{{ property.name }}</span>
-                @if (property.typeId === 'Array') {
-                <div class="flex flex-wrap gap-1">
-                  @for (val of $any(property.value); track $index) {
-                  <p-chip [label]="val" />
-                  }
-                </div>
-                } @else {
-                <span>{{ property.value }}</span>
-                }
-              </div>
-              }
+              <app-property-list [properties]="node.properties" />
             </div>
             <div class="col-fixed w-auto p-1 flex align-content-end align-items-end gap-2">
               @if (keyProperty(annotation.properties)?.value; as annotationId) { @if (keyProperty(node.properties)?.value; as

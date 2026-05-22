@@ -49,15 +49,16 @@
         }
       </div>
     </div>
-
+    @if(annotations().length > 0) {
     <div class="col-12 grid">
       <div class="col-12">
         <span class="text-3xl font-bold">Statements</span>
       </div>
       <div class="col-12 mx-0 grid w-full gap-5">
-        <app-statements [annotations]="annotations()" />
+        <app-statements [annotations]="annotations()" class="w-full" />
       </div>
     </div>
+    }
   </div>
 </div>
 } @else {

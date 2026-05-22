@@ -14,6 +14,7 @@ import { AnnotationApiService } from '../api/annotation-api.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { getKeyProperty } from '../utils/entity.utils';
 import { EntityService } from '../entity.service';
+import { PropertyList } from './property-list/property-list';
 
 interface AnnotationGroup {
   type: string;
@@ -22,7 +23,7 @@ interface AnnotationGroup {
 
 @Component({
   selector: 'app-statements',
-  imports: [Accordion, AccordionContent, AccordionHeader, AccordionPanel, Button, Chip, Tag, UpdateAnnotation, RouterLink],
+  imports: [Accordion, AccordionContent, AccordionHeader, AccordionPanel, Button, Chip, Tag, UpdateAnnotation, RouterLink, PropertyList],
   templateUrl: './statements.html',
   styles: `
     :host ::ng-deep {
@@ -39,7 +40,6 @@ interface AnnotationGroup {
       }
 
       p-motion[name='p-collapsible'] {
-        display: block;
         overflow: hidden;
       }
     }
