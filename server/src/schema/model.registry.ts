@@ -5,10 +5,12 @@ import { DataType } from './interfaces/data-type.interface';
 import { Logger } from '@nestjs/common';
 import { GAttribute } from './interfaces/g-attribute.interface';
 import { BASE_DATA_TYPES } from '../constants';
+import { GNode } from './interfaces/g-node.interface';
 
 export class ModelRegistry {
   logger = new Logger(ModelRegistry.name);
 
+  private nodeAliases = new Map<string, string>();
   private dataTypes = new Map<string, DataType>();
   private nodes = new Map<string, NodeType>();
   private relations = new Map<string, RelationType>();
@@ -56,13 +58,7 @@ export class ModelRegistry {
   private register(model: GModel) {
     model.classifiers.forEach((c) => {
       if (c.kind === 'GNode') {
-        const formatedId = this.formatId(c.id, model.id);
-        this.nodes.set(formatedId, {
-          id: formatedId,
-          name: c.name,
-          superTypes: this.formatSuperTypes(c.superTypes) || [],
-          attributes: this.mergeAttributes(c.attributes, c.superTypes) || [],
-        });
+        this.registerNode(c, model.id);
       } else if (c.kind === 'GDataType') {
         const formatedId = this.formatId(c.id, model.id);
         this.dataTypes.set(formatedId, {
@@ -83,7 +79,7 @@ export class ModelRegistry {
       const formatedId = this.formatId(r.id, model.id);
       this.relations.set(formatedId, {
         id: formatedId,
-        superTypes: this.formatSuperTypes(r.superTypes) || [],
+        superTypes: this.formatSuperTypes(r.superTypes, model.id) || [],
         name: r.name,
         from: {
           ...r.from,
@@ -95,6 +91,65 @@ export class ModelRegistry {
         },
       });
     });
+  }
+
+  private registerNode(node: GNode, modelId: string) {
+    const formatedId = this.formatId(node.id, modelId);
+    const existing = this.getNodeType(node.name);
+
+    if (!existing) {
+      this.nodes.set(formatedId, {
+        id: formatedId,
+        name: node.name,
+        superTypes: this.formatSuperTypes(node.superTypes, modelId),
+        attributes: this.mergeAttributes(
+          node.attributes,
+          node.superTypes,
+          modelId,
+        ),
+      });
+      return;
+    }
+
+    this.nodeAliases.set(formatedId, existing.id);
+
+    existing.attributes = this.mergeAttributeOverrides(
+      existing.attributes,
+      node.attributes,
+    );
+
+    const additionalSuperTypes = this.formatSuperTypes(
+      node.superTypes,
+      modelId,
+    );
+    additionalSuperTypes.forEach((name, id) => {
+      const resolvedId = this.resolveNodeId(id);
+
+      if (resolvedId !== existing.id) {
+        existing.superTypes.set(resolvedId, name);
+      }
+    });
+  }
+
+  private mergeAttributeOverrides(
+    baseAttributes: GAttribute[],
+    overlayAttributes: GAttribute[],
+  ): GAttribute[] {
+    const attributesByName = new Map<string, GAttribute>();
+
+    baseAttributes.forEach((attribute) => {
+      attributesByName.set(attribute.name, attribute);
+    });
+
+    overlayAttributes.forEach((attribute) => {
+      attributesByName.set(attribute.name, attribute);
+    });
+
+    return Array.from(attributesByName.values());
+  }
+
+  private resolveNodeId(id: string) {
+    return this.nodeAliases.get(id) ?? id;
   }
 
   getSuperNodes(name: string) {
@@ -280,36 +335,56 @@ export class ModelRegistry {
   }
 
   private formatId(id: string, modelId: string) {
+    if (id.includes(':')) {
+      return id;
+    }
+
     return `${modelId}:${id}`;
   }
 
-  private formatSuperTypes(typeIds: string[]) {
+  private formatSuperTypes(typeIds: string[], modelId: string) {
     const superTypes = new Map<string, string>();
+
     typeIds.forEach((typeId) => {
-      const node = this.nodes.get(typeId);
+      const formatedId = this.resolveNodeId(this.formatId(typeId, modelId));
+      const node = this.nodes.get(formatedId);
+
       if (!node) {
         return;
       }
-      superTypes.set(typeId, node.name);
+
+      superTypes.set(formatedId, node.name);
     });
+
     return superTypes;
   }
 
-  private mergeAttributes(attributes: GAttribute[], superTypes: string[]) {
-    const mergedAttributes: GAttribute[] = [...attributes.reverse()];
+  private mergeAttributes(
+    attributes: GAttribute[],
+    superTypes: string[],
+    modelId: string,
+  ) {
+    const mergedAttributes: GAttribute[] = [...attributes];
+
     superTypes.forEach((typeId) => {
-      const node = this.nodes.get(typeId);
-      if (node) {
-        node.attributes.forEach((a) => {
-          const exists = mergedAttributes.find((existingAttribute) => {
-            return existingAttribute.name === a.name;
-          });
-          if (!exists) {
-            mergedAttributes.push(a);
-          }
-        });
+      const formatedId = this.resolveNodeId(this.formatId(typeId, modelId));
+      const node = this.nodes.get(formatedId);
+
+      if (!node) {
+        return;
       }
+
+      node.attributes.forEach((attribute) => {
+        const exists = mergedAttributes.some((existingAttribute) => {
+          return existingAttribute.name === attribute.name;
+        });
+
+        if (!exists) {
+          mergedAttributes.unshift(attribute);
+        }
+      });
     });
-    return mergedAttributes.reverse();
+
+    return mergedAttributes;
   }
 }
