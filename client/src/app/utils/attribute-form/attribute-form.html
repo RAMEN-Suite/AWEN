@@ -37,7 +37,11 @@
       autocomplete="off"
       fluid
     />
-    <label [for]="fieldId">{{ property.name }}<small class="text-red-400"> *</small></label>
+    <label [for]="fieldId"
+      >{{ property.name }}@if (property.bounds.lowerBound > 0) {
+      <small class="text-red-400"> *</small>
+      }</label
+    >
   </p-floatlabel>
   } @if (dataType.name.toLowerCase() === 'boolean') {
   <p-toggle-button [formControlName]="property.name" [onLabel]="property.name" [offLabel]="'Not ' + property.name" [id]="fieldId" />
@@ -74,11 +78,13 @@
   } }
 
   <!-- Validierungsfehler -->
-  @if (propertiesForm().get(property.name)?.invalid && propertiesForm().get(property.name)?.dirty) {
+  @let control = propertiesForm().get(property.name); @if (control?.invalid && control?.dirty) {
   <small class="text-red-400">
-    @if (propertiesForm().get(property.name)?.errors?.['minlength']) { At least {{ property.bounds.lowerBound }} value(s) required. } @if
-    (propertiesForm().get(property.name)?.errors?.['maxlength']) { At most {{ property.bounds.upperBound }} value(s) allowed. }
+    @if (control?.errors?.['minlength']) { At least {{ property.bounds.lowerBound }} value(s) required. } @if
+    (control?.errors?.['maxlength']) { At most {{ property.bounds.upperBound }} value(s) allowed. } @if (control?.errors?.['required']) {
+    This field is required. }
   </small>
   }
 </div>
 } }
+<small><span class="text-red-400">*</span> mandatory field</small>
