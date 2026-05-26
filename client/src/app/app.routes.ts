@@ -4,7 +4,6 @@ import { DetailPage } from './views/detail-page/detail-page';
 import { entityIdResolver } from './utils/entity-id-resolver';
 import { ErrorPage } from './views/error-page/error-page';
 import { ConfigPage } from './views/config-page/config-page';
-import { annotationsByEntityIdResolver } from './utils/annotations-by-entity-id-resolver';
 
 export const routes: Routes = [
   {
@@ -16,7 +15,6 @@ export const routes: Routes = [
     component: DetailPage,
     resolve: {
       entityId: entityIdResolver,
-      annotations: annotationsByEntityIdResolver,
     },
   },
   {
