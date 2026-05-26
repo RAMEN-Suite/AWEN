@@ -1,14 +1,14 @@
 @for (property of visibleProperties(properties()); track property.name) {
 <div class="flex flex-column gap-1">
   <span class="text-xs text-gray-500">{{ property.name }}</span>
-  @if (property.typeId === 'Array') {
+  @if (property.typeId === 'Array' && isArrayValue(property.value)) {
   <div class="flex flex-wrap gap-1">
-    @for (val of $any(property.value); track $index) {
-    <p-chip [label]="val" />
+    @for (value of property.value; track $index) {
+    <p-chip [label]="displayValue(value)" />
     }
   </div>
   } @else {
-  <span>{{ property.value }}</span>
+  <span>{{ displayValue(property.value) }}</span>
   }
 </div>
 } @empty {
