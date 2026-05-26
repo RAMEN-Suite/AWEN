@@ -1,6 +1,6 @@
 @for (property of visibleProperties(properties()); track property.name) {
 <div class="flex flex-column gap-1">
-  <span class="text-xs text-gray-400">{{ property.name }}</span>
+  <span class="text-xs text-gray-500">{{ property.name }}</span>
   @if (property.typeId === 'Array') {
   <div class="flex flex-wrap gap-1">
     @for (val of $any(property.value); track $index) {
@@ -11,4 +11,6 @@
   <span>{{ property.value }}</span>
   }
 </div>
+} @empty {
+<span class="text-sm text-gray-500">This Statement has no properties yet.</span>
 }
