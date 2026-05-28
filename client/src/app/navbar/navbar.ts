@@ -1,10 +1,12 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { Menubar } from 'primeng/menubar';
 import { MenuItem } from 'primeng/api';
 import { BackButtonComponent } from '../utils/back-button.component';
 import { isActive, Router } from '@angular/router';
 import { EntityService } from '../entity.service';
 import { Skeleton } from 'primeng/skeleton';
+
+const HEADER_MAX_LENGTH = 24;
 
 @Component({
   selector: 'app-navbar',
@@ -15,17 +17,25 @@ export class Navbar {
   private router = inject(Router);
   private readonly entityService = inject(EntityService);
 
-  entity = this.entityService.entity;
-  entityLoading = this.entityService.loading;
+  private entity = this.entityService.entity;
+  protected entityLoading = this.entityService.loading;
 
-  isHomeRoute = isActive('/', this.router, {
+  protected header = computed(() => {
+    const label = this.entity()?.label;
+    if (label && label.length > HEADER_MAX_LENGTH) {
+      return label.slice(0, HEADER_MAX_LENGTH).padEnd(HEADER_MAX_LENGTH + 3, '...');
+    }
+    return label;
+  });
+
+  protected isHomeRoute = isActive('/', this.router, {
     paths: 'exact',
     queryParams: 'ignored',
     fragment: 'ignored',
     matrixParams: 'ignored',
   });
 
-  items: MenuItem[] = [
+  protected items: MenuItem[] = [
     {
       label: 'Home',
       icon: 'pi pi-home',

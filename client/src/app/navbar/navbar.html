@@ -5,8 +5,8 @@
     }
   </ng-template>
   <ng-template #end>
-    @if (entity(); as entity) {
-    <span class="text-2xl">{{ entity.label }}</span>
+    @if (header()) {
+    <span class="text-2xl">{{ header() }}</span>
     } @else if (entityLoading()) {
     <p-skeleton width="5rem" height="1.5rem" />
     }
