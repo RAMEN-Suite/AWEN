@@ -31,28 +31,27 @@
             <div class="col-3 p-3 bg-gray-50 border-right-1 border-gray-200 flex flex-column gap-2">
               <p-tag [value]="node.node.direction" [severity]="node.directionSeverity" styleClass="text-xs w-fit" />
               <app-node-types [nodeTypes]="node.node.types" class="flex flex-column gap-2" />
-
-              <!-- Key Property – mit Link wenn Entity -->
-              @if (node.keyValue) { @if (node.entityLink) {
-              <a [routerLink]="node.entityLink" class="text-xs text-primary no-underline hover:underline"> {{ node.keyValue }} </a>
-              } @else {
-              <span class="text-xs text-gray-500">{{ node.keyValue }}</span>
-              } }
             </div>
             <div class="col p-3 flex flex-column gap-2">
               <app-property-list [properties]="node.node.properties" />
             </div>
-            <div class="col-fixed w-auto p-1 flex align-content-end align-items-end gap-2">
-              @if (annotation.id; as annotationId) { @if (node.id; as connectedNodeId) {
-              <p-button
-                icon="pi pi-trash"
-                severity="danger"
-                text
-                rounded
-                size="small"
-                (onClick)="clickDeleteAnnotationRelation(annotationId, connectedNodeId, $event)"
-              />
-              } }
+            <div class="col-fixed w-auto p-1 flex justify-content-end align-items-end">
+              <div class="flex flex-column align-items-end gap-2">
+                <!-- Key Property – mit Link wenn Entity -->
+                @if (annotation.id; as annotationId) { @if (node.id; as connectedNodeId) { @if (node.entityLink) {
+                <p-button icon="pi pi-arrow-right" severity="primary" text rounded size="small" [routerLink]="node.entityLink" />
+                }
+                <p-button icon="pi pi-clipboard" severity="primary" text rounded size="small" (onClick)="copyToClipboard(node.id)" />
+                <p-button
+                  icon="pi pi-trash"
+                  severity="danger"
+                  text
+                  rounded
+                  size="small"
+                  (onClick)="clickDeleteAnnotationRelation(annotationId, connectedNodeId, $event)"
+                />
+                } }
+              </div>
             </div>
           </div>
           }

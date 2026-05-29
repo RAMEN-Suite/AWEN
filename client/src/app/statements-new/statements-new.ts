@@ -15,6 +15,7 @@ import { NodeTypes } from '../statements/node-types/node-types';
 import { PropertyList } from '../statements/property-list/property-list';
 import { Tag } from 'primeng/tag';
 import { RouterLink } from '@angular/router';
+import { UtilsService } from '../utils/utils.service';
 
 interface StatementAnnotationView {
   annotation: Annotation;
@@ -25,7 +26,6 @@ interface StatementAnnotationView {
 interface StatementNodeView {
   node: ConnectedNodeDto;
   id: string | null;
-  keyValue: string | null;
   entityLink: string | null;
   directionSeverity: 'success' | 'info';
 }
@@ -77,6 +77,7 @@ export class StatementsNew {
   private readonly annotationApi = inject(AnnotationApiService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly messageService = inject(MessageService);
+  private readonly utils = inject(UtilsService);
 
   annotations = input.required<Annotation[]>();
   entity = this.entityService.entity;
@@ -123,7 +124,6 @@ export class StatementsNew {
     return {
       node,
       id: keyValue,
-      keyValue,
       entityLink: isEntity && keyValue ? `/entity/${keyValue}` : null,
       directionSeverity: node.direction === 'OUTGOING' ? 'success' : 'info',
     };
@@ -200,5 +200,5 @@ export class StatementsNew {
     await this.annotationApi.deleteOutgoingRelation(id, connectedNodeId);
   }
 
-  protected readonly keyProperty = getKeyProperty;
+  protected copyToClipboard = this.utils.copyToClipboard;
 }
