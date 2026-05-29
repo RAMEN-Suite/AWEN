@@ -2,12 +2,14 @@ import { inject, Injectable } from '@angular/core';
 import { castValue, castValues } from './utils';
 import { EntityPropertyDto, GAttribute } from '../../interfaces';
 import { ConfigService } from '../config-module/config.service';
+import { MessageService } from 'primeng/api';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UtilsService {
   private readonly configService = inject(ConfigService);
+  private readonly messageService = inject(MessageService);
 
   createPayload = (values: Partial<Record<string, unknown>>, properties: (GAttribute | EntityPropertyDto)[]) => {
     const payload: Record<string, unknown> = {};
@@ -39,5 +41,13 @@ export class UtilsService {
     });
 
     return payload;
+  };
+
+  copyToClipboard = async (id: string) => {
+    await navigator.clipboard.writeText(id);
+    this.messageService.add({
+      severity: 'success',
+      detail: `Copied "${id}" to clipboard.`,
+    });
   };
 }

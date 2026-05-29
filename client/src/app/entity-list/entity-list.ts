@@ -2,11 +2,12 @@ import { Component, inject, input } from '@angular/core';
 import { OldEntity } from '../../interfaces';
 import { Scroller } from 'primeng/scroller';
 import { NgClass } from '@angular/common';
-import { MessageService, PrimeTemplate } from 'primeng/api';
+import { PrimeTemplate } from 'primeng/api';
 import { ProgressSpinner } from 'primeng/progressspinner';
 import { Chip } from 'primeng/chip';
 import { Button } from 'primeng/button';
 import { Tooltip } from 'primeng/tooltip';
+import { UtilsService } from '../utils/utils.service';
 
 @Component({
   selector: 'app-entity-list',
@@ -22,7 +23,7 @@ import { Tooltip } from 'primeng/tooltip';
   `,
 })
 export class EntityList {
-  messageService = inject(MessageService);
+  private readonly utils = inject(UtilsService);
 
   width = input<string>('100%');
   height = input<string>('100%');
@@ -31,14 +32,8 @@ export class EntityList {
   entitiesLoading = input.required<boolean>();
   onSelect = input.required<(entity: OldEntity) => void>();
 
-  selectEntity(entity: OldEntity) {
+  protected selectEntity(entity: OldEntity) {
     this.onSelect()(entity);
   }
-  async copyToClipboard(id: string) {
-    await navigator.clipboard.writeText(id);
-    this.messageService.add({
-      severity: 'success',
-      detail: `Copied "${id}" to clipboard.`,
-    });
-  }
+  protected copyToClipboard = this.utils.copyToClipboard;
 }
