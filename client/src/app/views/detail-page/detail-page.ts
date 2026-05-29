@@ -9,12 +9,12 @@ import { CreateAnnotation } from '../../create-annotation/create-annotation';
 import { DialogService } from 'primeng/dynamicdialog';
 import { visibleProperties } from '../../utils/utils';
 import { NodeTypes } from '../../statements/node-types/node-types';
-import { StatementsNew } from '../../statements-new/statements-new';
+import { Statements } from '../../statements/statements';
 
 @Component({
   selector: 'app-detail-page',
   providers: [DialogService],
-  imports: [TableModule, Chip, DeleteEntity, EditEntity, ProgressSpinner, CreateAnnotation, NodeTypes, StatementsNew],
+  imports: [TableModule, Chip, DeleteEntity, EditEntity, ProgressSpinner, CreateAnnotation, NodeTypes, Statements],
   templateUrl: './detail-page.html',
 })
 export class DetailPage implements OnDestroy {

@@ -1,32 +1,27 @@
 <p-accordion [multiple]="true" class="w-full">
   @for (group of groupedAnnotations(); track group.type) {
   <p-accordion-panel [value]="group.type">
-    <!-- Typ-Sektion -->
-    <!-- <div class="col-12 mx-0 flex flex-column gap-3"> -->
     <p-accordion-header>
       <div class="w-full flex align-items-center gap-3 pb-2 border-bottom-2 border-primary text-color">
         <span class="text-xl font-bold">{{ group.type }}</span>
-        <p-chip [label]="group.annotations.length.toString()" />
+        <p-chip class="text-sm" [label]="group.annotations.length.toString()" />
       </div>
     </p-accordion-header>
-    <!-- Annotations der Gruppe -->
     <p-accordion-content>
       <div class="col-12 mx-0 flex flex-column gap-3">
-        @for (annotation of group.annotations; track $index) {
-        <div class="border-1 border-gray-200 border-round overflow-hidden">
-          <!-- Annotation Properties -->
-
+        @for (annotation of group.annotations; track annotation.id) {
+        <div class="border-1 border-gray-200 border-round">
           <div class="grid m-0 border-bottom-1 border-gray-200">
             <div class="col-3 p-3 bg-gray-50 border-right-1 border-gray-200">
-              <app-node-types [nodeTypes]="annotation.types" class="flex flex-column gap-2" />
+              <app-node-types [nodeTypes]="annotation.annotation.types" class="flex flex-column gap-2" />
             </div>
             <div class="col p-3 flex flex-column gap-2">
-              <app-property-list [properties]="annotation.properties" />
+              <app-property-list [properties]="annotation.annotation.properties" />
             </div>
           </div>
 
           <!-- Connected Nodes -->
-          @for (node of annotation.connectedNodes; track $index) {
+          @for (node of annotation.nodes; track node.id) {
           <div
             class="grid m-0"
             [class.border-bottom-1]="$last"
@@ -34,52 +29,51 @@
             [class.border-gray-200]="$index > 0 || $last"
           >
             <div class="col-3 p-3 bg-gray-50 border-right-1 border-gray-200 flex flex-column gap-2">
-              <p-tag [value]="node.direction" [severity]="node.direction === 'OUTGOING' ? 'success' : 'info'" styleClass="text-xs w-fit" />
-              <app-node-types [nodeTypes]="node.types" class="flex flex-column gap-2" />
-
-              <!-- Key Property – mit Link wenn Entity -->
-              @if (keyProperty(node.properties); as key) { @if (isEntity(node) && entityRouterLink(node); as link) {
-              <a [routerLink]="link" class="text-xs text-primary no-underline hover:underline"> {{ key.value }} </a>
-              } @else {
-              <span class="text-xs text-gray-500">{{ key.value }}</span>
-              } }
+              <p-tag [value]="node.node.direction" [severity]="node.directionSeverity" styleClass="text-xs w-fit" />
+              <app-node-types [nodeTypes]="node.node.types" class="flex flex-column gap-2" />
             </div>
             <div class="col p-3 flex flex-column gap-2">
-              <app-property-list [properties]="node.properties" />
+              <app-property-list [properties]="node.node.properties" />
             </div>
-            <div class="col-fixed w-auto p-1 flex align-content-end align-items-end gap-2">
-              @if (keyProperty(annotation.properties)?.value; as annotationId) { @if (keyProperty(node.properties)?.value; as
-              connectedNodeId) {
-              <p-button
-                icon="pi pi-trash"
-                severity="danger"
-                text
-                rounded
-                size="small"
-                (onClick)="clickDeleteAnnotationRelation(String(annotationId), String(connectedNodeId), $event)"
-              />
-              } }
+            <div class="col-fixed w-auto p-1 flex justify-content-end align-items-end">
+              <div class="flex flex-column align-items-end gap-2">
+                <!-- Key Property – mit Link wenn Entity -->
+                @if (annotation.id; as annotationId) { @if (node.id; as connectedNodeId) { @if (node.entityLink) {
+                <p-button icon="pi pi-arrow-right" severity="primary" text rounded size="small" [routerLink]="node.entityLink" />
+                }
+                <p-button icon="pi pi-clipboard" severity="primary" text rounded size="small" (onClick)="copyToClipboard(node.id)" />
+                <p-button
+                  icon="pi pi-trash"
+                  severity="danger"
+                  text
+                  rounded
+                  size="small"
+                  (onClick)="clickDeleteAnnotationRelation(annotationId, connectedNodeId, $event)"
+                />
+                } }
+              </div>
             </div>
           </div>
           }
+
           <div class="flex justify-content-end p-1">
-            @if (keyProperty(annotation.properties)?.value; as annotationId) {
+            @if (annotation.id) {
             <p-button
               icon="pi pi-plus-circle"
               severity="primary"
               text
               rounded
               size="small"
-              (onClick)="clickCreateAnnotationConnection(annotation)"
+              (onClick)="clickCreateAnnotationConnection(annotation.annotation)"
             />
-            <app-update-annotation [annotation]="annotation" />
+            <app-update-annotation [annotation]="annotation.annotation" />
             <p-button
               icon="pi pi-trash"
               severity="danger"
               text
               rounded
               size="small"
-              (onClick)="clickDeleteAnnotation(String(annotationId), $event)"
+              (onClick)="clickDeleteAnnotation(annotation.id, $event)"
             />
             }
           </div>
@@ -87,7 +81,6 @@
         }
       </div>
     </p-accordion-content>
-    <!--            </div>-->
   </p-accordion-panel>
   }
 </p-accordion>
