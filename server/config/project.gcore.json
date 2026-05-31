@@ -37,7 +37,7 @@
       "superTypes": ["lW611f30a2ky4276g3l8N:aP3xK8nV1qR6tY2uZ9wB"],
       "attributes": [
         {
-          "name": "url",
+          "name": "date",
           "typeId": "String",
           "bounds": {
             "lowerBound": 1,
@@ -45,7 +45,7 @@
           }
         },
         {
-          "name": "date",
+          "name": "url",
           "typeId": "String",
           "bounds": {
             "lowerBound": 1,
