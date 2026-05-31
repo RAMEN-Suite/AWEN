@@ -16,6 +16,15 @@ import { Statements } from '../../statements/statements';
   providers: [DialogService],
   imports: [TableModule, Chip, DeleteEntity, EditEntity, ProgressSpinner, CreateAnnotation, NodeTypes, Statements],
   templateUrl: './detail-page.html',
+  styles: `
+    :host ::ng-deep {
+      // Der generierte Button im Header sticky machen
+      .entity-infocard {
+        position: sticky !important;
+        top: 0;
+      }
+    }
+  `,
 })
 export class DetailPage implements OnDestroy {
   private readonly entityService = inject(EntityService);
@@ -28,6 +37,14 @@ export class DetailPage implements OnDestroy {
   protected readonly visibleProperties = visibleProperties;
   protected readonly Array = Array;
   protected readonly String = String;
+
+  protected isArrayValue(value: unknown): value is unknown[] {
+    return Array.isArray(value);
+  }
+
+  protected displayValue(value: unknown): string {
+    return String(value ?? '');
+  }
 
   constructor() {
     effect(async () => {

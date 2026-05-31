@@ -6,19 +6,24 @@
 <!--</div>-->
 @if (entity(); as entity) {
 <div class="grid flex justify-content-center pt-5">
-  <div class="col px-3 md:flex flex-order-0 md:flex-order-0 align-self-start sticky top-0"></div>
-  <div class="col px-3 flex gap-2 justify-content-end flex-order-1 md:flex-order-2 align-self-start sticky top-0">
-    <app-create-annotation [entityId]="entityId()" label="Add Statement" />
-    <app-edit-entity [entity]="entity" />
-    <app-delete-entity [entityId]="entityId()" />
-  </div>
-  <div class="col-11 mb-8 md:col-9 md:mb-8 lg:col-7 lg:mb-5 flex-order-2 md:flex-order-1 grid gap-3">
-    <div class="col-12">
-      <span class="text-4xl font-bold"> {{ entity.label }} </span>
-      <app-node-types [nodeTypes]="entity.types" asChips class="flex gap-2" />
-    </div>
-    <div class="col-12 grid">
-      <div class="col-12 flex flex-column gap-3">
+  <!--  <div class="col-1 px-3 md:flex flex-order-0 md:flex-order-0 align-self-start sticky top-0"></div>-->
+  <!--  <div class="col-fixed w-auto px-3 flex gap-2 justify-content-end flex-order-1 md:flex-order-2 align-self-start sticky top-0">-->
+
+  <!--  </div>-->
+  <div class="col-12 mb-8 md:mb-8 lg:col-11 lg:mb-5 flex-order-2 md:flex-order-1 grid gap-3 align-content-start">
+    <div class="entity-infocard col-12 md:col-5 grid h-min">
+      <div class="col-12 flex flex-column gap-2">
+        <span class="text-4xl font-bold w-12"> {{ entity.label }} </span>
+        <div class="flex">
+          <app-node-types [nodeTypes]="entity.types" asChips class="flex gap-2" />
+        </div>
+        <div class="flex gap-2">
+          <app-edit-entity [entity]="entity" />
+          <app-delete-entity [entityId]="entityId()" />
+        </div>
+      </div>
+      @if(visibleProperties(entity.properties).length > 0) {
+      <div class="col-12 flex flex-column gap-3 h-min">
         @for (property of visibleProperties(entity.properties); track $index) {
         <div class="col-12 mx-0">
           <div class="border-1 border-gray-200 border-round overflow-hidden">
@@ -28,14 +33,14 @@
               </div>
               <div class="col p-3 flex flex-column gap-2">
                 <div class="flex flex-column gap-1">
-                  @if (property.typeId === 'Array') {
+                  @if (isArrayValue(property.value)) {
                   <div class="flex flex-wrap gap-1">
-                    @for (val of $any(property.value); track $index) {
-                    <p-chip [label]="val" />
+                    @for (value of property.value; track $index) {
+                    <p-chip [label]="displayValue(value)" class="py-1" />
                     }
                   </div>
                   } @else {
-                  <span>{{ property.value }}</span>
+                  <span>{{ displayValue(property.value) }}</span>
                   }
                 </div>
               </div>
@@ -44,11 +49,13 @@
         </div>
         }
       </div>
+      }
     </div>
     @if(annotations().length > 0) {
-    <div class="col-12 grid">
-      <div class="col-12">
+    <div class="col-12 md:col-7 grid align-content-start">
+      <div class="col-12 h-min flex justify-content-between">
         <span class="text-3xl font-bold">Statements</span>
+        <app-create-annotation [entityId]="entityId()" label="" icon="pi pi-plus" />
       </div>
       <div class="col-12 mx-0 grid w-full gap-5">
         <app-statements [annotations]="annotations()" class="w-full" />
