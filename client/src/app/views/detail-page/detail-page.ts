@@ -16,15 +16,6 @@ import { Statements } from '../../statements/statements';
   providers: [DialogService],
   imports: [TableModule, Chip, DeleteEntity, EditEntity, ProgressSpinner, CreateAnnotation, NodeTypes, Statements],
   templateUrl: './detail-page.html',
-  styles: `
-    :host ::ng-deep {
-      // Der generierte Button im Header sticky machen
-      .entity-infocard {
-        position: sticky !important;
-        top: 0;
-      }
-    }
-  `,
 })
 export class DetailPage implements OnDestroy {
   private readonly entityService = inject(EntityService);
