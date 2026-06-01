@@ -3,7 +3,7 @@ import { EntityService } from '../entity.service';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { AnnotationApiService } from '../api/annotation-api.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { Annotation, ConnectedNodeDto } from '../../interfaces';
+import { Annotation, ConnectedNodeDto, StatementNodeView } from '../../interfaces';
 import { CreateAnnotationConnection } from '../create-annotation-connection/create-annotation-connection';
 import { getKeyProperty } from '../utils/entity.utils';
 import { ENTITY_LABEL_NAME } from '../../constants';
@@ -13,21 +13,13 @@ import { Button } from 'primeng/button';
 import { UpdateAnnotation } from '../edit-annotation/update-annotation';
 import { NodeTypes } from './node-types/node-types';
 import { PropertyList } from './property-list/property-list';
-import { Tag } from 'primeng/tag';
-import { RouterLink } from '@angular/router';
 import { UtilsService } from '../utils/utils.service';
+import { ConnectedNode } from './connected-node/connected-node';
 
 interface StatementAnnotationView {
   annotation: Annotation;
   id: string | null;
   nodes: StatementNodeView[];
-}
-
-interface StatementNodeView {
-  node: ConnectedNodeDto;
-  id: string | null;
-  entityLink: string | null;
-  directionSeverity: 'success' | 'info';
 }
 
 interface AnnotationGroupView {
@@ -47,8 +39,7 @@ interface AnnotationGroupView {
     UpdateAnnotation,
     NodeTypes,
     PropertyList,
-    Tag,
-    RouterLink,
+    ConnectedNode,
   ],
   templateUrl: './statements.html',
   styles: `
@@ -146,9 +137,9 @@ export class Statements {
     });
   }
 
-  protected async clickDeleteAnnotation(id: string, event: MouseEvent) {
+  protected async clickDeleteAnnotation(id: string, event?: Event) {
     this.confirmationService.confirm({
-      target: event.target as EventTarget,
+      target: event?.target as EventTarget,
       message: `Are you sure you want to delete this annotation?\n Doing so will delete the annotation and disconnect all associated nodes.`,
       header: 'Danger Zone',
       icon: 'pi pi-info-circle',
@@ -169,35 +160,9 @@ export class Statements {
     });
   }
 
-  protected async clickDeleteAnnotationRelation(id: string, connectedNodeId: string, event: MouseEvent) {
-    this.confirmationService.confirm({
-      target: event.target as EventTarget,
-      message: `Are you sure you want to delete the relation to this annotation?`,
-      header: 'Danger Zone',
-      icon: 'pi pi-info-circle',
-      rejectButtonProps: {
-        label: 'Cancel',
-        severity: 'secondary',
-        outlined: true,
-      },
-      acceptButtonProps: {
-        label: 'Delete Relation',
-        severity: 'danger',
-      },
-      accept: async () => {
-        await this.deleteAnnotationRelation(id, connectedNodeId);
-        this.messageService.add({ severity: 'success', summary: 'Relation deleted' });
-        await this.entityService.reloadEntity();
-      },
-    });
-  }
 
   private async deleteAnnotation(id: string) {
     await this.annotationApi.delete(id);
-  }
-
-  private async deleteAnnotationRelation(id: string, connectedNodeId: string) {
-    await this.annotationApi.deleteOutgoingRelation(id, connectedNodeId);
   }
 
   protected copyToClipboard = this.utils.copyToClipboard;

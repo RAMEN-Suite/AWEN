@@ -162,3 +162,10 @@ export interface PropertyConfig {
 }
 
 export type PropertyConfigDataType = 'array' | 'boolean' | 'date' | 'date-time' | 'integer' | 'number' | 'string' | 'time';
+
+export interface StatementNodeView {
+  node: ConnectedNodeDto;
+  id: string | null;
+  entityLink: string | null;
+  directionSeverity: 'success' | 'info';
+}
