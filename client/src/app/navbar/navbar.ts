@@ -6,7 +6,7 @@ import { isActive, Router } from '@angular/router';
 import { EntityService } from '../entity.service';
 import { Skeleton } from 'primeng/skeleton';
 
-const HEADER_MAX_LENGTH = 24;
+const HEADER_MAX_LENGTH = 20;
 
 @Component({
   selector: 'app-navbar',
