@@ -30,7 +30,7 @@ services:
     restart: always
     environment:
       APP_NAME: Entity-Manager
-      PREFIX: "/em"
+#      PREFIX: "/em"
     env_file:
       - path: .env
         required: true
