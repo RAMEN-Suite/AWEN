@@ -1,6 +1,23 @@
 name: entity-manager-prod
 
 services:
+
+  proxy:
+    container_name: proxy
+    image: nginx:alpine
+    volumes:
+      - ./nginx/nginx-prod.conf:/etc/nginx/nginx.conf
+      - ./nginx/.htpasswd:/etc/nginx/.htpasswd
+      - ./nginx/logs:/var/log/nginx
+      - /certificates/:/etc/nginx/certs
+    ports:
+      - '80:80'
+      - '443:443'
+    restart: always
+    depends_on:
+      - entity-manager
+
+
   entity-manager:
     container_name: entity-manager
     hostname: entity-manager
@@ -8,14 +25,12 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        - APP_VERSION=2026.4.7
+        - APP_VERSION=2026.5.1
     image: entity-manager
-    restart: unless-stopped
+    restart: always
     environment:
       APP_NAME: Entity-Manager
       PREFIX: "/em"
-    ports:
-      - "8000:3000"
     env_file:
       - path: ./server/.env
         required: true
@@ -30,9 +45,7 @@ services:
     container_name: neo4j
     hostname: neo4j
     image: neo4j:2026.04
-    restart: unless-stopped
-    profiles:
-      - with-db
+    restart: always
     ports:
       - "7474:7474"
       - "7687:7687"
@@ -41,6 +54,7 @@ services:
       - ./neo4j/plugins:/var/lib/neo4j/plugins
       - ./neo4j/backups:/var/lib/neo4j/backups
       - ./neo4j/data:/data
+      - /certificates/:/etc/nginx/certs
     environment:
       NEO4J_AUTH: neo4j/neo4jadmin
       NEO4J_PLUGINS: '["apoc", "apoc-extended"]'
