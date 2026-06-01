@@ -39,6 +39,7 @@ ENV APP_VERSION=$APP_VERSION
 ENV SERVER_SIDE_CLIENT=true
 COPY server/package*.json ./
 RUN npm ci
+RUN npm install -g @nestjs/cli
 COPY server/. .
 RUN npm run build
 
