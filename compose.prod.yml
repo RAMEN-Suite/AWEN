@@ -32,7 +32,7 @@ services:
       APP_NAME: Entity-Manager
       PREFIX: "/em"
     env_file:
-      - path: ./server/.env
+      - path: .env
         required: true
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:3000/api/health" ]
