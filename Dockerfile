@@ -34,13 +34,10 @@ RUN npx ng build --configuration=production
 # Builder
 FROM base AS server-builder
 WORKDIR /usr/src/app
-ENV NODE_ENV=production
 ENV APP_VERSION=$APP_VERSION
 ENV SERVER_SIDE_CLIENT=true
-COPY server/package.json ./
-COPY server/package-lock.json ./
+COPY server/package*.json ./
 RUN npm ci
-RUN npm install -g @nestjs/cli
 COPY server/. .
 RUN npm run build
 
