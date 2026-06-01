@@ -37,7 +37,8 @@ WORKDIR /usr/src/app
 ENV NODE_ENV=production
 ENV APP_VERSION=$APP_VERSION
 ENV SERVER_SIDE_CLIENT=true
-COPY server/package*.json ./
+COPY server/package.json ./
+COPY server/package-lock.json ./
 RUN npm ci
 RUN npm install -g @nestjs/cli
 COPY server/. .
