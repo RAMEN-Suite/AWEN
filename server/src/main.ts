@@ -24,6 +24,7 @@ async function bootstrap() {
     : false;
 
   if (serverSideClient) {
+    console.log(`serverSideClient enabled. Prefixed with "${APP_PREFIX}". `);
     if (APP_PREFIX !== '/') {
       app.use(
         '/',
@@ -39,6 +40,7 @@ async function bootstrap() {
           const queryIndex = req.originalUrl.indexOf('?');
           const query =
             queryIndex === -1 ? '' : req.originalUrl.slice(queryIndex);
+          console.log(`client redirected to ${APP_PREFIX + query}`);
           res.redirect(302, APP_PREFIX + query);
         },
       );
