@@ -34,6 +34,7 @@ RUN npx ng build --configuration=production
 # Builder
 FROM base AS server-builder
 WORKDIR /usr/src/app
+ARG APP_VERSION=0.0.0
 ENV APP_VERSION=$APP_VERSION
 ENV SERVER_SIDE_CLIENT=true
 COPY server/package*.json ./
@@ -46,6 +47,7 @@ RUN npm run build
 FROM base AS server-prod
 WORKDIR /usr/src/app
 
+ARG APP_VERSION=0.0.0
 ENV NODE_ENV=production
 ENV APP_VERSION=$APP_VERSION
 ENV SERVER_SIDE_CLIENT=true
