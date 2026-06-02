@@ -24,6 +24,26 @@ async function bootstrap() {
     : false;
 
   if (serverSideClient) {
+    if (APP_PREFIX !== '/') {
+      app.use(
+        '/',
+        (
+          req: express.Request,
+          res: express.Response,
+          next: express.NextFunction,
+        ) => {
+          if (!['GET', 'HEAD'].includes(req.method) || req.path !== '/') {
+            return next();
+          }
+
+          const queryIndex = req.originalUrl.indexOf('?');
+          const query =
+            queryIndex === -1 ? '' : req.originalUrl.slice(queryIndex);
+          res.redirect(302, APP_PREFIX + query);
+        },
+      );
+    }
+
     app.use(
       APP_PREFIX,
       express.static(path.join(__dirname, '..', 'client'), {
