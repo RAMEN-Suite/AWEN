@@ -38,7 +38,7 @@ async function bootstrap() {
     const indexHtml = raw
       .replace('__BASE_HREF__', APP_PREFIX)
       .replace('__APP_NAME__', APP_NAME)
-      .replace('__APP_CANONICAL__', APP_HOST)
+      .replace('__APP_CANONICAL__', 'https://' + APP_HOST)
       .replace('__APP_FAVICON__', APP_FAVICON);
 
     app.use(
