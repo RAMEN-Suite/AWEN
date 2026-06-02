@@ -36,6 +36,12 @@ services:
       AWEN_GCORE: ${AWEN_GCORE}
       AWEN_GCORE_RAMEN: ${AWEN_GCORE_RAMEN}
       AWEN_GCORE_PROJECT: ${AWEN_GCORE_PROJECT}
+      DB_HOST: ${DB_HOST}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_SCHEME: ${DB_SCHEME}
+      DB_NAME: ${DB_NAME}
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:3000/api/health" ]
       interval: 30s
