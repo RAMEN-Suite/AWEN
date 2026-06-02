@@ -44,7 +44,7 @@ services:
   neo4j:
     container_name: neo4j
     hostname: neo4j
-    image: neo4j:5.26.7
+    image: neo4j:2026.04
     restart: always
     ports:
       - "7473:7473"
