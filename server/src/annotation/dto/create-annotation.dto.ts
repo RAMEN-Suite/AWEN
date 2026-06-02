@@ -1,9 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsObject, IsString, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsObject, IsString } from 'class-validator';
 
 export class CreateAnnotationDto {
   @ApiProperty()
-  @IsUUID()
+  @IsString()
+  @IsNotEmpty()
   entityId: string;
 
   @ApiProperty()

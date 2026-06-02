@@ -1,8 +1,8 @@
 import {
   IsArray,
+  IsNotEmpty,
   IsObject,
   IsString,
-  IsUUID,
   MinLength,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
@@ -67,14 +67,15 @@ export class OldEntityDto {
   types: string[];
 
   /**
-   * The id of the entity. The id-type is an uuid.
+   * The id of the entity.
    * @example 'bcf3a913-7c9b-4c46-a4b3-2e4d3926ef35'
    */
   @ApiProperty({
-    description: 'The id of the entity. The id-type is an uuid.',
+    description: 'The id of the entity.',
     example: 'bcf3a913-7c9b-4c46-a4b3-2e4d3926ef35',
   })
-  @IsUUID()
+  @IsString()
+  @IsNotEmpty()
   id: string;
 
   @ApiProperty({
