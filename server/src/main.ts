@@ -48,8 +48,10 @@ async function bootstrap() {
         res: express.Response,
         next: express.NextFunction,
       ) => {
+        if (!['GET', 'HEAD'].includes(req.method)) return next();
         if (req.path.startsWith('/api')) return next();
-        if (req.path.length > APP_PREFIX.length) return next();
+        if (req.path.startsWith('/docs')) return next();
+        if (path.extname(req.path)) return next();
         res.setHeader('Content-Type', 'text/html');
         res.send(indexHtml);
       },
