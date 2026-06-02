@@ -2,8 +2,13 @@ import { Injectable, Logger } from '@nestjs/common';
 import { GModel } from './interfaces/g-model.interface';
 import * as fs from 'node:fs';
 import { ModelRegistry } from './model.registry';
-import path from 'node:path';
 import { compileSchema, JsonSchema, SchemaNode } from 'json-schema-library';
+import { ConfigService } from '@nestjs/config';
+
+type SchemaSourceName =
+  | 'AWEN_GCORE'
+  | 'AWEN_GCORE_RAMEN'
+  | 'AWEN_GCORE_PROJECT';
 
 @Injectable()
 export class SchemaLoaderService {
@@ -13,25 +18,26 @@ export class SchemaLoaderService {
   private profileModel: GModel;
   private registry: ModelRegistry;
 
-  constructor() {
-    this.loadSchemas();
-  }
+  constructor(private readonly configService: ConfigService) {}
 
-  private loadSchemas() {
-    const gCoreSchemaJSON: JsonSchema = JSON.parse(
-      fs.readFileSync(this.gCorePath(), 'utf8'),
-    ) as JsonSchema;
+  async loadSchemas() {
+    const gCoreSchemaJSON: JsonSchema =
+      await this.loadJsonFromSource<JsonSchema>('AWEN_GCORE');
     const gCoreSchema: SchemaNode = compileSchema(gCoreSchemaJSON);
     this.logger.log('Loading schemas...');
 
-    const ramen: GModel = this.loadAndValidate<GModel>(
-      this.ramenPath(),
+    // const ramen: GModel = await this.loadJsonFromSource('AWEN_GCORE_RAMEN');
+
+    const ramen: GModel = this.validateJSON<GModel>(
+      await this.loadJsonFromSource('AWEN_GCORE_RAMEN'),
       gCoreSchema,
     );
     this.logger.log(`Loaded ramen schema "${ramen.version}" successfully`);
 
-    const profile: GModel = this.loadAndValidate<GModel>(
-      this.profilePath(),
+    // const profile: GModel = await this.loadJsonFromSource('AWEN_GCORE_PROJECT');
+
+    const profile: GModel = this.validateJSON<GModel>(
+      await this.loadJsonFromSource('AWEN_GCORE_PROJECT'),
       gCoreSchema,
     );
     this.logger.log(
@@ -44,25 +50,11 @@ export class SchemaLoaderService {
     this.registry = new ModelRegistry(ramen, profile);
   }
 
-  getRegistry() {
+  getRegistry(): ModelRegistry {
     return this.registry;
   }
 
-  private gCorePath() {
-    return path.join(process.cwd(), 'dist', 'config', 'gcore.json');
-  }
-
-  private ramenPath() {
-    return path.join(process.cwd(), 'dist', 'config', 'ramen.gcore.json');
-  }
-
-  private profilePath() {
-    return path.join(process.cwd(), 'dist', 'config', 'project.gcore.json');
-  }
-
-  private loadAndValidate<T>(path: string, schema: SchemaNode): T {
-    const json = JSON.parse(fs.readFileSync(path, 'utf8')) as unknown;
-
+  private validateJSON<T>(json: unknown, schema: SchemaNode): T {
     const result = schema.validate(json);
 
     if (!result.valid) {
@@ -73,5 +65,31 @@ export class SchemaLoaderService {
     }
 
     return json as T;
+  }
+
+  private async loadJsonFromSource<T>(envName: SchemaSourceName): Promise<T> {
+    const source = this.configService.getOrThrow<string>(envName);
+
+    if (this.isHttpUrl(source)) {
+      const response = await fetch(source);
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch ${envName} from ${source}: ${response.status}`,
+        );
+      }
+      return (await response.json()) as T;
+    }
+
+    const content = await fs.promises.readFile(source, 'utf8');
+    return JSON.parse(content) as T;
+  }
+
+  private isHttpUrl(value: string): boolean {
+    try {
+      const url = new URL(value);
+      return url.protocol === 'http:' || url.protocol === 'https:';
+    } catch {
+      return false;
+    }
   }
 }

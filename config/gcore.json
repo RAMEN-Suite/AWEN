@@ -1,20 +1,10 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ramen-schema.org/gcore/1.0.0/schema.json",
-  "title": "GCore Light",
+  "title": "GCore",
 
   "type": "object",
-  "required": [
-    "$schema",
-    "$id",
-    "id",
-    "version",
-    "kind",
-    "name",
-    "imports",
-    "classifiers",
-    "relations"
-  ],
+  "required": ["$schema", "$id", "id", "version", "kind", "name", "imports", "classifiers", "relations"],
   "additionalProperties": false,
 
   "properties": {
@@ -28,11 +18,7 @@
     "version": { "$ref": "#/$defs/Version" },
 
     "kind": { "const": "GModel" },
-    "name": {
-      "type": "string",
-      "minLength": 1,
-      "$comment": "Human-readable name of the model."
-    },
+    "name": { "type": "string", "minLength": 1, "$comment": "Human-readable name of the model." },
 
     "imports": {
       "type": "array",
@@ -63,7 +49,7 @@
     }
   },
 
-  "$comment": "GCore Light: a minimal, JSON-first structural metamodel inspired by MOF/Ecore, focused on data modeling rather than full behavioral or reflective semantics.",
+  "$comment": "GCore: JSON-first structural metamodel inspired by MOF/Ecore, focused on data modeling rather than full behavioral or reflective semantics.",
 
   "$defs": {
     "Id": {
@@ -93,10 +79,7 @@
     },
 
     "Ref": {
-      "oneOf": [
-        { "$ref": "#/$defs/LocalRef" },
-        { "$ref": "#/$defs/QualifiedRef" }
-      ],
+      "oneOf": [{ "$ref": "#/$defs/LocalRef" }, { "$ref": "#/$defs/QualifiedRef" }],
       "$comment": "Reference to a local or imported element."
     },
 
@@ -112,7 +95,8 @@
       "$comment": "Import declaration for another model.",
       "properties": {
         "schemaId": { "type": "string", "format": "uri" },
-        "modelId": { "$ref": "#/$defs/Id" }
+        "modelId": { "$ref": "#/$defs/Id" },
+        "name": { "type": "string", "minLength": 1, "$comment": "Human-readable name of the model." }
       }
     },
 
@@ -327,12 +311,6 @@
         "from": { "$ref": "#/$defs/RelationEnd" },
         "to": { "$ref": "#/$defs/RelationEnd" },
 
-        "isBidirectional": {
-          "type": "boolean",
-          "default": false,
-          "$comment": "Tool hint: navigation may be exposed from both ends."
-        },
-
         "constraints": {
           "type": "array",
           "items": { "$ref": "#/$defs/GConstraint" },
@@ -361,6 +339,12 @@
           "type": "boolean",
           "default": false,
           "$comment": "Composition/containment: this end is the owning (whole) end. Typically only one end is composite."
+        },
+
+        "isNavigable": {
+          "type": "boolean",
+          "default": false,
+          "$comment": "Controls navigability of this relation end only."
         },
 
         "constraints": {

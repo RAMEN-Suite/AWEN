@@ -2,6 +2,7 @@
 .DS_Store
 /neo4j/backups/
 /neo4j/data/
+/neo4j/data*
 /neo4j/import/
 /neo4j/plugins/apoc*.jar
 /nginx/.htpasswd

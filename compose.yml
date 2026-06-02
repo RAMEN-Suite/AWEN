@@ -7,7 +7,7 @@ services:
       target: dev
       dockerfile: Dockerfile
       args:
-        - APP_VERSION=2026.4.7
+        - APP_VERSION=2026.5.1
     image: em-backend
     restart: unless-stopped
     depends_on:
@@ -15,8 +15,10 @@ services:
         condition: service_healthy
     ports:
       - "8090:3000"
+    volumes:
+      - ./config:/awen-config:r
     environment:
-      APP_NAME: Entity-Manager-Backend
+      APP_NAME: ${APP_NAME}
     env_file:
       - path: server/.env
         required: true

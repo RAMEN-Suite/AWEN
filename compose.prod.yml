@@ -28,9 +28,14 @@ services:
         - APP_VERSION=2026.5.1
     image: entity-manager
     restart: always
+    volumes:
+      - ./config:/awen-config:r
     environment:
       APP_NAME: ${APP_NAME}
       PREFIX: ${APP_PREFIX}
+      AWEN_GCORE: ${AWEN_GCORE}
+      AWEN_GCORE_RAMEN: ${AWEN_GCORE_RAMEN}
+      AWEN_GCORE_PROJECT: ${AWEN_GCORE_PROJECT}
     env_file:
       - path: .env
         required: true
