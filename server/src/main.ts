@@ -13,14 +13,19 @@ async function bootstrap() {
 
   app.useGlobalFilters(new Neo4jExceptionFilter(), new RAMENExceptionFilter());
 
-  const prefix = process.env.PREFIX ? process.env.PREFIX + '/' : '/';
+  const APP_PREFIX = process.env.PREFIX ? process.env.PREFIX.trim() + '/' : '/';
+  const APP_NAME = process.env.APP_NAME ? process.env.APP_NAME.trim() : 'CRANN';
+  const APP_HOST = process.env.APP_HOST ? process.env.APP_HOST.trim() : '';
+  const APP_FAVICON = process.env.APP_FAVICON
+    ? process.env.APP_FAVICON.trim()
+    : 'favicon-default.jpg';
   const serverSideClient = process.env.SERVER_SIDE_CLIENT
     ? process.env.SERVER_SIDE_CLIENT === 'true'
     : false;
 
   if (serverSideClient) {
     app.use(
-      prefix,
+      APP_PREFIX,
       express.static(path.join(__dirname, '..', 'client'), {
         index: false,
       }),
@@ -30,17 +35,21 @@ async function bootstrap() {
       path.join(__dirname, '..', 'client', 'index.html'),
       'utf-8',
     );
-    const indexHtml = raw.replace('__BASE_HREF__', prefix);
+    const indexHtml = raw
+      .replace('__BASE_HREF__', APP_PREFIX)
+      .replace('__APP_NAME__', APP_NAME)
+      .replace('__APP_CANONICAL__', APP_HOST)
+      .replace('__APP_FAVICON__', APP_FAVICON);
 
     app.use(
-      prefix,
+      APP_PREFIX,
       (
         req: express.Request,
         res: express.Response,
         next: express.NextFunction,
       ) => {
         if (req.path.startsWith('/api')) return next();
-        if (req.path.length > prefix.length) return next();
+        if (req.path.length > APP_PREFIX.length) return next();
         res.setHeader('Content-Type', 'text/html');
         res.send(indexHtml);
       },
