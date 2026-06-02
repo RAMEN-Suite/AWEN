@@ -13,7 +13,13 @@ async function bootstrap() {
 
   app.useGlobalFilters(new Neo4jExceptionFilter(), new RAMENExceptionFilter());
 
-  const APP_PREFIX = process.env.PREFIX ? process.env.PREFIX.trim() + '/' : '/';
+  let APP_PREFIX = process.env.PREFIX ? process.env.PREFIX.trim() : '/';
+  if (!APP_PREFIX.endsWith('/')) {
+    APP_PREFIX = APP_PREFIX + '/';
+  }
+  if (!APP_PREFIX.startsWith('/')) {
+    APP_PREFIX = '/' + APP_PREFIX;
+  }
   const APP_NAME = process.env.APP_NAME ? process.env.APP_NAME.trim() : 'CRANN';
   const APP_HOST = process.env.APP_HOST ? process.env.APP_HOST.trim() : '';
   const APP_FAVICON = process.env.APP_FAVICON
