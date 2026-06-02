@@ -7,3 +7,4 @@
 /neo4j/plugins/apoc*.jar
 /nginx/.htpasswd
 /nginx/logs
+*temp*
