@@ -8,3 +8,4 @@
 /nginx/.htpasswd
 /nginx/logs
 *temp*
+.env*

@@ -1,5 +1,5 @@
 ARG NODE_VERSION=24-alpine
-ARG NGINX_VERSION=1-alpine3.23
+ARG CADDY_VERSION=2.11.2-alpine
 
 FROM node:${NODE_VERSION} AS base
 
@@ -57,21 +57,46 @@ RUN npm run build
 # Stage 2: Prepare Nginx to Serve Static Files
 # =========================================
 
-FROM nginx:${NGINX_VERSION} AS prod
+FROM caddy:${CADDY_VERSION} AS prod
+WORKDIR /app
 
-# Copy custom Nginx config
-COPY nginx.conf /etc/nginx/nginx.conf
+RUN addgroup -S webuser \
+  && adduser -S webuser -G webuser \
+  && apk add --no-cache gettext-envsubst=0.24.1-r1
 
-# Copy the static build output from the build stage to Nginx's default HTML serving directory
-COPY --chown=nginx:nginx --from=builder /app/dist/*/browser /usr/share/nginx/html
 
-# Use a non-root user for security best practices
-USER nginx
+COPY --chown=nginx:nginx --from=builder /app/dist/*/browser /usr/share/caddy
 
-# Expose port 8080 to allow HTTP traffic
-# Note: The default Nginx container now listens on port 8080 instead of 80
+RUN cat > /etc/caddy/Caddyfile <<'EOF'
+:8080 {
+    root * /tmp/www
+    try_files {path} {path}/ /index.html
+    file_server
+}
+EOF
+
+RUN cat > /usr/local/bin/awen-entrypoint <<'EOF' \
+  && chmod +x /usr/local/bin/awen-entrypoint
+#!/bin/sh
+set -eu
+
+: "${AWEN_APP_NAME:=AWEN - Graph-based Digital Edition}"
+: "${AWEN_APP_PREFIX:=/}"
+: "${AWEN_APP_FAVICON:=/favicon-default.jpg}"
+
+rm -rf /tmp/www
+mkdir -p /tmp/www
+cp -R /usr/share/caddy/. /tmp/www/
+
+envsubst '${AWEN_APP_HOST} ${AWEN_APP_NAME} ${AWEN_APP_PREFIX} ${AWEN_APP_FAVICON}' \
+  < /usr/share/caddy/index.html \
+  > /tmp/www/index.html
+
+exec caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
+EOF
+
+USER webuser
 EXPOSE 8080
 
-# Start Nginx directly with custom config
-ENTRYPOINT ["nginx", "-c", "/etc/nginx/nginx.conf"]
-CMD ["-g", "daemon off;"]
+CMD ["awen-entrypoint"]
+

@@ -1,10 +1,10 @@
 name: entity-manager-dev
 
 services:
-  backend:
+  awen-server:
     build:
       context: server
-      target: dev
+      target: prod
       dockerfile: Dockerfile
       args:
         - APP_VERSION=2026.5.1
@@ -31,43 +31,53 @@ services:
       AWEN_DB_USER: ${AWEN_DB_USER}
       AWEN_DB_SCHEME: ${AWEN_DB_SCHEME}
       AWEN_DB_NAME: ${AWEN_DB_NAME}
-    develop:
-      watch:
-        - action: sync
-          path: ./server
-          target: /app
-          ignore:
-            - node_modules
-        - action: rebuild
-          path: ./server/package.json
-          target: /app/package.json
+    networks:
+      - traefik-public
+      - awen-internal
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:3000/api/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 10s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik-public"
+      - "traefik.http.routers.awen-server.rule=(Host(`${THM_HOST}`) || Host(`${HOST}`)) && PathPrefix(`/api`)"
+      - "traefik.http.routers.awen-server.tls=true"
+      - "traefik.http.routers.awen-server.entrypoints=https"
+      - "traefik.http.services.awen-server.loadbalancer.server.port=3000"
+      - "traefik.http.middlewares.awenserverauth.basicauth.users=${BASIC_AUTH_STR}"
+      - "traefik.http.routers.awen-server.middlewares=awenserverauth"
 
 
-  frontend:
+  awen-client:
     build:
       context: client
-      target: dev
+      target: prod
       dockerfile: Dockerfile
     image: em-frontend
     restart: unless-stopped
     ports:
-      - "8080:4200"
-    develop:
-      watch:
-        - action: sync
-          path: ./client
-          target: /app
-          ignore:
-            - node_modules
-        - action: rebuild
-          path: ./client/package.json
-          target: /app/package.json
+      - "8080:8080"
+    environment:
+      AWEN_APP_NAME: ${AWEN_APP_NAME}
+      AWEN_APP_PREFIX: ${AWEN_APP_PREFIX}
+      AWEN_APP_FAVICON: ${AWEN_APP_FAVICON}
+      AWEN_APP_HOST: ${AWEN_APP_HOST}
+    networks:
+      - traefik-public
+      - awen-internal
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik-public"
+      - "traefik.http.routers.awen-client.rule=Host(`${THM_HOST}`) || Host(`${HOST}`)"
+      - "traefik.http.routers.awen-client.tls=true"
+      - "traefik.http.routers.awen-client.entrypoints=https"
+      - "traefik.http.services.awen-client.loadbalancer.server.port=8080"
+      - "traefik.http.middlewares.awenclientauth.basicauth.users=${BASIC_AUTH_STR}"
+      - "traefik.http.routers.awen-client.middlewares=awenclientauth"
+
 
 
   neo4j:
@@ -81,7 +91,7 @@ services:
       - ./neo4j/import:/var/lib/neo4j/import
       - ./neo4j/plugins:/var/lib/neo4j/plugins
       - ./neo4j/backups:/var/lib/neo4j/backups
-      - ./neo4j/data:/data
+      - ./neo4j/data-abbw:/data
     environment:
       NEO4J_AUTH: neo4j/neo4jadmin
       NEO4J_PLUGINS: '["apoc", "apoc-extended"]'
@@ -94,20 +104,14 @@ services:
       apoc.initializer.neo4j.3: CREATE CONSTRAINT annotation_uuid IF NOT EXISTS FOR (a:Annotation) REQUIRE a.uuid IS UNIQUE
       apoc.initializer.neo4j.4: CREATE CONSTRAINT entity_uuid IF NOT EXISTS FOR (e:Entity) REQUIRE e.uuid IS UNIQUE
       apoc.initializer.neo4j.5: CREATE FULLTEXT INDEX search IF NOT EXISTS FOR (n:Entity) ON EACH [n.label]
+    networks:
+      - traefik-public
+      - awen-internal
     healthcheck:
       test: /var/lib/neo4j/bin/cypher-shell -u neo4j -p neo4jadmin "show databases;"
       start_period: 20s
 
-  proxy:
-    container_name: proxy
-    hostname: proxy
-    image: nginx:alpine
-    profiles:
-      - with-proxy
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-    ports:
-      - '80:80'
-    restart: unless-stopped
-    depends_on:
-      - frontend
+networks:
+  awen-internal:
+  traefik-public:
+    name: traefik-public

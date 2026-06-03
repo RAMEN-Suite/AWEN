@@ -35,6 +35,7 @@ RUN npm run build
 FROM base AS prod
 WORKDIR /usr/src/app
 ENV NODE_ENV=production
+ENV APP_VERSION=$APP_VERSION
 COPY package*.json ./
 RUN npm ci --omit=dev
 COPY --from=builder /usr/src/app/dist ./dist

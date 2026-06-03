@@ -19,12 +19,12 @@ import { AnnotationModule } from './annotation/annotation.module';
     Neo4jModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        host: config.getOrThrow<string>('DB_HOST'),
-        password: config.getOrThrow<string>('DB_PASSWORD'),
-        port: config.getOrThrow<number>('DB_PORT'),
-        scheme: config.getOrThrow<Neo4jScheme>('DB_SCHEME'),
-        username: config.getOrThrow<string>('DB_USER'),
-        database: config.get<string>('DB_NAME'),
+        host: config.getOrThrow<string>('AWEN_DB_HOST'),
+        password: config.getOrThrow<string>('AWEN_DB_PASSWORD'),
+        port: config.getOrThrow<number>('AWEN_DB_PORT'),
+        scheme: config.getOrThrow<Neo4jScheme>('AWEN_DB_SCHEME'),
+        username: config.getOrThrow<string>('AWEN_DB_USER'),
+        database: config.get<string>('AWEN_DB_NAME'),
       }),
     }),
     GuidelinesModule,

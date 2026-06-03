@@ -13,17 +13,23 @@ async function bootstrap() {
 
   app.useGlobalFilters(new Neo4jExceptionFilter(), new RAMENExceptionFilter());
 
-  let APP_PREFIX = process.env.PREFIX ? process.env.PREFIX.trim() : '/';
+  let APP_PREFIX = process.env.AWEN_APP_PREFIX
+    ? process.env.AWEN_APP_PREFIX.trim()
+    : '/';
   if (!APP_PREFIX.endsWith('/')) {
     APP_PREFIX = APP_PREFIX + '/';
   }
   if (!APP_PREFIX.startsWith('/')) {
     APP_PREFIX = '/' + APP_PREFIX;
   }
-  const APP_NAME = process.env.APP_NAME ? process.env.APP_NAME.trim() : 'CRANN';
-  const APP_HOST = process.env.APP_HOST ? process.env.APP_HOST.trim() : '';
-  const APP_FAVICON = process.env.APP_FAVICON
-    ? process.env.APP_FAVICON.trim()
+  const APP_NAME = process.env.AWEN_APP_NAME
+    ? process.env.AWEN_APP_NAME.trim()
+    : 'CRANN';
+  const APP_HOST = process.env.AWEN_APP_HOST
+    ? process.env.AWEN_APP_HOST.trim()
+    : '';
+  const APP_FAVICON = process.env.AWEN_APP_FAVICON
+    ? process.env.AWEN_APP_FAVICON.trim()
     : 'favicon-default.jpg';
   const serverSideClient = process.env.SERVER_SIDE_CLIENT
     ? process.env.SERVER_SIDE_CLIENT === 'true'
@@ -64,10 +70,10 @@ async function bootstrap() {
       'utf-8',
     );
     const indexHtml = raw
-      .replace('__BASE_HREF__', APP_PREFIX)
-      .replace('__APP_NAME__', APP_NAME)
-      .replace('__APP_CANONICAL__', 'https://' + APP_HOST)
-      .replace('__APP_FAVICON__', APP_FAVICON);
+      .replace('${AWEN_APP_PREFIX}', APP_PREFIX)
+      .replace('${AWEN_APP_NAME}', APP_NAME)
+      .replace('${AWEN_APP_HOST}', APP_HOST)
+      .replace('${AWEN_APP_FAVICON}', APP_FAVICON);
 
     app.use(
       APP_PREFIX,
@@ -102,7 +108,9 @@ async function bootstrap() {
     }),
   );
 
-  const config = new DocumentBuilder().setTitle('Entity Manager').build();
+  const config = new DocumentBuilder()
+    .setTitle(process.env.AWEN_APP_NAME ?? 'AWEN')
+    .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, documentFactory);
 

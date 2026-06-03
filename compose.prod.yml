@@ -31,17 +31,19 @@ services:
     volumes:
       - ./config:/awen-config:r
     environment:
-      APP_NAME: ${APP_NAME}
-      PREFIX: ${APP_PREFIX}
+      AWEN_APP_NAME: ${AWEN_APP_NAME}
+      AWEN_APP_PREFIX: ${AWEN_APP_PREFIX}
+      AWEN_APP_FAVICON: ${AWEN_APP_FAVICON}
+      AWEN_APP_HOST: ${AWEN_APP_HOST}
       AWEN_GCORE: ${AWEN_GCORE}
       AWEN_GCORE_RAMEN: ${AWEN_GCORE_RAMEN}
       AWEN_GCORE_PROJECT: ${AWEN_GCORE_PROJECT}
-      DB_HOST: ${DB_HOST}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_PORT: ${DB_PORT}
-      DB_USER: ${DB_USER}
-      DB_SCHEME: ${DB_SCHEME}
-      DB_NAME: ${DB_NAME}
+      AWEN_DB_HOST: ${AWEN_DB_HOST}
+      AWEN_DB_PASSWORD: ${AWEN_DB_PASSWORD}
+      AWEN_DB_PORT: ${AWEN_DB_PORT}
+      AWEN_DB_USER: ${AWEN_DB_USER}
+      AWEN_DB_SCHEME: ${AWEN_DB_SCHEME}
+      AWEN_DB_NAME: ${AWEN_DB_NAME}
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:3000/api/health" ]
       interval: 30s
