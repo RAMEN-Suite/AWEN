@@ -6,7 +6,7 @@ import { ProgressSpinner } from 'primeng/progressspinner';
 import { MenubarModule } from 'primeng/menubar';
 import { MenuItem } from 'primeng/api';
 import { Button, ButtonDirective, ButtonLabel } from 'primeng/button';
-import { HealthService } from './api/health.service';
+import { HealthService } from './health.service';
 import { filter } from 'rxjs';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Navbar } from './navbar/navbar';

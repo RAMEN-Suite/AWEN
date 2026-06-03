@@ -1,13 +1,12 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { catchError, firstValueFrom } from 'rxjs';
 import { MessageService } from 'primeng/api';
+import { HealthApiService, HealthStatus } from './api/health-api.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class HealthService {
-  private http = inject(HttpClient);
+  private readonly healthApi = inject(HealthApiService);
   private readonly messageService = inject(MessageService);
 
   private readonly _version = signal<string>('0.0.0');
@@ -18,16 +17,18 @@ export class HealthService {
   }
 
   private async loadStatus() {
-    const temp = this.http.get<{ version: string; healthy: boolean }>('/api/health').pipe(
-      catchError((err) => {
-        this.messageService.add({
-          severity: 'error',
-          detail: `The Server is not healthy. Please try again later.`,
-        });
-        throw err;
-      }),
-    );
-    const res = await firstValueFrom(temp);
+    let res: HealthStatus;
+    try {
+      res = await this.healthApi.getStatus();
+    } catch {
+      this._healthy.set(false);
+      this.messageService.add({
+        severity: 'error',
+        detail: `The Server is not healthy. Please try again later.`,
+      });
+      return;
+    }
+
     this._healthy.set(res.healthy);
     this._version.set(res.version);
 

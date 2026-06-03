@@ -8,7 +8,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { EntityService } from './entity.service';
 import { LocalStoreService } from './utils/local-store.service';
 import { ConfigService } from './config-module/config.service';
-import { HealthService } from './api/health.service';
+import { HealthService } from './health.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
