@@ -80,15 +80,16 @@ RUN cat > /usr/local/bin/awen-entrypoint <<'EOF' \
 #!/bin/sh
 set -eu
 
-: "${AWEN_APP_NAME:=AWEN - Graph-based Digital Edition}"
+: "${AWEN_APP_NAME:=AWEN - Graph Based Entity Management}"
 : "${AWEN_APP_PREFIX:=/}"
+: "${AWEN_APP_DESCRIPTION:=Entity Management for Graph Applications using the RAMEN-Framework}"
 : "${AWEN_APP_FAVICON:=/favicon-default.jpg}"
 
 rm -rf /tmp/www
 mkdir -p /tmp/www
 cp -R /usr/share/caddy/. /tmp/www/
 
-envsubst '${AWEN_APP_HOST} ${AWEN_APP_NAME} ${AWEN_APP_PREFIX} ${AWEN_APP_FAVICON}' \
+envsubst '${AWEN_APP_HOST} ${AWEN_APP_NAME} ${AWEN_APP_PREFIX} ${AWEN_APP_DESCRIPTION} ${AWEN_APP_FAVICON}' \
   < /usr/share/caddy/index.html \
   > /tmp/www/index.html
 

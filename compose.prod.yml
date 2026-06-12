@@ -33,8 +33,10 @@ services:
     environment:
       AWEN_APP_NAME: ${AWEN_APP_NAME}
       AWEN_APP_PREFIX: ${AWEN_APP_PREFIX}
+      AWEN_APP_DESCRIPTION: ${AWEN_APP_DESCRIPTION}
       AWEN_APP_FAVICON: ${AWEN_APP_FAVICON}
       AWEN_APP_HOST: ${AWEN_APP_HOST}
+      AWEN_SERVER_PORT: ${AWEN_SERVER_PORT}
       AWEN_GCORE: ${AWEN_GCORE}
       AWEN_GCORE_RAMEN: ${AWEN_GCORE_RAMEN}
       AWEN_GCORE_PROJECT: ${AWEN_GCORE_PROJECT}
@@ -45,7 +47,7 @@ services:
       AWEN_DB_SCHEME: ${AWEN_DB_SCHEME}
       AWEN_DB_NAME: ${AWEN_DB_NAME}
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:3000/api/health" ]
+      test: [ "CMD", "curl", "-f", "http://localhost:${AWEN_SERVER_PORT:-3000}/api/health" ]
       interval: 30s
       timeout: 10s
       retries: 3

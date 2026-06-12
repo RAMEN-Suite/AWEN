@@ -8,29 +8,26 @@ import express from 'express';
 import * as path from 'path';
 import * as fs from 'fs';
 
+function envOrDefault(name: string, defaultValue: string = ''): string {
+  const value = process.env[name]?.trim() ?? '';
+  return value.length > 0 ? value : defaultValue;
+}
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.useGlobalFilters(new Neo4jExceptionFilter(), new RAMENExceptionFilter());
 
-  let APP_PREFIX = process.env.AWEN_APP_PREFIX
-    ? process.env.AWEN_APP_PREFIX.trim()
-    : '/';
+  let APP_PREFIX = envOrDefault('AWEN_APP_PREFIX', '/');
   if (!APP_PREFIX.endsWith('/')) {
     APP_PREFIX = APP_PREFIX + '/';
   }
   if (!APP_PREFIX.startsWith('/')) {
     APP_PREFIX = '/' + APP_PREFIX;
   }
-  const APP_NAME = process.env.AWEN_APP_NAME
-    ? process.env.AWEN_APP_NAME.trim()
-    : 'CRANN';
-  const APP_HOST = process.env.AWEN_APP_HOST
-    ? process.env.AWEN_APP_HOST.trim()
-    : '';
-  const APP_FAVICON = process.env.AWEN_APP_FAVICON
-    ? process.env.AWEN_APP_FAVICON.trim()
-    : 'favicon-default.jpg';
+  const APP_NAME = envOrDefault('AWEN_APP_NAME', 'CRANN');
+  const APP_HOST = envOrDefault('AWEN_APP_HOST');
+  const APP_FAVICON = envOrDefault('AWEN_APP_FAVICON', 'favicon-default.jpg');
   const serverSideClient = process.env.SERVER_SIDE_CLIENT
     ? process.env.SERVER_SIDE_CLIENT === 'true'
     : false;
@@ -114,7 +111,7 @@ async function bootstrap() {
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, documentFactory);
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(envOrDefault('AWEN_SERVER_PORT', '3000'));
   console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap().catch(console.error);
