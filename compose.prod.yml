@@ -1,4 +1,4 @@
-name: entity-manager-prod
+name: awen-prod
 
 services:
 
@@ -18,15 +18,15 @@ services:
       - entity-manager
 
 
-  entity-manager:
-    container_name: entity-manager
-    hostname: entity-manager
+  awen:
+    container_name: awen
+    hostname: awen
     build:
       context: .
       dockerfile: Dockerfile
       args:
         - APP_VERSION=2026.5.1
-    image: entity-manager
+    image: awen
     restart: always
     volumes:
       - ./config:/awen-config:r

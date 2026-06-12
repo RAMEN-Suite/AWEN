@@ -1,14 +1,14 @@
-name: entity-manager-dev
+name: awen-dev
 
 services:
-  backend:
+  awen-server:
     build:
       context: server
       target: dev
       dockerfile: Dockerfile
       args:
         - APP_VERSION=2026.5.1
-    image: em-backend
+    image: awen-server
     restart: unless-stopped
     depends_on:
       neo4j:
@@ -51,12 +51,12 @@ services:
       start_period: 10s
 
 
-  frontend:
+  awen-client:
     build:
       context: client
       target: dev
       dockerfile: Dockerfile
-    image: em-frontend
+    image: awen-client
     restart: unless-stopped
     ports:
       - "8080:4200"

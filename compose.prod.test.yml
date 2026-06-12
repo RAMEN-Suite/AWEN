@@ -1,4 +1,4 @@
-name: entity-manager-dev
+name: awen-prod-test
 
 services:
   awen-server:
