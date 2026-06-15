@@ -112,7 +112,7 @@ services:
       - DAC_OVERRIDE
       - FOWNER
     healthcheck:
-      test: /var/lib/neo4j/bin/cypher-shell -u ${NEO4J_USER} -p ${NEO4J_PASSWORD} "show databases;"
+      test: /var/lib/neo4j/bin/cypher-shell -u "${NEO4J_USER}" -p "${NEO4J_PASSWORD}" "show databases;"
       start_period: 20s
     environment:
       NEO4J_server_memory_heap_max__size: "${NEO4J_MAX_HEAP:-2G}"
