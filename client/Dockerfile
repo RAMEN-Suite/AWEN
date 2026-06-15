@@ -65,7 +65,7 @@ RUN addgroup -S webuser \
   && apk add --no-cache gettext-envsubst=0.24.1-r1
 
 
-COPY --chown=nginx:nginx --from=builder /app/dist/*/browser /usr/share/caddy
+COPY --chown=webuser:webuser --from=builder /app/dist/*/browser /usr/share/caddy
 
 RUN cat > /etc/caddy/Caddyfile <<'EOF'
 :8080 {
