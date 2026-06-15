@@ -63,7 +63,7 @@ services:
       context: client
       target: prod
       dockerfile: Dockerfile
-    image: em-frontend
+    image: awen-client
     restart: unless-stopped
     read_only: true
     environment:
