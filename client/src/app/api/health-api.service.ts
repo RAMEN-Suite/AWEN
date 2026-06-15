@@ -4,6 +4,7 @@ import { firstValueFrom, retry } from 'rxjs';
 
 export interface HealthStatus {
   version: string;
+  ramenVersion: string;
   healthy: boolean;
 }
 

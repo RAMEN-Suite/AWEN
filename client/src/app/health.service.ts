@@ -10,6 +10,7 @@ export class HealthService {
   private readonly messageService = inject(MessageService);
 
   private readonly _version = signal<string>('0.0.0');
+  private readonly _ramenVersion = signal<string>('0.0.0');
   private readonly _healthy = signal<boolean>(true);
 
   constructor() {
@@ -31,6 +32,7 @@ export class HealthService {
 
     this._healthy.set(res.healthy);
     this._version.set(res.version);
+    this._ramenVersion.set(res.ramenVersion);
 
     if (!res.healthy) {
       this.messageService.add({
@@ -42,6 +44,10 @@ export class HealthService {
 
   getVersion() {
     return this._version.asReadonly();
+  }
+
+  getRamenVersion() {
+    return this._ramenVersion.asReadonly();
   }
 
   getHealthStatus() {

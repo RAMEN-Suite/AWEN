@@ -10,10 +10,11 @@ import { GNode } from './interfaces/g-node.interface';
 export class ModelRegistry {
   logger = new Logger(ModelRegistry.name);
 
-  private nodeAliases = new Map<string, string>();
-  private dataTypes = new Map<string, DataType>();
-  private nodes = new Map<string, NodeType>();
-  private relations = new Map<string, RelationType>();
+  private readonly nodeAliases = new Map<string, string>();
+  private readonly dataTypes = new Map<string, DataType>();
+  private readonly nodes = new Map<string, NodeType>();
+  private readonly relations = new Map<string, RelationType>();
+  private readonly _modelVersion!: string;
   private readonly _collectionChains!: string[][];
 
   private get allDataTypes(): Array<DataType> {
@@ -28,11 +29,16 @@ export class ModelRegistry {
     return Array.from(this.relations.values());
   }
 
+  get modelVersion(): string {
+    return this._modelVersion;
+  }
+
   get collectionChains() {
     return [...this._collectionChains];
   }
 
   constructor(ramen: GModel, profile: GModel) {
+    this._modelVersion = ramen.version;
     this.registerBaseDataTypes();
     this.register(ramen);
     this.register(profile);

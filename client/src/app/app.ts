@@ -48,6 +48,7 @@ export class App {
   });
 
   version = this.status.getVersion();
+  ramenVersion = this.status.getRamenVersion();
 
   protected menuItems: MenuItem[] = [
     {

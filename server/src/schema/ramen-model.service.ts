@@ -9,6 +9,10 @@ export class RamenModelService {
   logger = new Logger(RamenModelService.name);
   constructor(private schema: SchemaLoaderService) {}
 
+  get ramenVersion(): string {
+    return this.schema.getRegistry().modelVersion;
+  }
+
   getNodeType(name: string) {
     const type = this.schema.getRegistry().getNodeType(name);
     if (!type) {
