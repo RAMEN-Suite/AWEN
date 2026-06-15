@@ -83,7 +83,6 @@ async function bootstrap() {
         if (req.path.startsWith('/api')) return next();
         if (req.path.startsWith('/docs')) return next();
         if (path.extname(req.path)) return next();
-        console.log('test');
         res.setHeader('Content-Type', 'text/html');
         res.send(indexHtml);
       },
