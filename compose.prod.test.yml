@@ -10,7 +10,7 @@ services:
         - APP_VERSION=2026.5.15
     image: awen-server
     restart: unless-stopped
-#    read_only: true
+    read_only: true
     tmpfs:
       - /tmp
     security_opt:
@@ -85,6 +85,12 @@ services:
     networks:
       - traefik-public
       - awen-internal
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "/dev/null http://127.0.0.1:8080" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik-public"
