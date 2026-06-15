@@ -144,7 +144,7 @@ services:
       apoc.initializer.neo4j.5: CREATE FULLTEXT INDEX search IF NOT EXISTS FOR (n:Entity) ON EACH [n.label]
     deploy:
       resources:
-        limits: { cpus: "${NEO4J_CPU:-2}", memory: "${NEO4J_MEMORY:-5G}" }
+        limits: { cpus: "${NEO4J_CPU:-1.5}", memory: "${NEO4J_MEMORY:-5G}" }
     networks:
       - awen-internal
       - traefik-public
