@@ -1,6 +1,6 @@
 {
   "/api": {
-    "target": "http://backend:3000",
+    "target": "http://awen-server:3000",
     "secure": false,
     "logLevel": "info"
   }
