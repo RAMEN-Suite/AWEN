@@ -50,9 +50,9 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik-public"
-      - "traefik.http.routers.awen-server.rule=(Host(`${THM_HOST}`) || Host(`${HOST}`)) && PathPrefix(`/api`)"
+      - "traefik.http.routers.awen-server.rule=Host(`${HOST}`) && PathPrefix(`/api`)"
       - "traefik.http.routers.awen-server.tls=true"
-      - "traefik.http.routers.awen-server.entrypoints=https"
+      - "traefik.http.routers.awen-server.entrypoints=websecure"
       - "traefik.http.services.awen-server.loadbalancer.server.port=3000"
       - "traefik.http.middlewares.awenserverauth.basicauth.users=${BASIC_AUTH_STR}"
       - "traefik.http.routers.awen-server.middlewares=awenserverauth"
@@ -88,9 +88,9 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik-public"
-      - "traefik.http.routers.awen-client.rule=Host(`${THM_HOST}`) || Host(`${HOST}`)"
+      - "traefik.http.routers.awen-client.rule=Host(`${HOST}`)"
       - "traefik.http.routers.awen-client.tls=true"
-      - "traefik.http.routers.awen-client.entrypoints=https"
+      - "traefik.http.routers.awen-client.entrypoints=websecure"
       - "traefik.http.services.awen-client.loadbalancer.server.port=8080"
       - "traefik.http.middlewares.awenclientauth.basicauth.users=${BASIC_AUTH_STR}"
       - "traefik.http.routers.awen-client.middlewares=awenclientauth"
