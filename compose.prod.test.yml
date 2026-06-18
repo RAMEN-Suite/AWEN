@@ -11,6 +11,9 @@ services:
     image: awen-server
     restart: unless-stopped
     read_only: true
+    depends_on:
+      neo4j:
+        condition: service_healthy
     tmpfs:
       - /tmp
     security_opt:

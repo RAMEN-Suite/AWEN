@@ -44,7 +44,7 @@ services:
           path: ./server/package.json
           target: /app/package.json
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:${AWEN_SERVER_PORT:-3000}/api/health" ]
+      test: [ "CMD", "wget", "-qO-", "http://127.0.0.1:${AWEN_SERVER_PORT:-3000}/api/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -97,7 +97,7 @@ services:
       apoc.initializer.neo4j.4: CREATE CONSTRAINT entity_uuid IF NOT EXISTS FOR (e:Entity) REQUIRE e.uuid IS UNIQUE
       apoc.initializer.neo4j.5: CREATE FULLTEXT INDEX search IF NOT EXISTS FOR (n:Entity) ON EACH [n.label]
     healthcheck:
-      test: /var/lib/neo4j/bin/cypher-shell -u neo4j -p neo4jadmin "show databases;"
+      test: /var/lib/neo4j/bin/cypher-shell -u "neo4j" -p "neo4jadmin" "show databases;"
       start_period: 20s
 
   proxy:
