@@ -238,7 +238,36 @@
             "superTypes": [
                 "lW611f30a2ky4276g3l8N:m2Xv8qL0sP6tN1yK7rB3"
             ],
-            "attributes": [],
+            "attributes": [
+              {
+                "name": "kind",
+                "typeId": "String",
+                "bounds": {
+                  "lowerBound": 0,
+                  "upperBound": 1
+                },
+                "isKey": false,
+                "isReadOnly": false,
+                "isUnique": false,
+                "isOrdered": false,
+                "constraints": [],
+                "ext": {}
+              },
+              {
+                "name": "note",
+                "typeId": "String",
+                "bounds": {
+                  "lowerBound": 0,
+                  "upperBound": 1
+                },
+                "isKey": false,
+                "isReadOnly": false,
+                "isUnique": false,
+                "isOrdered": false,
+                "constraints": [],
+                "ext": {}
+              }
+            ],
             "constraints": [],
             "ext": {}
         },
