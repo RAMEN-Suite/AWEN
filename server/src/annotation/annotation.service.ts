@@ -189,15 +189,11 @@ export class AnnotationService {
   async getAnnotationsWithReferencesOfContent(entityId: string) {
     const eNode = new Cypher.Node();
     const aNode = new Cypher.Node();
-    const conectedEntityNode = new Cypher.Node();
-    const conectedContentNode = new Cypher.Node();
-    const conectedCollectionNode = new Cypher.Node();
+    const connectedNode = new Cypher.Node();
 
     // Relationship-Variablen für Richtungserkennung
     const relToAnnotation = new Cypher.Relationship();
-    const relEntity = new Cypher.Relationship();
-    const relContent = new Cypher.Relationship();
-    const relCollection = new Cypher.Relationship();
+    const relConnectedNode = new Cypher.Relationship();
 
     const searchPattern = new Cypher.Pattern(eNode, {
       labels: ENTITY_LABEL_NAME,
@@ -212,82 +208,43 @@ export class AnnotationService {
         labels: ANNOTATION_LABEL_NAME,
       });
 
-    const optionalEntityPattern = searchPattern
-      .related(relEntity, {
+    const optionalConnectedNodePattern = searchPattern
+      .related(relConnectedNode, {
         direction: 'undirected',
       })
-      .to(conectedEntityNode, {
-        labels: ENTITY_LABEL_NAME,
-      })
+      .to(connectedNode)
       .where(
-        not(
-          eq(
-            conectedEntityNode.property(this.ENTITY_KEY_PROPERTY),
-            new Cypher.Param(entityId),
+        or(
+          connectedNode.hasLabels(CONTENT_LABEL_NAME),
+          connectedNode.hasLabels(COLLECTION_LABEL_NAME),
+          and(
+            connectedNode.hasLabels(ENTITY_LABEL_NAME),
+            not(
+              eq(
+                connectedNode.property(this.ENTITY_KEY_PROPERTY),
+                new Cypher.Param(entityId),
+              ),
+            ),
           ),
         ),
       );
 
-    const optionalContentPattern = searchPattern
-      .related(relContent, {
-        direction: 'undirected',
-      })
-      .to(conectedContentNode, {
-        labels: CONTENT_LABEL_NAME,
-      });
-
-    const optionalCollectionPattern = searchPattern
-      .related(relCollection, {
-        direction: 'undirected',
-      })
-      .to(conectedCollectionNode, {
-        labels: COLLECTION_LABEL_NAME,
-      });
-
     const clause = new Cypher.Match(searchPattern)
-      .optionalMatch(optionalEntityPattern)
-      .optionalMatch(optionalContentPattern)
-      .optionalMatch(optionalCollectionPattern)
+      .optionalMatch(optionalConnectedNodePattern)
       .return(
         [aNode, 'annotation'],
         [
           Cypher.collect(
             new Cypher.Map({
-              node: conectedEntityNode,
-              relationship: relEntity,
+              node: connectedNode,
+              relationship: relConnectedNode,
               direction: new Cypher.Case()
-                .when(Cypher.eq(Cypher.startNode(relEntity), aNode))
+                .when(Cypher.eq(Cypher.startNode(relConnectedNode), aNode))
                 .then(new Cypher.Literal('OUTGOING'))
                 .else(new Cypher.Literal('INCOMING')),
             }),
           ),
-          'connectedEntities',
-        ],
-        [
-          Cypher.collect(
-            new Cypher.Map({
-              node: conectedContentNode,
-              relationship: relContent,
-              direction: new Cypher.Case()
-                .when(Cypher.eq(Cypher.startNode(relContent), aNode))
-                .then(new Cypher.Literal('OUTGOING'))
-                .else(new Cypher.Literal('INCOMING')),
-            }),
-          ),
-          'connectedContents',
-        ],
-        [
-          Cypher.collect(
-            new Cypher.Map({
-              node: conectedCollectionNode,
-              relationship: relCollection,
-              direction: new Cypher.Case()
-                .when(Cypher.eq(Cypher.startNode(relCollection), aNode))
-                .then(new Cypher.Literal('OUTGOING'))
-                .else(new Cypher.Literal('INCOMING')),
-            }),
-          ),
-          'connectedCollections',
+          'connectedNodes',
         ],
       );
 
@@ -295,17 +252,7 @@ export class AnnotationService {
 
     const res = await this.neo4jService.read<{
       annotation: Node<Integer, Record<string, any>>;
-      connectedEntities: Array<{
-        node: Node;
-        relationship: Relationship;
-        direction: string;
-      }>;
-      connectedContents: Array<{
-        node: Node;
-        relationship: Relationship;
-        direction: string;
-      }>;
-      connectedCollections: Array<{
+      connectedNodes: Array<{
         node: Node;
         relationship: Relationship;
         direction: string;
@@ -315,51 +262,38 @@ export class AnnotationService {
     const annotations = res.records.map((record) => {
       return {
         annotation: record.get('annotation'),
-        connectedEntities: record.get('connectedEntities'),
-        connectedContents: record.get('connectedContents'),
-        connectedCollections: record.get('connectedCollections'),
+        connectedNodes: record.get('connectedNodes'),
       };
     });
 
     return annotations
-      .map(
-        ({
-          annotation,
-          connectedEntities,
-          connectedContents,
-          connectedCollections,
-        }) => {
-          const gNode = this.model.getMostSpecificType(annotation.labels);
-          if (gNode) {
-            const connectedNodes: ConnectedNodeDto[] = [
-              ...connectedEntities,
-              ...connectedContents,
-              ...connectedCollections,
-            ]
-              .filter((c) => !!c.node) // optionalMatch kann null liefern
-              .flatMap((c) => {
-                const connectedGNode = this.model.getMostSpecificType(
-                  c.node.labels,
-                );
-                if (!connectedGNode) return [];
-                return [
-                  transformConnectedNodeToDto(
-                    c.node,
-                    c.relationship,
-                    c.direction,
-                    connectedGNode,
-                  ),
-                ];
-              });
+      .map(({ annotation, connectedNodes }) => {
+        const gNode = this.model.getMostSpecificType(annotation.labels);
+        if (gNode) {
+          const transformedConnectedNodes: ConnectedNodeDto[] = connectedNodes
+            .filter((c) => !!c.node) // optionalMatch kann null liefern
+            .flatMap((c) => {
+              const connectedGNode = this.model.getMostSpecificType(
+                c.node.labels,
+              );
+              if (!connectedGNode) return [];
+              return [
+                transformConnectedNodeToDto(
+                  c.node,
+                  c.relationship,
+                  c.direction,
+                  connectedGNode,
+                ),
+              ];
+            });
 
-            return transformNodeToAnnotationWithContentDTO(
-              annotation,
-              gNode,
-              connectedNodes,
-            );
-          }
-        },
-      )
+          return transformNodeToAnnotationWithContentDTO(
+            annotation,
+            gNode,
+            transformedConnectedNodes,
+          );
+        }
+      })
       .filter((annotation) => !!annotation);
   }
 
