@@ -21,3 +21,9 @@ app-root {
   justify-content: center;
   height: 80vh;
 }
+
+.card {
+  border: 1px solid var(--p-surface-200);
+  border-radius: 6px;
+  padding: 1rem;
+  background: var(--p-surface-0);}
