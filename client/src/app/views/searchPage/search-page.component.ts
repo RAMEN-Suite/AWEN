@@ -2,13 +2,12 @@ import { Component, inject } from '@angular/core';
 import { FilterPane } from '../../filter-pane/filter-pane';
 import { SearchEntityService } from '../../search-entity.service';
 import { EntityList } from '../../entity-list/entity-list';
-import { CreateEntity } from '../../create-entity/create-entity';
 import { OldEntity } from '../../../interfaces';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-search-page',
-  imports: [FilterPane, EntityList, CreateEntity],
+  imports: [FilterPane, EntityList],
   providers: [SearchEntityService],
   templateUrl: './search-page.component.html',
   styles: `
