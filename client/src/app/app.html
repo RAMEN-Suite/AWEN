@@ -35,27 +35,24 @@
 
 <p-menubar class="configMenuBar">
   <ng-template #start>
-    <div class="flex items-center gap-2 h-3rem">
-      <p-button styleClass="h-3rem" severity="secondary" icon="pi pi-cog" size="large" outlined [routerLink]="['config']" />
-    </div>
+    <a
+      pButton
+      class="no-underline h-3rem"
+      size="small"
+      severity="secondary"
+      outlined
+      [href]="'https://github.com/RAMEN-Suite/AWEN'"
+      target="_blank"
+    >
+      <div pButtonLabel class="flex flex-column justify-content-center text-center gap-1">
+        <span>AWEN</span>
+        <small>v{{ version() }}</small>
+      </div>
+    </a>
   </ng-template>
 
   <ng-template #end>
     <div class="flex items-center gap-2 h-3rem">
-      <a
-        pButton
-        class="no-underline h-3rem"
-        size="small"
-        severity="secondary"
-        outlined
-        [href]="'https://github.com/RAMEN-Suite/AWEN'"
-        target="_blank"
-      >
-        <div pButtonLabel class="flex flex-column justify-content-center text-center gap-1">
-          <span>AWEN</span>
-          <small>v{{ version() }}</small>
-        </div>
-      </a>
       <a pButton class="no-underline h-3rem" size="small" severity="secondary" outlined [href]="'https://ramen-schema.org'" target="_blank">
         <div pButtonLabel class="flex flex-column justify-content-center text-center gap-1">
           <span>RAMEN</span>
