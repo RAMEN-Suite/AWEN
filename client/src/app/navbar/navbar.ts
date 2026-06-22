@@ -2,15 +2,15 @@ import { Component, computed, inject } from '@angular/core';
 import { Menubar } from 'primeng/menubar';
 import { MenuItem } from 'primeng/api';
 import { BackButtonComponent } from '../utils/back-button.component';
-import { isActive, Router } from '@angular/router';
+import { isActive, Router, RouterLink } from '@angular/router';
 import { EntityService } from '../entity.service';
-import { Skeleton } from 'primeng/skeleton';
+import { CreateEntity } from '../create-entity/create-entity';
 
 const HEADER_MAX_LENGTH = 20;
 
 @Component({
   selector: 'app-navbar',
-  imports: [Menubar, BackButtonComponent, Skeleton],
+  imports: [Menubar, BackButtonComponent, RouterLink, CreateEntity],
   templateUrl: './navbar.html',
 })
 export class Navbar {
@@ -35,11 +35,5 @@ export class Navbar {
     matrixParams: 'ignored',
   });
 
-  protected items: MenuItem[] = [
-    {
-      label: 'Home',
-      icon: 'pi pi-home',
-      routerLink: '/',
-    },
-  ];
+  protected items: MenuItem[] = [];
 }
