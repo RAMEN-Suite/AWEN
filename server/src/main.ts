@@ -28,8 +28,8 @@ async function bootstrap() {
   const APP_NAME = envOrDefault('AWEN_APP_NAME', 'CRANN');
   const APP_HOST = envOrDefault('AWEN_APP_HOST');
   const APP_FAVICON = envOrDefault('AWEN_APP_FAVICON', 'favicon-default.jpg');
-  const serverSideClient = process.env.SERVER_SIDE_CLIENT
-    ? process.env.SERVER_SIDE_CLIENT === 'true'
+  const serverSideClient = process.env['SERVER_SIDE_CLIENT']
+    ? process.env['SERVER_SIDE_CLIENT'] === 'true'
     : false;
 
   if (serverSideClient) {
@@ -106,7 +106,7 @@ async function bootstrap() {
   );
 
   const config = new DocumentBuilder()
-    .setTitle(process.env.AWEN_APP_NAME ?? 'AWEN')
+    .setTitle(envOrDefault('AWEN_APP_NAME', 'AWEN'))
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, documentFactory);

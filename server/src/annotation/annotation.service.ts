@@ -179,9 +179,7 @@ export class AnnotationService {
     return annotations
       .map((annotation) => {
         const gNode = this.model.getMostSpecificType(annotation.labels);
-        if (gNode) {
-          return transformNodeToAnnotationDTO(annotation, gNode);
-        }
+        return transformNodeToAnnotationDTO(annotation, gNode);
       })
       .filter((annotation) => !!annotation);
   }
@@ -269,30 +267,28 @@ export class AnnotationService {
     return annotations
       .map(({ annotation, connectedNodes }) => {
         const gNode = this.model.getMostSpecificType(annotation.labels);
-        if (gNode) {
-          const transformedConnectedNodes: ConnectedNodeDto[] = connectedNodes
-            .filter((c) => !!c.node) // optionalMatch kann null liefern
-            .flatMap((c) => {
-              const connectedGNode = this.model.getMostSpecificType(
-                c.node.labels,
-              );
-              if (!connectedGNode) return [];
-              return [
-                transformConnectedNodeToDto(
-                  c.node,
-                  c.relationship,
-                  c.direction,
-                  connectedGNode,
-                ),
-              ];
-            });
+        const transformedConnectedNodes: ConnectedNodeDto[] = connectedNodes
+          .filter((c) => !!c.node) // optionalMatch kann null liefern
+          .flatMap((c) => {
+            const connectedGNode = this.model.getMostSpecificType(
+              c.node.labels,
+            );
+            if (!connectedGNode) return [];
+            return [
+              transformConnectedNodeToDto(
+                c.node,
+                c.relationship,
+                c.direction,
+                connectedGNode,
+              ),
+            ];
+          });
 
-          return transformNodeToAnnotationWithContentDTO(
-            annotation,
-            gNode,
-            transformedConnectedNodes,
-          );
-        }
+        return transformNodeToAnnotationWithContentDTO(
+          annotation,
+          gNode,
+          transformedConnectedNodes,
+        );
       })
       .filter((annotation) => !!annotation);
   }

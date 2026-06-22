@@ -203,9 +203,7 @@ export class ModelRegistry {
 
   resolveNodeNameFromRef(ref: string): string | undefined {
     const node = this.nodes.get(ref);
-    if (node) {
-      return node.name;
-    }
+    return node?.name;
   }
 
   /** Transitive subtype-Prüfung via superTypes */

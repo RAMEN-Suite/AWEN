@@ -12,11 +12,23 @@
     </div>
   </ng-template>
   <ng-template #end>
-    <app-create-entity />
-    <!--    @if (header()) {-->
-    <!--    <span class="text-2xl">{{ header() }}</span>-->
-    <!--    } @else if (entityLoading()) {-->
-    <!--    <p-skeleton width="5rem" height="1.5rem" />-->
-    <!--    }-->
+    <div class="flex items-center align-content-center align-items-center gap-2 h-3rem">
+      <app-create-entity />
+      <a
+        pButton
+        class="no-underline"
+        severity="secondary"
+        icon="pi pi-cog"
+        pButtonIcon="pi pi-cog"
+        size="large"
+        outlined
+        [routerLink]="['config']"
+      ></a>
+      <!--    @if (header()) {-->
+      <!--    <span class="text-2xl">{{ header() }}</span>-->
+      <!--    } @else if (entityLoading()) {-->
+      <!--    <p-skeleton width="5rem" height="1.5rem" />-->
+      <!--    }-->
+    </div>
   </ng-template>
 </p-menubar>
