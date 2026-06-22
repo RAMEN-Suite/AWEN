@@ -54,7 +54,7 @@ COPY . .
 RUN npm run build
 
 # =========================================
-# Stage 2: Prepare Nginx to Serve Static Files
+# Stage 2: Prepare caddy to Serve Static Files
 # =========================================
 
 FROM caddy:${CADDY_VERSION} AS prod
