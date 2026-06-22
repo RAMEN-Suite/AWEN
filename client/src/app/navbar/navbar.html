@@ -1,13 +1,15 @@
 <p-menubar [model]="items" class="border-noround border-0 bg-gray-200 px-5" breakpoint="0px">
   <ng-template #start>
-    <div class="pr-5">
-      <a routerLink="/" class="flex items-center no-underline text-inherit">
-        <h1 class="text-3xl m-0 font-bold tracking-widest text-primary">AWEN</h1>
-      </a>
+    <div class="flex text-center align-content-center align-items-center">
+      <div class="pr-5">
+        <a routerLink="/" class="flex items-center no-underline text-inherit">
+          <h1 class="text-3xl m-0 font-bold tracking-widest text-primary">AWEN</h1>
+        </a>
+      </div>
+      @if (!isHomeRoute()) {
+      <app-back-button />
+      }
     </div>
-    @if (!isHomeRoute()) {
-    <app-back-button />
-    }
   </ng-template>
   <ng-template #end>
     <app-create-entity />
