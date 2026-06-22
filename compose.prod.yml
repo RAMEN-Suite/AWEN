@@ -7,7 +7,7 @@ services:
       target: prod
       dockerfile: Dockerfile
       args:
-        - APP_VERSION=2026.5.15
+        - APP_VERSION=2026.6.22
     image: awen-server
     restart: unless-stopped
     read_only: true
