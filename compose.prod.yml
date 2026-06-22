@@ -1,4 +1,4 @@
-name: awen-prod-test
+name: awen-prod
 
 services:
   awen-server:
