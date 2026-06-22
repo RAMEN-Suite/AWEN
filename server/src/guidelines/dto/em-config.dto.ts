@@ -4,15 +4,15 @@ import { DataType } from '../../schema/interfaces/data-type.interface';
 
 export class EmConfigDto implements EmConfig {
   @ApiProperty()
-  collectionChains: string[][];
+  collectionChains!: string[][];
 
   @ApiProperty()
-  entityTypes: string[];
+  entityTypes!: string[];
 
   @ApiProperty({
     description: 'Possible Node Labels for the Annotation Nodes',
   })
-  annotationTypes: string[];
+  annotationTypes!: string[];
 
   // @ApiProperty({
   //  description: 'Possible types asserted via the Node property "type" the Annotation Nodes',
@@ -20,7 +20,7 @@ export class EmConfigDto implements EmConfig {
   // annotationTypeAttributes: string[];
 
   @ApiProperty()
-  dataTypes: DataType[];
+  dataTypes!: DataType[];
 
   constructor(value: EmConfig) {
     Object.assign(this, value);

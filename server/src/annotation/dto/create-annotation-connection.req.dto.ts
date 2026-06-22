@@ -8,5 +8,5 @@ export class CreateAnnotationConnectionReqDto {
   })
   @IsString()
   @IsNotEmpty()
-  connectionId: string;
+  connectionId!: string;
 }

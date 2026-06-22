@@ -1,5 +1,4 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { IGuidelines } from '../../shared/IGuidelines';
 import { GuidelinesService } from './guidelines.service';
 import { ApiResponse } from '@nestjs/swagger';
 import { EmConfigDto } from './dto/em-config.dto';
@@ -7,14 +6,6 @@ import { EmConfigDto } from './dto/em-config.dto';
 @Controller('guidelines')
 export class GuidelinesController {
   constructor(private readonly guidelinesService: GuidelinesService) {}
-
-  @ApiResponse({
-    type: IGuidelines,
-  })
-  @Get('')
-  async get() {
-    return this.guidelinesService.get();
-  }
 
   @ApiResponse({
     type: EmConfigDto,
@@ -27,7 +18,6 @@ export class GuidelinesController {
 
   @Get('config/node/properties/:type')
   getEntityProperties(@Param('type') type: string) {
-    const types = this.guidelinesService.getEntityProperties(type);
-    return types;
+    return this.guidelinesService.getEntityProperties(type);
   }
 }

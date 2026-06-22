@@ -4,16 +4,16 @@ import { ConnectedNodeDto } from './connected-node.dto';
 
 export class AnnotationDto {
   @ApiProperty()
-  type: string;
+  type!: string;
 
   @ApiProperty()
-  types: string[];
+  types!: string[];
 
   @ApiProperty()
-  properties: NodePropertyDto[];
+  properties!: NodePropertyDto[];
 
   @ApiProperty()
-  connectedNodes: ConnectedNodeDto[];
+  connectedNodes!: ConnectedNodeDto[];
 
   constructor(value: AnnotationDto) {
     Object.assign(this, value);

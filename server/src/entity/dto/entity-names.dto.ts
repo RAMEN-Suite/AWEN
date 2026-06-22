@@ -8,14 +8,14 @@ export class EntityNamesDto {
   })
   @IsString()
   @IsNotEmpty()
-  id: string;
+  id!: string;
 
   @ApiProperty({
     description: 'The name/label of the entity.',
     example: 'Lee "Apollo" Adama',
   })
   @IsString()
-  label: string;
+  label!: string;
 
   constructor(id: string, label: string) {
     this.id = id;

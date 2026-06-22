@@ -14,7 +14,7 @@ export class CollectionDto {
     example: 'Collection',
   })
   @IsString()
-  nodeLabel: string;
+  nodeLabel!: string;
 
   /**
    * The types of the entity.
@@ -28,7 +28,7 @@ export class CollectionDto {
   })
   @IsString({ each: true })
   @IsArray()
-  types: string[];
+  types!: string[];
 
   /**
    * The id of the entity.
@@ -40,7 +40,7 @@ export class CollectionDto {
   })
   @IsString()
   @IsNotEmpty()
-  id: string;
+  id!: string;
 
   @ApiProperty({
     description: 'The name/label of the collection.',
@@ -48,7 +48,7 @@ export class CollectionDto {
   })
   @MinLength(3)
   @IsString()
-  label: string;
+  label!: string;
 
   @ApiProperty({
     description:
@@ -59,5 +59,5 @@ export class CollectionDto {
     },
   })
   @IsObject()
-  properties: Record<string, unknown>;
+  properties!: Record<string, unknown>;
 }

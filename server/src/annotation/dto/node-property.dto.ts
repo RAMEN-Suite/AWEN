@@ -2,25 +2,30 @@ import { ApiProperty } from '@nestjs/swagger';
 import { GAttribute } from '../../schema/interfaces/g-attribute.interface';
 import { GConstraint } from '../../schema/interfaces/g-constraint.interface';
 
+class Bounds {
+  @ApiProperty()
+  lowerBound!: number;
+
+  @ApiProperty()
+  upperBound!: number;
+}
+
 // TODO: Type und Value richtig machen
 export class NodePropertyDto implements GAttribute {
   @ApiProperty()
-  value: string;
+  value!: string;
   @ApiProperty()
-  bounds: {
-    lowerBound: number;
-    upperBound: number;
-  };
+  bounds!: Bounds;
   @ApiProperty()
   constraints?: GConstraint[];
   @ApiProperty()
-  isKey: boolean;
+  isKey!: boolean;
   @ApiProperty()
-  isReadOnly: boolean;
+  isReadOnly!: boolean;
   @ApiProperty()
-  name: string;
+  name!: string;
   @ApiProperty()
-  typeId: string;
+  typeId!: string;
 
   constructor(value: NodePropertyDto) {
     Object.assign(this, value);

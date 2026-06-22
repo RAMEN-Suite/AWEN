@@ -5,9 +5,9 @@ export class CreateEntityDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  type: string;
+  type!: string;
 
   @ApiProperty()
   @IsObject()
-  properties: Record<string, unknown>;
+  properties!: Record<string, unknown>;
 }

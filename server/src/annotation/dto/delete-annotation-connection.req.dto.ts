@@ -9,5 +9,5 @@ export class DeleteAnnotationConnectionReqDto extends IdDto {
   })
   @IsString()
   @IsNotEmpty()
-  connectedId: string;
+  connectedId!: string;
 }

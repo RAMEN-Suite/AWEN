@@ -6,5 +6,5 @@ export class EntityCollectionNameDto extends OldEntityDto {
   @ApiProperty({
     type: () => [CollectionNameTypeDto],
   })
-  collections: CollectionNameTypeDto[];
+  collections!: CollectionNameTypeDto[];
 }

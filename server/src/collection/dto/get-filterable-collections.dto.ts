@@ -3,5 +3,5 @@ import { CollectionNameDto } from './collection-name.dto';
 
 export class GetFilterableCollections {
   @ApiProperty()
-  collectionFilter: Record<string, CollectionNameDto[]>;
+  collectionFilter!: Record<string, CollectionNameDto[]>;
 }

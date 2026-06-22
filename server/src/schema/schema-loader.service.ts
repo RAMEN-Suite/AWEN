@@ -14,9 +14,9 @@ type SchemaSourceName =
 export class SchemaLoaderService {
   private logger = new Logger(SchemaLoaderService.name);
 
-  private ramenModel: GModel;
-  private profileModel: GModel;
-  private registry: ModelRegistry;
+  private ramenModel!: GModel;
+  private profileModel!: GModel;
+  private registry!: ModelRegistry;
 
   constructor(private readonly configService: ConfigService) {}
 

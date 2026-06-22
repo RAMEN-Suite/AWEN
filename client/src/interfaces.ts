@@ -98,27 +98,6 @@ export interface CollectionNameTypeDto {
   types: string[];
 }
 
-export interface IGuidelines {
-  entity: IEntity;
-
-  // names of the required fulltext indexes
-  fulltextIndexes: {
-    // A neo4j fulltext index, that queries the Entity-Node-Property `nameLabel`
-    search: string;
-  };
-
-  scenarios: {
-    findByCollection: {
-      collectionChain: string[];
-      filterable: string[];
-    };
-    searchEntities: {
-      orderBy: { property: string; order: 'DESC' | 'ASC' }[];
-      shownCollections: string[];
-    };
-  };
-}
-
 export interface EmConfigRemote {
   collectionChains: string[][];
   entityTypes: string[];

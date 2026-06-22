@@ -5,14 +5,14 @@ export class CreateAnnotationDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  entityId: string;
+  entityId!: string;
 
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  type: string;
+  type!: string;
 
   @ApiProperty()
   @IsObject()
-  properties: Record<string, unknown>;
+  properties!: Record<string, unknown>;
 }

@@ -11,5 +11,5 @@ export class LabelDto {
   @IsString()
   @MinLength(3)
   @IsNotEmpty()
-  label: string;
+  label!: string;
 }

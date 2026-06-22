@@ -3,16 +3,16 @@ import { NodePropertyDto } from './node-property.dto';
 
 export class ConnectedNodeDto {
   @ApiProperty()
-  types: string[];
+  types!: string[];
 
   @ApiProperty()
-  properties: NodePropertyDto[];
+  properties!: NodePropertyDto[];
 
   @ApiProperty()
-  relationshipProperties: Record<string, any>;
+  relationshipProperties!: Record<string, any>;
 
   @ApiProperty()
-  direction: string;
+  direction!: string;
 
   constructor(data: ConnectedNodeDto) {
     this.types = data.types;

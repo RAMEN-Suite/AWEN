@@ -20,7 +20,7 @@ export class OldEntityDto {
     example: 'Entity',
   })
   @IsString()
-  nodeLabel: string;
+  nodeLabel!: string;
 
   /**
    * The types of the entity.
@@ -64,7 +64,7 @@ export class OldEntityDto {
     },
     { toClassOnly: true },
   )
-  types: string[];
+  types!: string[];
 
   /**
    * The id of the entity.
@@ -76,7 +76,7 @@ export class OldEntityDto {
   })
   @IsString()
   @IsNotEmpty()
-  id: string;
+  id!: string;
 
   @ApiProperty({
     description: 'The name/label of the entity.',
@@ -84,7 +84,7 @@ export class OldEntityDto {
   })
   @MinLength(3)
   @IsString()
-  label: string;
+  label!: string;
 
   /**
    * Beliebige Key/Value-Properties der Entität.
@@ -100,5 +100,5 @@ export class OldEntityDto {
     },
   })
   @IsObject()
-  properties: Record<string, unknown>;
+  properties!: Record<string, unknown>;
 }

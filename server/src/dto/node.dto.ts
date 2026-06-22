@@ -16,7 +16,7 @@ export abstract class NodeDto {
   })
   @IsString({ each: true })
   @IsArray()
-  types: string[];
+  types!: string[];
 
   @ApiProperty({
     description: 'Key/value properties of the node.',
@@ -26,7 +26,7 @@ export abstract class NodeDto {
     },
   })
   @IsObject()
-  properties: Record<string, any>;
+  properties!: Record<string, any>;
 
   protected constructor(properties: Record<string, any>, types?: string[]) {
     this.properties = properties;

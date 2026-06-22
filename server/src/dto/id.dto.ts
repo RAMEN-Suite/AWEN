@@ -14,5 +14,5 @@ export class IdDto {
   })
   @IsString()
   @IsNotEmpty()
-  id: string;
+  id!: string;
 }

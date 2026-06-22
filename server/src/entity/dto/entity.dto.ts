@@ -3,13 +3,13 @@ import { EntityPropertyDto } from './entity-property.dto';
 
 export class EntityDto {
   @ApiProperty()
-  label: string;
+  label!: string;
 
   @ApiProperty()
-  types: string[];
+  types!: string[];
 
   @ApiProperty()
-  properties: EntityPropertyDto[];
+  properties!: EntityPropertyDto[];
 
   constructor(value: EntityDto) {
     Object.assign(this, value);

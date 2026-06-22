@@ -5,22 +5,22 @@ import { GConstraint } from '../../schema/interfaces/g-constraint.interface';
 // TODO: Type und Value richtig machen
 export class EntityPropertyDto implements GAttribute {
   @ApiProperty()
-  value: string;
+  value!: string;
   @ApiProperty()
-  bounds: {
+  bounds!: {
     lowerBound: number;
     upperBound: number;
   };
   @ApiProperty()
   constraints?: GConstraint[];
   @ApiProperty()
-  isKey: boolean;
+  isKey!: boolean;
   @ApiProperty()
-  isReadOnly: boolean;
+  isReadOnly!: boolean;
   @ApiProperty()
-  name: string;
+  name!: string;
   @ApiProperty()
-  typeId: string;
+  typeId!: string;
 
   constructor(value: EntityPropertyDto) {
     Object.assign(this, value);

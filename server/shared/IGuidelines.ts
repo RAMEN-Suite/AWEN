@@ -27,7 +27,7 @@ export class PropertyConfig {
       'Interner Property-Name (z. B. "folioEnd", "label", "websiteUrl").',
     example: 'label',
   })
-  name: string;
+  name!: string;
 
   @ApiProperty({
     description: 'Datentyp der Property.',
@@ -35,32 +35,32 @@ export class PropertyConfig {
     enumName: 'PropertyConfigDataType',
     example: 'string',
   })
-  type: PropertyConfigDataType;
+  type!: PropertyConfigDataType;
 
   @ApiProperty({
     description: 'Ob der Wert zwingend vorhanden sein muss.',
     example: true,
   })
-  required: boolean;
+  required!: boolean;
 
   @ApiProperty({
     description: 'Ob der Wert durch Nutzer:innen bearbeitet werden darf.',
     example: true,
   })
-  editable: boolean;
+  editable!: boolean;
 
   @ApiProperty({
     description: 'Ob die Property in der UI angezeigt wird.',
     example: true,
   })
-  visible: boolean;
+  visible!: boolean;
 
   @ApiProperty({
     description:
       'Ob die Property als eigene Node abgespeichert wird. Erlaubt detailliertere bearbeitung.',
     example: true,
   })
-  propertyNode: boolean;
+  propertyNode!: boolean;
 
   @ApiPropertyOptional({
     description:
@@ -130,33 +130,33 @@ export class IEntity {
       'Metatyp / Oberkategorie des Entity (frei definierbar, z. B. "node").',
     example: 'node',
   })
-  metaType: string;
+  metaType!: string;
 
   @ApiProperty({
     description: 'Spezifische Typen/Labels des Entity (z. B. Graph-Labels).',
     type: [String],
     example: ['Entity', 'Organization'],
   })
-  types: string[];
+  types!: string[];
 
   @ApiProperty({
     description: 'Property-Name, der die eindeutige ID enthält (z. B. "id").',
     example: 'id',
   })
-  idLabel: string;
+  idLabel!: string;
 
   @ApiProperty({
     description:
       'Property-Name, der die menschenlesbare Bezeichnung enthält (z. B. "nameLabel").',
     example: 'nameLabel',
   })
-  nameLabel: string;
+  nameLabel!: string;
 
   @ApiProperty({
     description: 'Konfiguration der verfügbaren Properties.',
     type: () => [PropertyConfig],
   })
-  properties: PropertyConfig[];
+  properties!: PropertyConfig[];
 }
 
 export class FulltextIndexes {
@@ -165,7 +165,7 @@ export class FulltextIndexes {
       'Name des Neo4j-Fulltext-Indexes, der auf die Entity-Property "nameLabel" zeigt.',
     example: 'entity_name_fulltext',
   })
-  search: string;
+  search!: string;
 }
 
 export class SearchEntitiesOrderBy {
@@ -173,13 +173,13 @@ export class SearchEntitiesOrderBy {
     description: 'Property-Name, nach der sortiert werden soll.',
     example: 'numberOfChilds',
   })
-  property: string;
+  property!: string;
 
   @ApiProperty({
     description: 'Sortierreihenfolge: ASC oder DESC.',
     example: 'DESC',
   })
-  order: 'ASC' | 'DESC';
+  order!: 'ASC' | 'DESC';
 }
 
 export class SearchEntitiesScenario {
@@ -193,7 +193,7 @@ export class SearchEntitiesScenario {
       },
     ],
   })
-  orderBy: SearchEntitiesOrderBy[];
+  orderBy!: SearchEntitiesOrderBy[];
 
   @ApiProperty({
     description: `
@@ -203,7 +203,7 @@ export class SearchEntitiesScenario {
     example: ['Volume', 'Department'],
     type: [String],
   })
-  shownCollections: string[];
+  shownCollections!: string[];
 }
 
 export class FindByCollectionScenario {
@@ -213,7 +213,7 @@ export class FindByCollectionScenario {
     example: ['Volume', 'Department'],
     type: [String],
   })
-  filterable: string[];
+  filterable!: string[];
 }
 
 export class Scenarios {
@@ -221,13 +221,13 @@ export class Scenarios {
     description: 'Szenario: Entities anhand einer Collection ableiten/filtern.',
     type: () => FindByCollectionScenario,
   })
-  findByCollection: FindByCollectionScenario;
+  findByCollection!: FindByCollectionScenario;
 
   @ApiProperty({
     description: 'Szenario: Entities suchen und sortieren.',
     type: () => SearchEntitiesScenario,
   })
-  searchEntities: SearchEntitiesScenario;
+  searchEntities!: SearchEntitiesScenario;
 }
 
 @ApiExtraModels(
@@ -243,24 +243,24 @@ export class IGuidelines {
       'Definition des Entity-Modells (Labels, Namens- und ID-Felder, Property-Schema).',
     type: () => IEntity,
   })
-  entity: IEntity;
+  entity!: IEntity;
 
   @ApiProperty({
     description:
       'Definition des Collection-Modells (Labels, Namens- und ID-Felder, Property-Schema).',
     type: () => IEntity,
   })
-  collection: IEntity;
+  collection!: IEntity;
 
   @ApiProperty({
     description: 'Bezeichnungen der erforderlichen Fulltext-Indizes.',
     type: () => FulltextIndexes,
   })
-  fulltextIndexes: FulltextIndexes;
+  fulltextIndexes!: FulltextIndexes;
 
   @ApiProperty({
     description: 'Vordefinierte Abfrage-/Filter-Szenarien.',
     type: () => Scenarios,
   })
-  scenarios: Scenarios;
+  scenarios!: Scenarios;
 }

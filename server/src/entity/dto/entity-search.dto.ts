@@ -19,7 +19,6 @@ export class EntitySearchDto extends PickType(OldEntityDto, [
     },
   })
   @IsOptional()
-  @IsOptional()
   @Transform(
     ({ value }) => {
       if (typeof value === 'object') return value as Record<string, string[]>;
