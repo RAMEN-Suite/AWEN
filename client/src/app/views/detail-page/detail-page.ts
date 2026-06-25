@@ -15,6 +15,7 @@ import { Statements } from '../../statements/statements';
   selector: 'app-detail-page',
   providers: [DialogService],
   imports: [TableModule, Chip, DeleteEntity, EditEntity, ProgressSpinner, CreateAnnotation, NodeTypes, Statements],
+  styleUrl: './detail-page.scss',
   templateUrl: './detail-page.html',
 })
 export class DetailPage implements OnDestroy {
