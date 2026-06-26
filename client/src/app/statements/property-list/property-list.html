@@ -1,18 +1,21 @@
 <div class="flex flex-column gap-2">
   @for (property of visibleProperties(properties()); track property.name) {
-  <div class="flex flex-column gap-1">
-    <span class="text-gray-500" [class]="lableTextSizeClass()">{{ property.name }}</span>
-    @if (isArrayValue(property.value)) {
-    <div class="flex flex-wrap gap-1">
-      @for (value of property.value; track $index) {
-      <p-chip [class]="valueTextSizeClass()" [label]="displayValue(value)" class="py-1" />
+  <div class="flex flex-row align-items-center">
+    <div class="flex w-6 flex-wrap" [class]="textSizeClass()">{{ property.name }}</div>
+    <div class="flex w-1 justify-content-center">:</div>
+    <div class="flex w-5 align-items-center" style="font-stretch: semi-expanded">
+      @if (isArrayValue(property.value)) {
+      <div class="flex flex-wrap gap-1">
+        @for (value of property.value; track $index) {
+        <p-chip [class]="textSizeClass()" [label]="displayValue(value)" class="py-1" />
+        }
+      </div>
+      } @else {
+      <span [class]="textSizeClass()">{{ displayValue(property.value) }}</span>
       }
     </div>
-    } @else {
-    <span [class]="valueTextSizeClass()">{{ displayValue(property.value) }}</span>
-    }
   </div>
   } @empty {
-  <span class="text-gray-500" [class]="valueTextSizeClass()">No properties</span>
+  <span class="text-gray-500" [class]="textSizeClass()">No properties</span>
   }
 </div>

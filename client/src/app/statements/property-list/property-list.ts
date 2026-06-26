@@ -3,7 +3,7 @@ import { Chip } from 'primeng/chip';
 import { visibleProperties } from '../../utils/utils';
 import { NodePropertyDto } from '../../../interfaces';
 
-type TextSize = 3 | 4 | 5 | 6 | 7 | 8 | 9;
+type TextSize = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 
 @Component({
   selector: 'app-property-list',
@@ -14,11 +14,7 @@ export class PropertyList {
   properties = input.required<NodePropertyDto[]>();
   textSize = input<TextSize>(3);
 
-  protected lableTextSizeClass = computed(() => {
-    return this.getTextSizeClass(this.textSize() - 2);
-  });
-
-  protected valueTextSizeClass = computed(() => {
+  protected textSizeClass = computed(() => {
     return this.getTextSizeClass(this.textSize());
   });
 
