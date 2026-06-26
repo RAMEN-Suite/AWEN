@@ -25,30 +25,7 @@
         </div>
         @if(visibleProperties(entity.properties).length > 0) {
         <div class="entity-properties-scroll col-12 flex flex-column gap-3">
-          @for (property of visibleProperties(entity.properties); track $index) {
-          <div class="property-row col-12 mx-0">
-            <div class="border-1 border-gray-200 border-round overflow-hidden">
-              <div class="grid m-0">
-                <div class="col-3 p-3 bg-gray-50 border-right-1 border-gray-200">
-                  <span class="">{{ property.name }}</span>
-                </div>
-                <div class="col p-3 flex flex-column gap-2">
-                  <div class="flex flex-column gap-1">
-                    @if (isArrayValue(property.value)) {
-                    <div class="flex flex-wrap gap-1">
-                      @for (value of property.value; track $index) {
-                      <p-chip [label]="displayValue(value)" class="py-1" />
-                      }
-                    </div>
-                    } @else {
-                    <span>{{ displayValue(property.value) }}</span>
-                    }
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          }
+          <app-property-list [properties]="entity.properties" [textSize]="5" />
         </div>
         }
       </section>
