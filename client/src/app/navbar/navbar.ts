@@ -5,13 +5,13 @@ import { BackButtonComponent } from '../utils/back-button.component';
 import { isActive, Router, RouterLink } from '@angular/router';
 import { EntityService } from '../entity.service';
 import { CreateEntity } from '../create-entity/create-entity';
-import { ButtonDirective, ButtonIcon } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 
 const HEADER_MAX_LENGTH = 20;
 
 @Component({
   selector: 'app-navbar',
-  imports: [Menubar, BackButtonComponent, RouterLink, CreateEntity, ButtonDirective, ButtonIcon],
+  imports: [Menubar, BackButtonComponent, RouterLink, CreateEntity, ButtonDirective],
   templateUrl: './navbar.html',
 })
 export class Navbar {
