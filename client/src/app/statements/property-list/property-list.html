@@ -3,7 +3,7 @@
   <div class="flex flex-row align-items-center">
     <div class="flex w-6 flex-wrap" [class]="textSizeClass()">{{ property.name }}</div>
     <div class="flex w-1 justify-content-center">:</div>
-    <div class="flex w-5 align-items-center" style="font-stretch: semi-expanded">
+    <div class="flex w-5 align-items-center">
       @if (isArrayValue(property.value)) {
       <div class="flex flex-wrap gap-1">
         @for (value of property.value; track $index) {
@@ -11,7 +11,7 @@
         }
       </div>
       } @else {
-      <span [class]="textSizeClass()">{{ displayValue(property.value) }}</span>
+      <span class="font-light" style="font-stretch: semi-expanded" [class]="textSizeClass()">{{ displayValue(property.value) }}</span>
       }
     </div>
   </div>
