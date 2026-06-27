@@ -1,22 +1,13 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { EntityService } from '../entity.service';
-import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { AnnotationApiService } from '../api/annotation-api.service';
-import { ConfirmationService, MessageService } from 'primeng/api';
 import { Annotation, ConnectedNodeDto, StatementNodeView } from '../../interfaces';
-import { CreateAnnotationConnection } from '../create-annotation-connection/create-annotation-connection';
 import { getKeyProperty } from '../utils/entity.utils';
 import { ENTITY_LABEL_NAME } from '../../constants';
 import { Accordion, AccordionContent, AccordionHeader, AccordionPanel } from 'primeng/accordion';
 import { Chip } from 'primeng/chip';
-import { Button } from 'primeng/button';
-import { UpdateAnnotation } from '../edit-annotation/update-annotation';
-import { NodeTypes } from './node-types/node-types';
-import { PropertyList } from './property-list/property-list';
-import { UtilsService } from '../utils/utils.service';
-import { ConnectedNode } from './connected-node/connected-node';
+import { AnnotationCard } from './annotation-card/annotation-card';
 
-interface StatementAnnotationView {
+export interface StatementAnnotationView {
   annotation: Annotation;
   id: string | null;
   nodes: StatementNodeView[];
@@ -29,18 +20,7 @@ interface AnnotationGroupView {
 
 @Component({
   selector: 'app-statements',
-  imports: [
-    Accordion,
-    AccordionPanel,
-    AccordionContent,
-    AccordionHeader,
-    Chip,
-    Button,
-    UpdateAnnotation,
-    NodeTypes,
-    PropertyList,
-    ConnectedNode,
-  ],
+  imports: [Accordion, AccordionPanel, AccordionContent, AccordionHeader, Chip, AnnotationCard],
   templateUrl: './statements.html',
   styles: `
     :host ::ng-deep {
@@ -64,16 +44,9 @@ interface AnnotationGroupView {
 })
 export class Statements {
   private readonly entityService = inject(EntityService);
-  private readonly dialogService = inject(DialogService);
-  private readonly annotationApi = inject(AnnotationApiService);
-  private readonly confirmationService = inject(ConfirmationService);
-  private readonly messageService = inject(MessageService);
-  private readonly utils = inject(UtilsService);
 
   annotations = input.required<Annotation[]>();
   entity = this.entityService.entity;
-
-  private createAnnotationConnectionDialogRef: DynamicDialogRef<CreateAnnotationConnection> | null = null;
 
   protected readonly groupedAnnotations = computed<AnnotationGroupView[]>(() => {
     const groups = new Map<string, StatementAnnotationView[]>();
@@ -119,51 +92,4 @@ export class Statements {
       directionSeverity: node.direction === 'OUTGOING' ? 'success' : 'info',
     };
   }
-
-  protected clickCreateAnnotationConnection(annotation: Annotation) {
-    this.createAnnotationConnectionDialogRef = this.dialogService.open(CreateAnnotationConnection, {
-      inputValues: {
-        annotation: annotation,
-      },
-      header: 'Create Annotation Connection',
-      styleClass: 'w-11 md:w-9 lg:w-8',
-      style: {
-        'min-height': '50vh',
-      },
-      contentStyle: {
-        'padding-top': '0.5rem',
-      },
-      closable: true,
-    });
-  }
-
-  protected async clickDeleteAnnotation(id: string, event?: Event) {
-    this.confirmationService.confirm({
-      target: event?.target as EventTarget,
-      message: `Are you sure you want to delete this annotation?\n Doing so will delete the annotation and disconnect all associated nodes.`,
-      header: 'Danger Zone',
-      icon: 'pi pi-info-circle',
-      rejectButtonProps: {
-        label: 'Cancel',
-        severity: 'secondary',
-        outlined: true,
-      },
-      acceptButtonProps: {
-        label: 'Delete Annotation',
-        severity: 'danger',
-      },
-      accept: async () => {
-        await this.deleteAnnotation(id);
-        this.messageService.add({ severity: 'success', summary: 'Annotation deleted' });
-        await this.entityService.reloadEntity();
-      },
-    });
-  }
-
-
-  private async deleteAnnotation(id: string) {
-    await this.annotationApi.delete(id);
-  }
-
-  protected copyToClipboard = this.utils.copyToClipboard;
 }

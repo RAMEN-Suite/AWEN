@@ -10,45 +10,7 @@
     <p-accordion-content>
       <div class="col-12 mx-0 flex flex-column gap-3">
         @for (annotation of group.annotations; track annotation.id) {
-        <div class="border-1 border-gray-200 border-round">
-          <div class="grid m-0 border-bottom-1 border-gray-200">
-            <div class="col-3 p-3 bg-gray-50 border-right-1 border-gray-200">
-              <app-node-types [nodeTypes]="annotation.annotation.types" class="flex flex-column gap-2" />
-            </div>
-            <div class="col p-3 flex flex-column gap-2">
-              <app-property-list [properties]="annotation.annotation.properties" />
-            </div>
-          </div>
-
-          <!-- Connected Nodes -->
-          @for (node of annotation.nodes; track node.id) {
-          <div class="" [class.border-bottom-1]="$last" [class.border-top-1]="$index > 0" [class.border-gray-200]="$index > 0 || $last">
-            <app-connected-node [annotationId]="annotation.id!" [node]="node" />
-          </div>
-          }
-
-          <div class="flex justify-content-end p-1">
-            @if (annotation.id) {
-            <p-button
-              icon="pi pi-plus-circle"
-              severity="primary"
-              text
-              rounded
-              size="small"
-              (onClick)="clickCreateAnnotationConnection(annotation.annotation)"
-            />
-            <app-update-annotation [annotation]="annotation.annotation" />
-            <p-button
-              icon="pi pi-trash"
-              severity="danger"
-              text
-              rounded
-              size="small"
-              (onClick)="clickDeleteAnnotation(annotation.id, $event)"
-            />
-            }
-          </div>
-        </div>
+        <app-annotation-card [annotation]="annotation" />
         }
       </div>
     </p-accordion-content>
