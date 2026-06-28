@@ -4,7 +4,7 @@ import angular from "angular-eslint";
 import prettier from "eslint-config-prettier";
 import { defineConfig } from "eslint/config";
 
-module.exports = defineConfig([
+export default defineConfig(
   {
     ignores: [
       ".angular/**",
@@ -97,4 +97,4 @@ module.exports = defineConfig([
     rules: {},
   },
   prettier,
-]);
+);
