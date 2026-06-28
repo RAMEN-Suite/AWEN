@@ -26,7 +26,7 @@ export default defineConfig(
     processor: angular.processInlineTemplates,
     languageOptions: {
       parserOptions: {
-        pojectService: true,
+        projectService: true,
         tsconfigRootDir: import.meta.dirname,
       },
     },
