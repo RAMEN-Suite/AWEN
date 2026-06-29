@@ -19,9 +19,9 @@ interface AnnotationGroupView {
 }
 
 @Component({
-  selector: 'app-statements',
+  selector: 'app-annotations-list',
   imports: [Accordion, AccordionPanel, AccordionContent, AccordionHeader, Chip, AnnotationCard],
-  templateUrl: './statements.html',
+  templateUrl: './annotation-list.html',
   styles: `
     :host ::ng-deep {
       // Das Panel braucht position: relative als Sticky-Boundary
@@ -42,7 +42,7 @@ interface AnnotationGroupView {
     }
   `,
 })
-export class Statements {
+export class AnnotationList {
   private readonly entityService = inject(EntityService);
 
   annotations = input.required<Annotation[]>();
