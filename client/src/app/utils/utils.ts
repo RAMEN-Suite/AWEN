@@ -22,4 +22,8 @@ const visibleProperties = (properties: NodePropertyDto[]): NodePropertyDto[] => 
   return properties.filter((p) => !p.isKey && p.value !== '');
 };
 
-export { castValue, castValues, visibleProperties };
+const getProperty = (properties: NodePropertyDto[], name: string): NodePropertyDto | undefined => {
+  return properties.find((p) => p.name === name);
+};
+
+export { castValue, castValues, visibleProperties, getProperty };

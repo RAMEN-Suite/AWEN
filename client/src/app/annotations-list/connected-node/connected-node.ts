@@ -5,10 +5,11 @@ import { EntityService } from '../../entity.service';
 import { AnnotationApiService } from '../../api/annotation-api.service';
 import { ConnectedNodeDto, StatementNodeView } from '../../../interfaces';
 import { UtilsService } from '../../utils/utils.service';
-import { ENTITY_LABEL_NAME } from '../../../constants';
+import { ANNOTATION_LABEL_NAME, ANNOTATION_TYPE_NAME, ENTITY_LABEL_NAME } from '../../../constants';
 import { getLabelProperty } from '../../utils/entity.utils';
 import { NodeTypes } from '../node-types/node-types';
 import { Button } from 'primeng/button';
+import { getProperty } from '../../utils/utils';
 
 @Component({
   selector: 'app-connected-node',
@@ -88,6 +89,9 @@ export class ConnectedNode implements OnInit {
   private getTitle(node: ConnectedNodeDto) {
     if (node.types.includes(ENTITY_LABEL_NAME)) {
       return getLabelProperty(node.properties)!.value as string;
+    }
+    if (node.types.includes(ANNOTATION_LABEL_NAME)) {
+      return getProperty(node.properties, ANNOTATION_TYPE_NAME)!.value as string;
     }
     return undefined;
   }
