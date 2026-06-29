@@ -1,20 +1,18 @@
-import { Component, inject, input, OnInit } from '@angular/core';
-import { Button } from 'primeng/button';
-import { Menu } from 'primeng/menu';
-import { NodeTypes } from '../node-types/node-types';
-import { PropertyList } from '../property-list/property-list';
-import { Tag } from 'primeng/tag';
-import { Router } from '@angular/router';
+import { booleanAttribute, Component, computed, inject, input, OnInit } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { EntityService } from '../../entity.service';
 import { AnnotationApiService } from '../../api/annotation-api.service';
-import { StatementNodeView } from '../../../interfaces';
+import { ConnectedNodeDto, StatementNodeView } from '../../../interfaces';
 import { UtilsService } from '../../utils/utils.service';
-import { SplitButton } from 'primeng/splitbutton';
+import { ENTITY_LABEL_NAME } from '../../../constants';
+import { getLabelProperty } from '../../utils/entity.utils';
+import { NodeTypes } from '../node-types/node-types';
+import { Button } from 'primeng/button';
 
 @Component({
   selector: 'app-connected-node',
-  imports: [Button, Menu, NodeTypes, PropertyList, Tag, SplitButton],
+  imports: [NodeTypes, RouterLink, Button],
   providers: [MessageService],
   templateUrl: './connected-node.html',
 })
@@ -28,6 +26,12 @@ export class ConnectedNode implements OnInit {
 
   annotationId = input.required<string>();
   node = input.required<StatementNodeView>();
+  firstEntry = input(false, { transform: booleanAttribute });
+  lastEntry = input(false, { transform: booleanAttribute });
+
+  title = computed<string | undefined>(() => {
+    return this.getTitle(this.node().node);
+  });
 
   protected annotationConnectionOptions: MenuItem[] | undefined;
 
@@ -79,5 +83,12 @@ export class ConnectedNode implements OnInit {
 
   private async deleteAnnotationRelation(id: string, connectedNodeId: string) {
     await this.annotationApi.deleteOutgoingRelation(id, connectedNodeId);
+  }
+
+  private getTitle(node: ConnectedNodeDto) {
+    if (node.types.includes(ENTITY_LABEL_NAME)) {
+      return getLabelProperty(node.properties)!.value as string;
+    }
+    return undefined;
   }
 }

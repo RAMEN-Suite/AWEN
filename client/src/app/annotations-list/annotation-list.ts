@@ -89,7 +89,7 @@ export class AnnotationList {
       node,
       id: keyValue,
       entityLink: isEntity && keyValue ? `/entity/${keyValue}` : null,
-      directionSeverity: node.direction === 'OUTGOING' ? 'success' : 'info',
+      directionIcon: node.direction === 'OUTGOING' ? 'pi-arrow-right' : 'pi-arrow-left',
     };
   }
 }

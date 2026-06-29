@@ -1,41 +1,21 @@
-@if (annotation().id) {
-  @let annotationId =  annotation().id!;
+@if (annotation().id) { @let annotationId = annotation().id!;
 
-<div class="border-1 border-gray-200 border-round">
-  <div class="grid m-0 border-bottom-1 border-gray-200">
-    <div class="col-3 p-3 bg-gray-50 border-right-1 border-gray-200">
-      <app-node-types [nodeTypes]="annotation().annotation.types" class="flex flex-column gap-2" />
+<div class="card p-0 w-full flex flex-row" style="min-height: 8rem">
+  <div class="col-4 p-3 border-right-1 border-gray-200">
+    <div class="text-lg font-bold mb-2">{{annotation().annotation.type}}</div>
+    <div class="mb-3">
+      <app-node-types [nodeTypes]="annotation().annotation.types" asChips />
     </div>
-    <div class="col p-3 flex flex-column gap-2">
+    <div>
       <app-property-list [properties]="annotation().annotation.properties" />
     </div>
   </div>
-
-  <!-- Connected Nodes -->
-  @for (node of annotation().nodes; track node.id) {
-    <div class="" [class.border-bottom-1]="$last" [class.border-top-1]="$index > 0" [class.border-gray-200]="$index > 0 || $last">
-      <app-connected-node [annotationId]="annotationId" [node]="node" />
-    </div>
-  }
-
-  <div class="flex justify-content-end p-1">
-      <p-button
-        icon="pi pi-plus-circle"
-        severity="primary"
-        text
-        rounded
-        size="small"
-        (onClick)="clickCreateAnnotationConnection(annotation().annotation)"
-      />
-      <app-update-annotation [annotation]="annotation().annotation" />
-      <p-button
-        icon="pi pi-trash"
-        severity="danger"
-        text
-        rounded
-        size="small"
-        (onClick)="clickDeleteAnnotation(annotationId, $event)"
-      />
+  <div class="col-8 p-3 max-h-30rem overflow-y-auto">
+    @for (node of annotation().nodes; track node.id; let first = $first; let last = $last) {
+    <app-connected-node [annotationId]="annotationId" [node]="node" [firstEntry]="first" [lastEntry]="last" />
+    } @empty {
+    <span class="text-gray-500">No connected nodes</span>
+    }
   </div>
 </div>
 }

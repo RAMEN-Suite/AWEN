@@ -2,7 +2,7 @@
   @for (group of groupedAnnotations(); track group.type) {
   <p-accordion-panel [value]="group.type">
     <p-accordion-header>
-      <div class="w-full flex align-items-center gap-3 pb-2 border-bottom-2 border-primary text-color">
+      <div class="w-full flex align-items-center gap-3 text-color">
         <span class="text-xl font-bold">{{ group.type }}</span>
         <p-chip class="text-sm" [label]="group.annotations.length.toString()" />
       </div>

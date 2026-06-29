@@ -146,5 +146,5 @@ export interface StatementNodeView {
   node: ConnectedNodeDto;
   id: string | null;
   entityLink: string | null;
-  directionSeverity: 'success' | 'info';
+  directionIcon: string;
 }
