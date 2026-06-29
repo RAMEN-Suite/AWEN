@@ -1,4 +1,4 @@
-import { Component, computed, inject, input } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { EntityService } from '../entity.service';
 import { Annotation, ConnectedNodeDto, StatementNodeView } from '../../interfaces';
 import { getKeyProperty } from '../utils/entity.utils';
@@ -6,6 +6,7 @@ import { ENTITY_LABEL_NAME } from '../../constants';
 import { Accordion, AccordionContent, AccordionHeader, AccordionPanel } from 'primeng/accordion';
 import { Chip } from 'primeng/chip';
 import { AnnotationCard } from './annotation-card/annotation-card';
+import { Button } from 'primeng/button';
 
 export interface StatementAnnotationView {
   annotation: Annotation;
@@ -20,7 +21,7 @@ interface AnnotationGroupView {
 
 @Component({
   selector: 'app-annotations-list',
-  imports: [Accordion, AccordionPanel, AccordionContent, AccordionHeader, Chip, AnnotationCard],
+  imports: [Accordion, AccordionPanel, AccordionContent, AccordionHeader, Chip, AnnotationCard, Button],
   templateUrl: './annotation-list.html',
   styles: `
     :host ::ng-deep {
@@ -65,6 +66,8 @@ export class AnnotationList {
     return Array.from(groups, ([type, annotations]) => ({ type, annotations }));
   });
 
+  protected activeAccordionPanels = signal<string[]>([]);
+
   private toAnnotationView(annotation: Annotation): StatementAnnotationView {
     return {
       annotation,
@@ -91,5 +94,22 @@ export class AnnotationList {
       entityLink: isEntity && keyValue ? `/entity/${keyValue}` : null,
       directionIcon: node.direction === 'OUTGOING' ? 'pi-arrow-right' : 'pi-arrow-left',
     };
+  }
+
+  protected expandAll() {
+    this.activeAccordionPanels.set(this.groupedAnnotations().map((group) => group.type));
+  }
+
+  protected closeAll() {
+    this.activeAccordionPanels.set([]);
+  }
+
+  protected setActiveAccordionPanels(value: string | number | string[] | number[] | null | undefined) {
+    if (Array.isArray(value)) {
+      this.activeAccordionPanels.set(value.map(String));
+      return;
+    }
+
+    this.activeAccordionPanels.set(value === null || value === undefined ? [] : [String(value)]);
   }
 }

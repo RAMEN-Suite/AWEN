@@ -1,4 +1,8 @@
-<p-accordion [multiple]="true" class="w-full">
+<div class="flex flex-row justify-content-end gap-2">
+  <p-button (onClick)="expandAll()" severity="secondary" outlined label="expand all" icon="pi pi-chevron-down" />
+  <p-button (onClick)="closeAll()" severity="secondary" outlined label="colapse all" icon="pi pi-chevron-up" />
+</div>
+<p-accordion [multiple]="true" class="w-full" [value]="activeAccordionPanels()" (valueChange)="setActiveAccordionPanels($event)">
   @for (group of groupedAnnotations(); track group.type) {
   <p-accordion-panel [value]="group.type">
     <p-accordion-header>
