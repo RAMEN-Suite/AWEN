@@ -1,0 +1,34 @@
+:host {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.annotation-list-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 0.25rem;
+  scrollbar-gutter: stable;
+}
+
+:host ::ng-deep {
+// Das Panel braucht position: relative als Sticky-Boundary
+.p-accordionpanel {
+  position: relative;
+}
+
+// Der generierte Button im Header sticky machen
+.p-accordionheader {
+  position: sticky !important;
+  top: 0;
+  z-index: 10;
+}
+
+  p-motion[name='p-collapsible'] {
+    overflow: hidden;
+  }
+}

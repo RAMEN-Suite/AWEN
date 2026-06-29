@@ -23,25 +23,7 @@ interface AnnotationGroupView {
   selector: 'app-annotations-list',
   imports: [Accordion, AccordionPanel, AccordionContent, AccordionHeader, Chip, AnnotationCard, Button],
   templateUrl: './annotation-list.html',
-  styles: `
-    :host ::ng-deep {
-      // Das Panel braucht position: relative als Sticky-Boundary
-      .p-accordionpanel {
-        position: relative;
-      }
-
-      // Der generierte Button im Header sticky machen
-      .p-accordionheader {
-        position: sticky !important;
-        top: 0;
-        z-index: 10;
-      }
-
-      p-motion[name='p-collapsible'] {
-        overflow: hidden;
-      }
-    }
-  `,
+  styleUrl: './annotation-list.scss',
 })
 export class AnnotationList {
   private readonly entityService = inject(EntityService);

@@ -34,8 +34,7 @@
   flex: 0 0 auto;
 }
 
-.entity-properties-scroll,
-.annotations-scroll {
+.entity-properties-scroll {
   flex: 1 1 auto;
   min-height: 0;
   overflow-x: hidden;
@@ -45,8 +44,18 @@
   scrollbar-gutter: stable;
 }
 
-app-statements {
-  display: block;
+.annotations-scroll {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+app-annotations-list {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
   min-height: 0;
 }
 
@@ -73,8 +82,11 @@ app-statements {
     overflow: visible;
   }
 
-  .entity-properties-scroll,
-  .annotations-scroll {
+  .entity-properties-scroll {
     max-height: 60vh;
+  }
+
+  .annotations-scroll {
+    height: 60vh;
   }
 }
