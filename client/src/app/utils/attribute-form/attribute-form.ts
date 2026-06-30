@@ -41,11 +41,11 @@ export class AttributeForm {
   private readonly entityAPI = inject(EntityApiService);
   private readonly messageService = inject(MessageService);
 
-  properties = input.required<AttributeWithOptValue[]>();
-  formName = input.required<string>();
-  enableCheckForSimilarLabels = input<boolean>(false);
+  public properties = input.required<AttributeWithOptValue[]>();
+  public formName = input.required<string>();
+  public enableCheckForSimilarLabels = input<boolean>(false);
 
-  readonly propertiesForm = computed(() => {
+  public readonly propertiesForm = computed(() => {
     const props = this.properties();
     return this.buildFormGroup(props);
   });
@@ -107,10 +107,11 @@ export class AttributeForm {
             isArray && Array.isArray(prop.value)
               ? castValues<boolean>(prop.value, 'boolean')
               : castValue<boolean>(prop.value, 'boolean');
-        // @ts-expect-error ???
-        return isArray
-          ? new FormControl<boolean[]>(val, { validators })
-          : new FormControl<boolean>(val, { nonNullable: true });
+        if (isArray && Array.isArray(val)) {
+          return new FormControl<boolean[]>(val, { validators });
+        } else {
+          return new FormControl<boolean>(Boolean(val), { nonNullable: true });
+        }
       }
       default:
         return undefined;
@@ -125,7 +126,7 @@ export class AttributeForm {
     return bounds.upperBound === -1 || bounds.upperBound > 1;
   }
 
-  async onLabelBlur(event: FocusEvent) {
+  protected async onLabelBlur(event: FocusEvent) {
     const value = (event.target as HTMLInputElement).value;
     if (this.enableCheckForSimilarLabels()) {
       await this.checkForSimilarLabels(value);

@@ -5,7 +5,7 @@ import { BackButtonComponent } from '../utils/back-button.component';
 import { isActive, Router, RouterLink } from '@angular/router';
 import { EntityService } from '../entity.service';
 import { CreateEntity } from '../create-entity/create-entity';
-import { ButtonDirective, ButtonIcon } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 
 const HEADER_MAX_LENGTH = 20;
 
@@ -17,7 +17,6 @@ const HEADER_MAX_LENGTH = 20;
     RouterLink,
     CreateEntity,
     ButtonDirective,
-    ButtonIcon,
   ],
   templateUrl: './navbar.html',
 })
