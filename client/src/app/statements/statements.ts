@@ -161,7 +161,7 @@ export class Statements {
 
   protected async clickDeleteAnnotation(id: string, event?: Event) {
     this.confirmationService.confirm({
-      target: event?.target as EventTarget,
+      target: event?.target!,
       message: `Are you sure you want to delete this annotation?\n Doing so will delete the annotation and disconnect all associated nodes.`,
       header: 'Danger Zone',
       icon: 'pi pi-info-circle',

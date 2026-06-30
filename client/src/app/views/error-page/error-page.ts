@@ -10,5 +10,5 @@ import { Button } from 'primeng/button';
 export class ErrorPage {
   private activeRoute: ActivatedRoute = inject(ActivatedRoute);
 
-  status = this.activeRoute.snapshot.paramMap.get('status');
+  protected status = this.activeRoute.snapshot.paramMap.get('status');
 }

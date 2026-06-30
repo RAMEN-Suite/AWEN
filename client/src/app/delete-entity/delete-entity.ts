@@ -20,7 +20,7 @@ export class DeleteEntity {
 
   protected clickDeleteBtn(event: PointerEvent) {
     this.confirmationService.confirm({
-      target: event.target as EventTarget,
+      target: event.target!,
       message: 'Do you want to delete this Entity?',
       header: 'Danger Zone',
       icon: 'pi pi-info-circle',

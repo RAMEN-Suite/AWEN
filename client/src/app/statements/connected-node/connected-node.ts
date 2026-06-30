@@ -64,7 +64,7 @@ export class ConnectedNode implements OnInit {
     event?: Event,
   ) {
     this.confirmationService.confirm({
-      target: event?.target as EventTarget,
+      target: event?.target!,
       message: `Are you sure you want to delete the relation to this annotation?`,
       header: 'Danger Zone',
       icon: 'pi pi-info-circle',

@@ -29,7 +29,7 @@ import { Statements } from '../../statements/statements';
 export class DetailPage implements OnDestroy {
   private readonly entityService = inject(EntityService);
 
-  entityId = input.required<string>();
+  public entityId = input.required<string>();
 
   annotations = this.entityService.annotations;
   entity = this.entityService.entity;
@@ -46,14 +46,14 @@ export class DetailPage implements OnDestroy {
     return String(value ?? '');
   }
 
-  constructor() {
+  public constructor() {
     effect(async () => {
       const id = this.entityId(); // Signal wird getrackt
       await this.entityService.loadNewEntity(id);
     });
   }
 
-  ngOnDestroy() {
+  public ngOnDestroy() {
     this.entityService.resetState();
   }
 }

@@ -171,7 +171,7 @@ export class FilterPane {
       const formatted: Record<string, string[]> = {};
 
       for (const key of Object.keys(collectionFilter)) {
-        const id = collectionFilter[key as keyof typeof collectionFilter]?.id;
+        const id = collectionFilter[key]?.id;
         if (id) formatted[key] = [id];
       }
 
@@ -203,7 +203,7 @@ export class FilterPane {
     const formatted: Record<string, string[]> = {};
 
     for (const key of Object.keys(collectionFilter)) {
-      const id = collectionFilter[key as keyof typeof collectionFilter]?.id;
+      const id = collectionFilter[key]?.id;
       if (id) formatted[key] = [id];
     }
 
@@ -294,7 +294,7 @@ export class FilterPane {
   }
 
   protected onItemSelect(e: AutoCompleteSelectEvent) {
-    this.form.controls['label'].setValue(e.value.label);
+    this.form.controls.label.setValue(e.value.label);
   }
 
   private fillForm(form: FormGroup, values: Record<string, never>) {

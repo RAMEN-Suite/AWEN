@@ -11,7 +11,7 @@ export class GuidelinesService {
   private readonly http = inject(HttpClient);
   private readonly messageService = inject(MessageService);
 
-  getConfig() {
+  public getConfig() {
     const temp = this.http.get<EmConfigRemote>('/api/guidelines/config').pipe(
       catchError((err) => {
         this.messageService.add({
@@ -24,7 +24,7 @@ export class GuidelinesService {
     return firstValueFrom(temp);
   }
 
-  getNodeProperties(type: string) {
+  public getNodeProperties(type: string) {
     const temp = this.http
       .get<GAttribute[]>('/api/guidelines/config/node/properties/' + type)
       .pipe(

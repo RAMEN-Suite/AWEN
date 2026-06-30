@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { MessageService } from 'primeng/api';
 import { catchError, firstValueFrom, map } from 'rxjs';
 import { Annotation } from '../../interfaces';
@@ -11,7 +11,7 @@ export class AnnotationApiService {
   private readonly http = inject(HttpClient);
   private readonly messageService = inject(MessageService);
 
-  async get(id: string) {
+  public async get(id: string) {
     const res = this.http.get<Annotation>('/api/annotation/' + id).pipe(
       catchError((err) => {
         this.messageService.add({
@@ -24,7 +24,7 @@ export class AnnotationApiService {
     return await firstValueFrom(res);
   }
 
-  async createAnnotationForEntity(
+  public async createAnnotationForEntity(
     entityId: string,
     type: string,
     payload: Record<string, unknown>,
@@ -39,21 +39,27 @@ export class AnnotationApiService {
       .post<{ id: string }>(`/api/annotation/entity`, body)
       .pipe(
         catchError((err) => {
-          if (err.error.statusCode === 400) {
-            this.messageService.add({
-              severity: 'error',
-              summary: `Error while creating a new annotation. Please try again.`,
-              detail: Array.isArray(err.error.message)
-                ? err.error.message.join('\n')
-                : err.error.message,
-              closable: true,
-              sticky: true,
-            });
-          } else {
-            this.messageService.add({
-              severity: 'error',
-              summary: `Error while creating a new annotation. Please try again.`,
-            });
+          if (err instanceof HttpErrorResponse) {
+            const error = err as {
+              statusCode?: number;
+              message?: string | string[];
+            };
+            if (error.statusCode === 400) {
+              this.messageService.add({
+                severity: 'error',
+                summary: `Error while creating a new annotation. Please try again.`,
+                detail: Array.isArray(error.message)
+                  ? error.message.join('\n')
+                  : error.message,
+                closable: true,
+                sticky: true,
+              });
+            } else {
+              this.messageService.add({
+                severity: 'error',
+                summary: `Error while creating a new annotation. Please try again.`,
+              });
+            }
           }
           throw err;
         }),
@@ -64,8 +70,8 @@ export class AnnotationApiService {
     return firstValueFrom(res);
   }
 
-  async delete(id: string) {
-    const res = this.http.delete<void>('/api/annotation/' + id).pipe(
+  public async delete(id: string) {
+    const res = this.http.delete('/api/annotation/' + id).pipe(
       catchError((err) => {
         this.messageService.add({
           severity: 'error',
@@ -78,9 +84,9 @@ export class AnnotationApiService {
     return;
   }
 
-  async deleteOutgoingRelation(id: string, connectedNodeId: string) {
+  public async deleteOutgoingRelation(id: string, connectedNodeId: string) {
     const res = this.http
-      .delete<void>(`/api/annotation/${id}/connection/${connectedNodeId}`)
+      .delete(`/api/annotation/${id}/connection/${connectedNodeId}`)
       .pipe(
         catchError((err) => {
           this.messageService.add({
@@ -94,41 +100,42 @@ export class AnnotationApiService {
     return;
   }
 
-  async createOutgoingRelation(id: string, connectedNodeId: string) {
+  public async createOutgoingRelation(id: string, connectedNodeId: string) {
     const body = {
       connectionId: connectedNodeId,
     };
-    const res = this.http
-      .post<void>(`/api/annotation/${id}/connection`, body)
-      .pipe(
-        catchError((err) => {
-          this.messageService.add({
-            severity: 'error',
-            detail: `Error while creating Annotation-Relation. Try again later.`,
-          });
-          throw err;
-        }),
-      );
+    const res = this.http.post(`/api/annotation/${id}/connection`, body).pipe(
+      catchError((err) => {
+        this.messageService.add({
+          severity: 'error',
+          detail: `Error while creating Annotation-Relation. Try again later.`,
+        });
+        throw err;
+      }),
+    );
     await firstValueFrom(res);
     return;
   }
 
-  async update(annotationId: string, payload: Record<string, unknown>) {
+  public async update(annotationId: string, payload: Record<string, unknown>) {
     const body = {
       properties: payload,
     };
 
-    const res = this.http
-      .put<void>(`/api/annotation/${annotationId}`, body)
-      .pipe(
-        catchError((err) => {
-          if (err.error.statusCode === 400) {
+    const res = this.http.put(`/api/annotation/${annotationId}`, body).pipe(
+      catchError((err: unknown) => {
+        if (err instanceof HttpErrorResponse) {
+          const error = err as {
+            statusCode?: number;
+            message?: string | string[];
+          };
+          if (error.statusCode === 400) {
             this.messageService.add({
               severity: 'error',
               summary: `Error while updating an annotation. Please try again.`,
-              detail: Array.isArray(err.error.message)
-                ? err.error.message.join('\n')
-                : err.error.message,
+              detail: Array.isArray(error.message)
+                ? error.message.join('\n')
+                : error.message,
               closable: true,
               sticky: true,
             });
@@ -138,9 +145,10 @@ export class AnnotationApiService {
               summary: `Error while updating an annotation. Please try again.`,
             });
           }
-          throw err;
-        }),
-      );
+        }
+        throw err;
+      }),
+    );
     await firstValueFrom(res);
     return;
   }
