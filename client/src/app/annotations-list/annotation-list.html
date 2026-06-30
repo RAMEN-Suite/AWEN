@@ -3,17 +3,18 @@
   <p-select-button
     [options]="annotationNodeLabels()"
     [ngModel]="selectedNodeLabel()"
-    (ngModelChange)="selectedNodeLabel.set($event)"
+    (ngModelChange)="setSelectedNodeLabel($event)"
     unselectable
     fluid
   />
-  } @if (annotationTypesOptions().length > 1) {
-  <p-select-button
-    [options]="annotationTypesOptions()"
+  } @if (annotationTypeOptions().length > 1) {
+  <p-multi-select
+    [options]="annotationTypeOptions()"
     [ngModel]="selectedTypes()"
-    (ngModelChange)="selectedTypes.set($event)"
-    multiple
-    unselectable
+    (ngModelChange)="setSelectedTypes($event)"
+    appendTo="body"
+    display="chip"
+    [maxSelectedLabels]="5"
     fluid
   />
   }

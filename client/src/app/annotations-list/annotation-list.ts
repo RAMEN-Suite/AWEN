@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
 import { EntityService } from '../entity.service';
 import { Annotation, ConnectedNodeDto, StatementNodeView } from '../../interfaces';
 import { getKeyProperty } from '../utils/entity.utils';
@@ -7,9 +7,10 @@ import { Accordion, AccordionContent, AccordionHeader, AccordionPanel } from 'pr
 import { Chip } from 'primeng/chip';
 import { AnnotationCard } from './annotation-card/annotation-card';
 import { Button } from 'primeng/button';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { SelectButton } from 'primeng/selectbutton';
 import { ConfigService } from '../config-module/config.service';
+import { MultiSelect } from 'primeng/multiselect';
 
 export interface StatementAnnotationView {
   annotation: Annotation;
@@ -33,8 +34,8 @@ interface AnnotationGroupView {
     AnnotationCard,
     Button,
     SelectButton,
-    ReactiveFormsModule,
     FormsModule,
+    MultiSelect,
   ],
   templateUrl: './annotation-list.html',
   styleUrl: './annotation-list.scss',
@@ -42,54 +43,56 @@ interface AnnotationGroupView {
 export class AnnotationList {
   private readonly entityService = inject(EntityService);
   private readonly configService = inject(ConfigService);
+  private previousAnnotationTypeOptions: string[] = [];
 
   annotations = input.required<Annotation[]>();
   entity = this.entityService.entity;
 
-  protected annotationNodeLabels = this.configService.getAnnotationTypes();
+  protected readonly annotationNodeLabels = this.configService.getAnnotationTypes();
+  protected readonly selectedTypes = signal<string[]>([]);
+  protected readonly selectedNodeLabel = signal<string>(ANNOTATION_LABEL_NAME);
+  protected readonly activeAccordionPanels = signal<string[]>([]);
 
-  protected annotationTypesOptions = computed<string[]>(() => {
-    return this._groupedAnnotations().map((group) => group.type);
+  protected readonly annotationTypeOptions = computed<string[]>(() => {
+    return this.allAnnotationGroups().map((group) => group.type);
   });
 
-  private readonly _groupedAnnotations = computed<AnnotationGroupView[]>(() => {
+  private readonly selectedTypeSet = computed(() => new Set(this.selectedTypes()));
+
+  private readonly allAnnotationGroups = computed<AnnotationGroupView[]>(() => {
     const groups = new Map<string, StatementAnnotationView[]>();
 
     for (const annotation of this.annotations()) {
       const view = this.toAnnotationView(annotation);
-      const annotations = groups.get(annotation.type);
-
-      if (annotations) {
-        annotations.push(view);
-      } else {
-        groups.set(annotation.type, [view]);
-      }
+      const annotations = groups.get(annotation.type) ?? [];
+      annotations.push(view);
+      groups.set(annotation.type, annotations);
     }
 
-    return Array.from(groups, ([type, annotations]) => ({ type, annotations }));
+    return Array.from(groups, ([type, annotations]) => ({ type, annotations })).sort((a, b) => a.type.localeCompare(b.type));
   });
 
   protected readonly groupedAnnotations = computed<AnnotationGroupView[]>(() => {
-    return this._groupedAnnotations()
-      .filter((group) => {
-        return this.selectedTypes().includes(group.type);
-      })
+    const selectedTypeSet = this.selectedTypeSet();
+    const selectedNodeLabel = this.selectedNodeLabel();
+
+    return this.allAnnotationGroups()
+      .filter((group) => selectedTypeSet.has(group.type))
       .map((group): AnnotationGroupView => {
-        const newAnnotations = group.annotations.filter((annotation) => {
-          return annotation.annotation.types.includes(this.selectedNodeLabel());
-        });
         return {
           ...group,
-          annotations: newAnnotations,
+          annotations: group.annotations.filter((annotation) => annotation.annotation.types.includes(selectedNodeLabel)),
         };
       })
-      .filter((group) => group.annotations.length > 0)
-      .sort((a, b) => a.type.localeCompare(b.type));
+      .filter((group) => group.annotations.length > 0);
   });
-  protected activeAccordionPanels = signal<string[]>([]);
 
-  protected readonly selectedTypes = signal<string[]>([]);
-  protected readonly selectedNodeLabel = signal<string>(ANNOTATION_LABEL_NAME);
+  constructor() {
+    effect(() => {
+      const options = this.annotationTypeOptions();
+      untracked(() => this.syncSelectedTypes(options));
+    });
+  }
 
   private toAnnotationView(annotation: Annotation): StatementAnnotationView {
     return {
@@ -120,7 +123,7 @@ export class AnnotationList {
   }
 
   protected expandAll() {
-    this.activeAccordionPanels.set(this._groupedAnnotations().map((group) => group.type));
+    this.activeAccordionPanels.set(this.groupedAnnotations().map((group) => group.type));
   }
 
   protected closeAll() {
@@ -128,11 +131,49 @@ export class AnnotationList {
   }
 
   protected setActiveAccordionPanels(value: string | number | string[] | number[] | null | undefined) {
-    if (Array.isArray(value)) {
-      this.activeAccordionPanels.set(value.map(String));
+    this.activeAccordionPanels.set(this.toStringArray(value));
+  }
+
+  protected setSelectedTypes(value: any) {
+    this.selectedTypes.set(this.toStringArray(value));
+  }
+
+  protected setSelectedNodeLabel(value: string) {
+    this.selectedNodeLabel.set(value);
+  }
+
+  private syncSelectedTypes(options: string[]) {
+    const selectedTypes = this.selectedTypes();
+    const previousOptions = this.previousAnnotationTypeOptions;
+    this.previousAnnotationTypeOptions = options;
+
+    if (options.length === 0) {
+      if (selectedTypes.length > 0) {
+        this.selectedTypes.set([]);
+      }
       return;
     }
 
-    this.activeAccordionPanels.set(value === null || value === undefined ? [] : [String(value)]);
+    const optionSet = new Set(options);
+    const previousOptionSet = new Set(previousOptions);
+    const stillAvailableSelectedTypes = selectedTypes.filter((type) => optionSet.has(type));
+    const newTypes = options.filter((type) => !previousOptionSet.has(type));
+    const nextSelectedTypes = previousOptions.length === 0 ? options : [...stillAvailableSelectedTypes, ...newTypes];
+
+    if (!this.arraysEqual(selectedTypes, nextSelectedTypes)) {
+      this.selectedTypes.set(nextSelectedTypes);
+    }
+  }
+
+  private toStringArray(value: any): string[] {
+    if (Array.isArray(value)) {
+      return value.map(String);
+    }
+
+    return value === null || value === undefined ? [] : [String(value)];
+  }
+
+  private arraysEqual(a: string[], b: string[]) {
+    return a.length === b.length && a.every((value, index) => value === b[index]);
   }
 }
