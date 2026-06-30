@@ -2,11 +2,14 @@ import { Component, computed, inject, input, signal } from '@angular/core';
 import { EntityService } from '../entity.service';
 import { Annotation, ConnectedNodeDto, StatementNodeView } from '../../interfaces';
 import { getKeyProperty } from '../utils/entity.utils';
-import { ENTITY_LABEL_NAME } from '../../constants';
+import { ANNOTATION_LABEL_NAME, ENTITY_LABEL_NAME } from '../../constants';
 import { Accordion, AccordionContent, AccordionHeader, AccordionPanel } from 'primeng/accordion';
 import { Chip } from 'primeng/chip';
 import { AnnotationCard } from './annotation-card/annotation-card';
 import { Button } from 'primeng/button';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { SelectButton } from 'primeng/selectbutton';
+import { ConfigService } from '../config-module/config.service';
 
 export interface StatementAnnotationView {
   annotation: Annotation;
@@ -21,17 +24,35 @@ interface AnnotationGroupView {
 
 @Component({
   selector: 'app-annotations-list',
-  imports: [Accordion, AccordionPanel, AccordionContent, AccordionHeader, Chip, AnnotationCard, Button],
+  imports: [
+    Accordion,
+    AccordionPanel,
+    AccordionContent,
+    AccordionHeader,
+    Chip,
+    AnnotationCard,
+    Button,
+    SelectButton,
+    ReactiveFormsModule,
+    FormsModule,
+  ],
   templateUrl: './annotation-list.html',
   styleUrl: './annotation-list.scss',
 })
 export class AnnotationList {
   private readonly entityService = inject(EntityService);
+  private readonly configService = inject(ConfigService);
 
   annotations = input.required<Annotation[]>();
   entity = this.entityService.entity;
 
-  protected readonly groupedAnnotations = computed<AnnotationGroupView[]>(() => {
+  protected annotationNodeLabels = this.configService.getAnnotationTypes();
+
+  protected annotationTypesOptions = computed<string[]>(() => {
+    return this._groupedAnnotations().map((group) => group.type);
+  });
+
+  private readonly _groupedAnnotations = computed<AnnotationGroupView[]>(() => {
     const groups = new Map<string, StatementAnnotationView[]>();
 
     for (const annotation of this.annotations()) {
@@ -48,7 +69,27 @@ export class AnnotationList {
     return Array.from(groups, ([type, annotations]) => ({ type, annotations }));
   });
 
+  protected readonly groupedAnnotations = computed<AnnotationGroupView[]>(() => {
+    return this._groupedAnnotations()
+      .filter((group) => {
+        return this.selectedTypes().includes(group.type);
+      })
+      .map((group): AnnotationGroupView => {
+        const newAnnotations = group.annotations.filter((annotation) => {
+          return annotation.annotation.types.includes(this.selectedNodeLabel());
+        });
+        return {
+          ...group,
+          annotations: newAnnotations,
+        };
+      })
+      .filter((group) => group.annotations.length > 0)
+      .sort((a, b) => a.type.localeCompare(b.type));
+  });
   protected activeAccordionPanels = signal<string[]>([]);
+
+  protected readonly selectedTypes = signal<string[]>([]);
+  protected readonly selectedNodeLabel = signal<string>(ANNOTATION_LABEL_NAME);
 
   private toAnnotationView(annotation: Annotation): StatementAnnotationView {
     return {
@@ -79,7 +120,7 @@ export class AnnotationList {
   }
 
   protected expandAll() {
-    this.activeAccordionPanels.set(this.groupedAnnotations().map((group) => group.type));
+    this.activeAccordionPanels.set(this._groupedAnnotations().map((group) => group.type));
   }
 
   protected closeAll() {
