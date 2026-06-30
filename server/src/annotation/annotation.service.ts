@@ -159,7 +159,7 @@ export class AnnotationService {
     const { cypher, params } = clause.build();
 
     const res = await this.neo4jService.read<{
-      annotation: Node<Integer, Record<string, any>>;
+      annotation: Node<Integer, Record<string, unknown>>;
     }>(cypher, params);
     const annotations = res.records.map((record) => {
       return record.get('annotation');
@@ -231,12 +231,12 @@ export class AnnotationService {
     const { cypher, params } = clause.build();
 
     const res = await this.neo4jService.read<{
-      annotation: Node<Integer, Record<string, any>>;
-      connectedNodes: Array<{
+      annotation: Node<Integer, Record<string, unknown>>;
+      connectedNodes: {
         node: Node;
         relationship: Relationship;
         direction: string;
-      }>;
+      }[];
     }>(cypher, params);
 
     const annotations = res.records.map((record) => {

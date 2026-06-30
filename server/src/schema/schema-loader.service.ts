@@ -24,12 +24,12 @@ export class SchemaLoaderService {
 
     // const ramen: GModel = await this.loadJsonFromSource('AWEN_GCORE_RAMEN');
 
-    const ramen: GModel = this.validateJSON<GModel>(await this.loadJsonFromSource('AWEN_GCORE_RAMEN'), gCoreSchema);
+    const ramen: GModel = this.validateJSON(await this.loadJsonFromSource('AWEN_GCORE_RAMEN'), gCoreSchema);
     this.logger.log(`Loaded ramen schema "${ramen.version}" successfully`);
 
     // const profile: GModel = await this.loadJsonFromSource('AWEN_GCORE_PROJECT');
 
-    const profile: GModel = this.validateJSON<GModel>(await this.loadJsonFromSource('AWEN_GCORE_PROJECT'), gCoreSchema);
+    const profile: GModel = this.validateJSON(await this.loadJsonFromSource('AWEN_GCORE_PROJECT'), gCoreSchema);
     this.logger.log(`Loaded project schema "${profile.name} ${profile.version}" successfully`);
 
     this.ramenModel = ramen;
@@ -42,7 +42,7 @@ export class SchemaLoaderService {
     return this.registry;
   }
 
-  private validateJSON<T>(json: unknown, schema: SchemaNode): T {
+  private validateJSON(json: unknown, schema: SchemaNode): GModel {
     const result = schema.validate(json);
 
     if (!result.valid) {
@@ -52,7 +52,7 @@ export class SchemaLoaderService {
       throw new Error('Invalid schema');
     }
 
-    return json as T;
+    return json as GModel;
   }
 
   private async loadJsonFromSource<T>(envName: SchemaSourceName): Promise<T> {

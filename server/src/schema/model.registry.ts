@@ -17,15 +17,15 @@ export class ModelRegistry {
   private readonly _modelVersion!: string;
   private readonly _collectionChains!: string[][];
 
-  private get allDataTypes(): Array<DataType> {
+  private get allDataTypes(): DataType[] {
     return Array.from(this.dataTypes.values());
   }
 
-  private get allNodes(): Array<NodeType> {
+  private get allNodes(): NodeType[] {
     return Array.from(this.nodes.values());
   }
 
-  private get allRelations(): Array<RelationType> {
+  private get allRelations(): RelationType[] {
     return Array.from(this.relations.values());
   }
 
@@ -158,9 +158,7 @@ export class ModelRegistry {
       if (node.name !== name) {
         continue;
       }
-      if (!type) {
-        type = node;
-      }
+      type ??= node;
       if (node.superTypes.size > type.superTypes.size) {
         type = node;
       }
@@ -201,7 +199,8 @@ export class ModelRegistry {
     const stack = [typeName];
 
     while (stack.length) {
-      const cur = stack.pop()!;
+      const cur = stack.pop();
+      if (!cur) continue;
       if (visited.has(cur)) continue;
       visited.add(cur);
 
@@ -247,9 +246,7 @@ export class ModelRegistry {
       if (!names.includes(node.name)) {
         continue;
       }
-      if (!type) {
-        type = node;
-      }
+      type ??= node;
       if (node.superTypes.size > type.superTypes.size) {
         type = node;
       }

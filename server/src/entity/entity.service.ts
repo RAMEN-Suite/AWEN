@@ -45,7 +45,7 @@ export class EntityService {
   }
 
   async getById(id: string): Promise<EntityDto | undefined> {
-    const entityNode: Node<Integer, Record<string, any>> | undefined = await this.nodes.getById(id, {
+    const entityNode: Node<Integer, Record<string, unknown>> | undefined = await this.nodes.getById(id, {
       labels: ENTITY_LABEL_NAME,
       keyName: this.ENTITY_KEY_PROPERTY,
     });
@@ -58,7 +58,7 @@ export class EntityService {
   }
 
   async getByProperty(key: string, value: string): Promise<EntityNodeDto[]> {
-    const entityNodes: Node<Integer, Record<string, any>>[] = await this.nodes.getByProperty(key, value, {
+    const entityNodes: Node<Integer, Record<string, unknown>>[] = await this.nodes.getByProperty(key, value, {
       labels: ENTITY_LABEL_NAME,
     });
 
@@ -258,7 +258,8 @@ export class EntityService {
     });
 
     for (const collection in collectionFilters) {
-      const col = collections.get(collection)!;
+      const col = collections.get(collection);
+      if (!col) continue;
       const colIDs = collectionFilters[collection];
 
       if (colIDs !== undefined) {

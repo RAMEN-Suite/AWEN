@@ -7,5 +7,5 @@ export interface GNode {
 
   superTypes: string[];
   attributes: GAttribute[];
-  constraints?: any[];
+  constraints?: unknown[];
 }

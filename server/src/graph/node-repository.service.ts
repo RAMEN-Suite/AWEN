@@ -5,10 +5,10 @@ import { GetNodeByIdOptions } from './interfaces/get-node-by-id-options.interfac
 import { Integer, Node } from 'neo4j-driver';
 import { GetNodeOptions } from './interfaces/get-node-options.interface';
 
-type NodePatternOptions = {
-  labels?: string | Array<string | Expr> | LabelExpr | Expr;
+interface NodePatternOptions {
+  labels?: string | (string | Expr)[] | LabelExpr | Expr;
   properties?: Record<string, Expr>;
-};
+}
 
 @Injectable()
 export class NodeRepository {
@@ -19,21 +19,21 @@ export class NodeRepository {
       .then(() => {
         this.logger.log('getById() is working!');
       })
-      .catch((err) => {
+      .catch((err: unknown) => {
         this.logger.error(`could not find node`, err instanceof Error ? err.stack : undefined);
       });
     this.getByProperty('label', 'Acqui')
       .then(() => {
         this.logger.log('getByProperty() is working!');
       })
-      .catch((err) => {
+      .catch((err: unknown) => {
         this.logger.error(`could not find node`, err instanceof Error ? err.stack : undefined);
       });
     this.indexFulltextQueryNodes('search', 'Aachen')
       .then(() => {
         this.logger.log('indexFulltextQueryNodes() is working!');
       })
-      .catch((err) => {
+      .catch((err: unknown) => {
         this.logger.error(`could not find node`, err instanceof Error ? err.stack : undefined);
       });
   }
@@ -56,7 +56,7 @@ export class NodeRepository {
       .build();
 
     const result = await this.neo4j.read<{
-      [NODE_NAME]: Node<Integer, Record<string, any>>;
+      [NODE_NAME]: Node<Integer, Record<string, unknown>>;
     }>(cypher, params);
 
     if (result.records.length === 0) {
@@ -82,7 +82,7 @@ export class NodeRepository {
       .build();
 
     const result = await this.neo4j.read<{
-      [NODE_NAME]: Node<Integer, Record<string, any>>;
+      [NODE_NAME]: Node<Integer, Record<string, unknown>>;
     }>(cypher, params);
 
     return result.records.map((record) => record.get(NODE_NAME));
@@ -92,7 +92,7 @@ export class NodeRepository {
     const procedure = Cypher.db.index.fulltext.queryNodes(new Cypher.Literal(fulltextIndex), new Cypher.Param(query));
     const { cypher, params } = procedure.build();
     const result = await this.neo4j.read<{
-      node: Node<Integer, Record<string, any>>;
+      node: Node<Integer, Record<string, unknown>>;
       score: Integer;
     }>(cypher, params);
 

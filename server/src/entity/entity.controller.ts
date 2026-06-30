@@ -42,7 +42,8 @@ export class EntityController {
 
     const searchQuery = parseStringToSearchQueryString(label);
     const entities = await this.entityService.find({
-      ...params,
+      collectionFilter: params.collectionFilter,
+      types: params.types,
       label: searchQuery,
     });
 

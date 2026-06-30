@@ -12,7 +12,7 @@ export class Neo4jService implements BeforeApplicationShutdown {
     @Inject('NEO4J_DRIVER') private readonly driver: Driver,
   ) {}
 
-  async write<T extends RecordShape>(cypher: string, params?: Record<string, any>, database?: string): Promise<Result<T>> {
+  async write<T extends RecordShape>(cypher: string, params?: Record<string, unknown>, database?: string): Promise<Result<T>> {
     const session = this.getWriteSession(database);
     try {
       return await session.executeWrite((tx: ManagedTransaction) => tx.run<T>(cypher, params));
@@ -24,7 +24,7 @@ export class Neo4jService implements BeforeApplicationShutdown {
     }
   }
 
-  async read<T extends RecordShape>(cypher: string, params?: Record<string, any>, database?: string): Promise<Result<T>> {
+  async read<T extends RecordShape>(cypher: string, params?: Record<string, unknown>, database?: string): Promise<Result<T>> {
     const session = this.getReadSession(database);
     try {
       return await session.executeRead((tx: ManagedTransaction) => tx.run<T>(cypher, params));
@@ -38,14 +38,14 @@ export class Neo4jService implements BeforeApplicationShutdown {
 
   private getReadSession(database?: string): Session {
     return this.driver.session({
-      database: database || this.config.database,
+      database: database ?? this.config.database,
       defaultAccessMode: session.READ,
     });
   }
 
   private getWriteSession(database?: string): Session {
     return this.driver.session({
-      database: database || this.config.database,
+      database: database ?? this.config.database,
       defaultAccessMode: session.WRITE,
     });
   }
