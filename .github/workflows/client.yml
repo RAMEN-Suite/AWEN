@@ -213,4 +213,4 @@ jobs:
       - name: Start Container
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: printf '%s' "$GH_TOKEN" | ssh staging deploy-awen-dev-client
+        run: printf '%s' "$GH_TOKEN" | ssh staging deploy-awen-client
