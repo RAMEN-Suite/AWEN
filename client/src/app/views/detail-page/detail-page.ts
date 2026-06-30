@@ -16,15 +16,13 @@ import { PropertyList } from '../../annotations-list/property-list/property-list
   providers: [DialogService],
   imports: [
     TableModule,
-    Chip,
     DeleteEntity,
     EditEntity,
     ProgressSpinner,
     CreateAnnotation,
     NodeTypes,
-    Statements,
     AnnotationList,
-    PropertyList
+    PropertyList,
   ],
   styleUrl: './detail-page.scss',
   templateUrl: './detail-page.html',
@@ -34,8 +32,8 @@ export class DetailPage implements OnDestroy {
 
   public entityId = input.required<string>();
 
-  annotations = this.entityService.annotations;
-  entity = this.entityService.entity;
+  protected annotations = this.entityService.annotations;
+  protected entity = this.entityService.entity;
 
   protected readonly visibleProperties = visibleProperties;
 
