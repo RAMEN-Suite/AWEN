@@ -42,44 +42,25 @@ export class GuidelinesService {
     annotationTypes.forEach((type) => {
       const newTypes = this.model
         .getRelationTypesOfNode(type)
-        .filter((relation) =>
-          this.isEntityAnnotationRelation(relation, entityType),
-        )
-        .map((relation) =>
-          this.getAnnotationTypeName(relation, this.model.getNodeType(type)),
-        );
+        .filter((relation) => this.isEntityAnnotationRelation(relation, entityType))
+        .map((relation) => this.getAnnotationTypeName(relation, this.model.getNodeType(type)));
       types = types.concat(newTypes);
     });
     return [...new Set(types)];
   }
 
-  private isEntityAnnotationRelation(
-    relation: RelationType,
-    entityType: NodeType,
-  ): boolean {
-    return (
-      this.isEntityOrSubtype(relation.from.nodeId, entityType) ||
-      this.isEntityOrSubtype(relation.to.nodeId, entityType)
-    );
+  private isEntityAnnotationRelation(relation: RelationType, entityType: NodeType): boolean {
+    return this.isEntityOrSubtype(relation.from.nodeId, entityType) || this.isEntityOrSubtype(relation.to.nodeId, entityType);
   }
 
   private isEntityOrSubtype(nodeTypeId: string, entityType: NodeType): boolean {
     const nodeType = this.model.getNodeTypeById(nodeTypeId);
 
-    return (
-      nodeType.id === entityType.id ||
-      this.model.isSubtypeOf(nodeType.name, entityType.name)
-    );
+    return nodeType.id === entityType.id || this.model.isSubtypeOf(nodeType.name, entityType.name);
   }
 
-  private getAnnotationTypeName(
-    relation: RelationType,
-    annotationType: NodeType,
-  ): string {
-    const oppositeNodeId =
-      relation.to.nodeId === annotationType.id
-        ? relation.to.nodeId
-        : relation.from.nodeId;
+  private getAnnotationTypeName(relation: RelationType, annotationType: NodeType): string {
+    const oppositeNodeId = relation.to.nodeId === annotationType.id ? relation.to.nodeId : relation.from.nodeId;
 
     return this.model.getNodeTypeById(oppositeNodeId).name;
   }

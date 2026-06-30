@@ -26,9 +26,9 @@ export abstract class NodeDto {
     },
   })
   @IsObject()
-  properties!: Record<string, any>;
+  properties!: Record<string, unknown>;
 
-  protected constructor(properties: Record<string, any>, types?: string[]) {
+  protected constructor(properties: Record<string, unknown>, types?: string[]) {
     this.properties = properties;
     this.types = types ?? [];
   }

@@ -14,7 +14,7 @@ export interface HealthStatus {
 export class HealthApiService {
   private readonly http = inject(HttpClient);
 
-  getStatus(): Promise<HealthStatus> {
+  public getStatus(): Promise<HealthStatus> {
     return firstValueFrom(
       this.http.get<HealthStatus>('/api/health').pipe(
         retry({

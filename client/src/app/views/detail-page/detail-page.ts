@@ -14,28 +14,39 @@ import { PropertyList } from '../../annotations-list/property-list/property-list
 @Component({
   selector: 'app-detail-page',
   providers: [DialogService],
-  imports: [TableModule, DeleteEntity, EditEntity, ProgressSpinner, CreateAnnotation, NodeTypes, AnnotationList, PropertyList],
+  imports: [
+    TableModule,
+    Chip,
+    DeleteEntity,
+    EditEntity,
+    ProgressSpinner,
+    CreateAnnotation,
+    NodeTypes,
+    Statements,
+    AnnotationList,
+    PropertyList
+  ],
   styleUrl: './detail-page.scss',
   templateUrl: './detail-page.html',
 })
 export class DetailPage implements OnDestroy {
   private readonly entityService = inject(EntityService);
 
-  entityId = input.required<string>();
+  public entityId = input.required<string>();
 
   annotations = this.entityService.annotations;
   entity = this.entityService.entity;
 
   protected readonly visibleProperties = visibleProperties;
 
-  constructor() {
+  public constructor() {
     effect(async () => {
       const id = this.entityId(); // Signal wird getrackt
       await this.entityService.loadNewEntity(id);
     });
   }
 
-  ngOnDestroy() {
+  public ngOnDestroy() {
     this.entityService.resetState();
   }
 }

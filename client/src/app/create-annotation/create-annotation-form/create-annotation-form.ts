@@ -1,4 +1,14 @@
-import { Component, computed, effect, inject, input, Signal, signal, viewChild, WritableSignal } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  Signal,
+  signal,
+  viewChild,
+  WritableSignal,
+} from '@angular/core';
 import { CreateAnnotationService } from '../create-annotation.service';
 import { FloatLabel } from 'primeng/floatlabel';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -16,7 +26,14 @@ import { UtilsService } from '../../utils/utils.service';
 @Component({
   selector: 'app-create-annotation-form',
   providers: [CreateAnnotationService],
-  imports: [FloatLabel, FormsModule, ButtonDirective, Select, ReactiveFormsModule, AttributeForm],
+  imports: [
+    FloatLabel,
+    FormsModule,
+    ButtonDirective,
+    Select,
+    ReactiveFormsModule,
+    AttributeForm,
+  ],
   templateUrl: './create-annotation-form.html',
 })
 export class CreateAnnotationForm {
@@ -26,14 +43,17 @@ export class CreateAnnotationForm {
   private readonly utilService = inject(UtilsService);
   private readonly createAnnotationService = inject(CreateAnnotationService);
   private readonly dialogRef = inject(DynamicDialogRef);
-  private createAnnotationConnectionDialogRef: DynamicDialogRef<CreateAnnotationConnection> | null = null;
+  private createAnnotationConnectionDialogRef: DynamicDialogRef<CreateAnnotationConnection> | null =
+    null;
 
-  protected readonly types: Signal<string[]> = this.createAnnotationService.getAnnotationTypes();
+  protected readonly types: Signal<string[]> =
+    this.createAnnotationService.getAnnotationTypes();
   entityId = input.required<string>();
   readonly properties: WritableSignal<GAttribute[]> = signal<GAttribute[]>([]);
   protected loading = signal<boolean>(false);
   readonly propertiesLoaded: WritableSignal<boolean> = signal<boolean>(true); // TODO: UI Loading state
-  readonly typesLoaded: Signal<boolean> = this.createAnnotationService.geAnnotationTypesLoaded();
+  readonly typesLoaded: Signal<boolean> =
+    this.createAnnotationService.geAnnotationTypesLoaded();
 
   attributeForm = viewChild.required<AttributeForm>(AttributeForm);
 
@@ -63,7 +83,8 @@ export class CreateAnnotationForm {
 
   private async loadAndDisplayPropertyInputs(type: string) {
     this.propertiesLoaded.set(false);
-    const props: GAttribute[] = await this.createAnnotationService.getAnnotationProperties(type);
+    const props: GAttribute[] =
+      await this.createAnnotationService.getAnnotationProperties(type);
     this.properties.set(props);
     this.propertiesLoaded.set(true);
   }
@@ -72,11 +93,19 @@ export class CreateAnnotationForm {
     event.preventDefault();
     try {
       this.loading.set(true);
-      const payload = this.utilService.createPayload(this.propertiesForm().value, this.properties());
-      const annotationId = await this.createAnnotationService.createAnnotationForEntity(this.entityId(), this.typeInput.value, payload);
+      const payload = this.utilService.createPayload(
+        this.propertiesForm().value,
+        this.properties(),
+      );
+      const annotationId =
+        await this.createAnnotationService.createAnnotationForEntity(
+          this.entityId(),
+          this.typeInput.value,
+          payload,
+        );
       console.log(`Created Annotation ${annotationId}`);
       this.confirmationService.confirm({
-        target: event.target as EventTarget,
+        target: event.target!,
         message: `Do you want to connect this annotation to an entity?`,
         icon: 'pi pi-info-circle',
         rejectButtonProps: {
@@ -101,19 +130,22 @@ export class CreateAnnotationForm {
   }
 
   protected clickCreateAnnotationConnection(annotation: Annotation) {
-    this.createAnnotationConnectionDialogRef = this.dialogService.open(CreateAnnotationConnection, {
-      inputValues: {
-        annotation: annotation,
+    this.createAnnotationConnectionDialogRef = this.dialogService.open(
+      CreateAnnotationConnection,
+      {
+        inputValues: {
+          annotation: annotation,
+        },
+        header: 'Create An Optional Annotation Connection',
+        styleClass: 'w-11 md:w-9 lg:w-8',
+        style: {
+          'min-height': '50vh',
+        },
+        contentStyle: {
+          'padding-top': '0.5rem',
+        },
+        closable: true,
       },
-      header: 'Create An Optional Annotation Connection',
-      styleClass: 'w-11 md:w-9 lg:w-8',
-      style: {
-        'min-height': '50vh',
-      },
-      contentStyle: {
-        'padding-top': '0.5rem',
-      },
-      closable: true,
-    });
+    );
   }
 }

@@ -1,4 +1,11 @@
-import { Component, computed, inject, input, Signal, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  input,
+  Signal,
+  signal,
+} from '@angular/core';
 import { SearchEntityService } from '../search-entity.service';
 import { FilterPane } from '../filter-pane/filter-pane';
 import { FormsModule } from '@angular/forms';
@@ -45,7 +52,8 @@ export class CreateAnnotationConnection {
       this.messageService.add({
         severity: 'danger',
         summary: 'Failed to update annotation',
-        detail: 'Please reload the page and try again. If this problem is recurring notify your administrator.',
+        detail:
+          'Please reload the page and try again. If this problem is recurring notify your administrator.',
       });
       return;
     }
@@ -67,7 +75,10 @@ export class CreateAnnotationConnection {
       accept: async () => {
         this.loadingReq.set(true);
         try {
-          await this.annotationApi.createOutgoingRelation(annotationId, entity.id);
+          await this.annotationApi.createOutgoingRelation(
+            annotationId,
+            entity.id,
+          );
           await this.entityService.reloadEntity();
           this.dialogRef.close();
         } finally {

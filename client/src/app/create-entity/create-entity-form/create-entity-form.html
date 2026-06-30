@@ -14,7 +14,7 @@
     <label for="create-entity-form_type-input">Entity-Type</label>
   </p-floatlabel>
   <app-attribute-form [formName]="typeInput.value" [properties]="properties()" [enableCheckForSimilarLabels]="true" />
-  <div class="field justify-content-end flex" [class]="typeInput.value === '' ? 'hidden':''">
+  <div class="field justify-content-end flex" [class]="typeInput.value === '' ? 'hidden' : ''">
     <button pButton type="submit" size="large" [disabled]="propertiesForm().invalid">Create</button>
   </div>
 </form>

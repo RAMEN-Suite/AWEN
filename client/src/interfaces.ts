@@ -140,7 +140,15 @@ export interface PropertyConfig {
   maxLength?: number;
 }
 
-export type PropertyConfigDataType = 'array' | 'boolean' | 'date' | 'date-time' | 'integer' | 'number' | 'string' | 'time';
+export type PropertyConfigDataType =
+  | 'array'
+  | 'boolean'
+  | 'date'
+  | 'date-time'
+  | 'integer'
+  | 'number'
+  | 'string'
+  | 'time';
 
 export interface StatementNodeView {
   node: ConnectedNodeDto;

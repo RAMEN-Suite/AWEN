@@ -5,12 +5,12 @@
 <!--  <app-delete-entity [entityId]="entityKeyValue()" />-->
 <!--</div>-->
 @if (entity(); as entity) {
-<div class="detail-page">
-  <!--  <div class="col-1 px-3 md:flex flex-order-0 md:flex-order-0 align-self-start sticky top-0"></div>-->
-  <!--  <div class="col-fixed w-auto px-3 flex gap-2 justify-content-end flex-order-1 md:flex-order-2 align-self-start sticky top-0">-->
+  <div class="detail-page">
+    <!--  <div class="col-1 px-3 md:flex flex-order-0 md:flex-order-0 align-self-start sticky top-0"></div>-->
+    <!--  <div class="col-fixed w-auto px-3 flex gap-2 justify-content-end flex-order-1 md:flex-order-2 align-self-start sticky top-0">-->
 
-  <!--  </div>-->
-  <div class="detail-layout grid flex justify-content-center">
+    <!--  </div>-->
+    <div class="detail-layout grid flex justify-content-center">
     <div class="detail-columns col-12 px-5 flex-order-2 md:flex-order-1 grid flex md:gap-6 align-content-start">
       <section class="detail-card col-12 md:col-5 card flex flex-column gap-3 h-min">
         <div class="detail-card-header col-12 flex flex-row gap-2 justify-content-between">
@@ -42,11 +42,11 @@
         </div>
       </section>
       }
+      </div>
     </div>
   </div>
-</div>
 } @else {
-<div class="loading-wrapper">
-  <p-progress-spinner ariaLabel="loading" />
-</div>
+  <div class="loading-wrapper">
+    <p-progress-spinner ariaLabel="loading" />
+  </div>
 }

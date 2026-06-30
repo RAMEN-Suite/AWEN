@@ -12,13 +12,21 @@ export class CollectionService {
   private readonly messageService = inject(MessageService);
 
   getFilterable() {
-    return this.http.get<{ collectionFilter: Record<string, CollectionName[]> }>('api/collection/filterable');
+    return this.http.get<{
+      collectionFilter: Record<string, CollectionName[]>;
+    }>('api/collection/filterable');
   }
 
   getFilterableByType(type: string, parentId?: string) {
-    const params = parentId != null ? new HttpParams({ fromObject: { parentId } }) : new HttpParams();
+    const params =
+      parentId != null
+        ? new HttpParams({ fromObject: { parentId } })
+        : new HttpParams();
 
-    const collator = new Intl.Collator('en', { numeric: true, sensitivity: 'base' });
+    const collator = new Intl.Collator('en', {
+      numeric: true,
+      sensitivity: 'base',
+    });
 
     return this.http
       .get<CollectionName[]>('/api/collection/filterable/' + type, {

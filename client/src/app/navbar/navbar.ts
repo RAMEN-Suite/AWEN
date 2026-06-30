@@ -11,7 +11,13 @@ const HEADER_MAX_LENGTH = 20;
 
 @Component({
   selector: 'app-navbar',
-  imports: [Menubar, BackButtonComponent, RouterLink, CreateEntity, ButtonDirective],
+  imports: [
+    Menubar,
+    BackButtonComponent,
+    RouterLink,
+    CreateEntity,
+    ButtonDirective,
+  ],
   templateUrl: './navbar.html',
 })
 export class Navbar {
@@ -24,7 +30,9 @@ export class Navbar {
   protected header = computed(() => {
     const label = this.entity()?.label;
     if (label && label.length > HEADER_MAX_LENGTH) {
-      return label.slice(0, HEADER_MAX_LENGTH).padEnd(HEADER_MAX_LENGTH + 3, '...');
+      return label
+        .slice(0, HEADER_MAX_LENGTH)
+        .padEnd(HEADER_MAX_LENGTH + 3, '...');
     }
     return label;
   });

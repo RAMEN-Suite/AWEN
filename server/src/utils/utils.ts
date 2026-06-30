@@ -26,16 +26,8 @@ const metadataForNewNode = (node: Cypher.Node): SetParam[] => {
 const metadataForUpdateNode = (node: Cypher.Node): SetParam[] => {
   return [
     [node.property('_updated_at'), Cypher.localdatetime()],
-    [
-      node.property('_version'),
-      Cypher.plus(node.property('_version'), new Cypher.Literal(1)),
-    ],
+    [node.property('_version'), Cypher.plus(node.property('_version'), new Cypher.Literal(1))],
   ];
 };
 
-export {
-  parseStringToSearchArray,
-  parseStringToSearchQueryString,
-  metadataForNewNode,
-  metadataForUpdateNode,
-};
+export { parseStringToSearchArray, parseStringToSearchQueryString, metadataForNewNode, metadataForUpdateNode };

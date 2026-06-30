@@ -15,5 +15,5 @@ export interface GModel {
   classifiers: GClassifier[];
   relations: GRelation[];
 
-  ext?: Record<string, any>;
+  ext?: Record<string, unknown>;
 }

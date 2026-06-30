@@ -1,5 +1,5 @@
 @for (type of formatedTypes(); track type; let first = $first) { @if (asChips()) {
-<p-chip class="py-1 max-w-min" [label]="type" [class.bg-gray-200]="first" />
+  <p-chip class="py-1 max-w-min" [label]="type" [class.bg-gray-200]="first" />
 } @else {
-<span class="text-sm font-medium" [class.font-bold]="first">{{ type }}</span>
+  <span class="text-sm font-medium" [class.font-bold]="first">{{ type }}</span>
 } }

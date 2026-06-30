@@ -6,7 +6,14 @@ import { Button } from 'primeng/button';
   selector: 'app-back-button',
   imports: [Button],
   template: `
-    <p-button [label]="label()" icon="pi pi-arrow-left" severity="secondary" [outlined]="outlined()" [text]="text()" (onClick)="goBack()" />
+    <p-button
+      [label]="label()"
+      icon="pi pi-arrow-left"
+      severity="secondary"
+      [outlined]="outlined()"
+      [text]="text()"
+      (onClick)="goBack()"
+    />
   `,
 })
 export class BackButtonComponent {

@@ -1,10 +1,31 @@
-import { Component, DestroyRef, effect, inject, input, signal } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AutoCompleteCompleteEvent, AutoCompleteModule, AutoCompleteSelectEvent } from 'primeng/autocomplete';
+import {
+  Component,
+  DestroyRef,
+  effect,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import {
+  AutoCompleteCompleteEvent,
+  AutoCompleteModule,
+  AutoCompleteSelectEvent,
+} from 'primeng/autocomplete';
 import { Message } from 'primeng/message';
 import { SearchEntityService } from '../search-entity.service';
 import { Button } from 'primeng/button';
-import { CollectionName, EntityAutocompleteQuery, EntityNames, EntitySearchQuery } from '../../interfaces';
+import {
+  CollectionName,
+  EntityAutocompleteQuery,
+  EntityNames,
+  EntitySearchQuery,
+} from '../../interfaces';
 import { CollectionService } from '../api/collection.service';
 import { Select } from 'primeng/select';
 import { distinctUntilChanged, firstValueFrom, map } from 'rxjs';
@@ -21,7 +42,15 @@ interface CFOption {
 
 @Component({
   selector: 'app-filter-pane',
-  imports: [ReactiveFormsModule, AutoCompleteModule, Message, Button, Select, TypeFilter, RouterLink],
+  imports: [
+    ReactiveFormsModule,
+    AutoCompleteModule,
+    Message,
+    Button,
+    Select,
+    TypeFilter,
+    RouterLink,
+  ],
   templateUrl: './filter-pane.html',
 })
 export class FilterPane {
@@ -45,14 +74,18 @@ export class FilterPane {
 
   form = new FormGroup<{
     label: FormControl<string>;
-    collectionFilter: FormGroup<Record<string, FormControl<CollectionName | null>>>;
+    collectionFilter: FormGroup<
+      Record<string, FormControl<CollectionName | null>>
+    >;
     types: FormControl<string[]>;
   }>({
     label: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required, Validators.minLength(3)],
     }),
-    collectionFilter: new FormGroup<Record<string, FormControl<CollectionName | null>>>({}),
+    collectionFilter: new FormGroup<
+      Record<string, FormControl<CollectionName | null>>
+    >({}),
     types: new FormControl<string[]>([], { nonNullable: true }),
   });
 
@@ -65,7 +98,9 @@ export class FilterPane {
       const opts = this.collectionFilterOptions();
       opts.forEach((opt) => {
         if (opt.values.length > 0) {
-          this.form.controls.collectionFilter.get(opt.type)?.enable({ emitEvent: false });
+          this.form.controls.collectionFilter
+            .get(opt.type)
+            ?.enable({ emitEvent: false });
         }
       });
     });
@@ -76,12 +111,20 @@ export class FilterPane {
 
       // Nur die filterbaren Typen zeigen
       const filterable: string[] = this.config().filterableCollections; // g.scenarios.findByCollection.filterable;
-      this.activeChain = this.collectionChain.filter((t) => filterable.includes(t));
+      this.activeChain = this.collectionChain.filter((t) =>
+        filterable.includes(t),
+      );
 
       // 1) Controls & Options nur für activeChain anlegen
       const optionsInit: CFOption[] = [];
       for (const type of this.activeChain) {
-        this.form.controls.collectionFilter.addControl(type, new FormControl<CollectionName | null>({ value: null, disabled: true }));
+        this.form.controls.collectionFilter.addControl(
+          type,
+          new FormControl<CollectionName | null>({
+            value: null,
+            disabled: true,
+          }),
+        );
         optionsInit.push({ type, values: [] });
       }
       this.collectionFilterOptions.set(optionsInit);
@@ -103,13 +146,17 @@ export class FilterPane {
             distinctUntilChanged(),
           )
           .subscribe(async (idOrNull) => {
-            const value = idOrNull ? (this.form.controls.collectionFilter.get(type)?.value as CollectionName) : null;
+            const value = idOrNull
+              ? (this.form.controls.collectionFilter.get(type)
+                  ?.value as CollectionName)
+              : null;
             await this.onLevelChanged(idx, value);
           });
       });
 
       // Fill form
-      const queryParamValues: Record<string, never> = await this.queryParamService.readDecodedQueryParams();
+      const queryParamValues: Record<string, never> =
+        await this.queryParamService.readDecodedQueryParams();
       this.fillForm(this.form, queryParamValues);
       if (Object.keys(queryParamValues).length > 0) {
         await this.onSubmit();
@@ -124,7 +171,7 @@ export class FilterPane {
       const formatted: Record<string, string[]> = {};
 
       for (const key of Object.keys(collectionFilter)) {
-        const id = collectionFilter[key as keyof typeof collectionFilter]?.id;
+        const id = collectionFilter[key]?.id;
         if (id) formatted[key] = [id];
       }
 
@@ -133,7 +180,10 @@ export class FilterPane {
       if (Object.keys(formatted).length > 0) {
         query.collectionFilter = formatted;
       }
-      const suggestions = await this.searchService.getSuggestions(e.query, query);
+      const suggestions = await this.searchService.getSuggestions(
+        e.query,
+        query,
+      );
       this.suggestions.set(suggestions);
     } else {
       this.suggestions.set([]);
@@ -153,7 +203,7 @@ export class FilterPane {
     const formatted: Record<string, string[]> = {};
 
     for (const key of Object.keys(collectionFilter)) {
-      const id = collectionFilter[key as keyof typeof collectionFilter]?.id;
+      const id = collectionFilter[key]?.id;
       if (id) formatted[key] = [id];
     }
 
@@ -165,7 +215,9 @@ export class FilterPane {
 
     await this.searchService.searchEntities(query);
     if (this.setQueryParams()) {
-      const queryParams = this.queryParamService.transformQueryParams(this.form.value);
+      const queryParams = this.queryParamService.transformQueryParams(
+        this.form.value,
+      );
       await this.queryParamService.setQueryParams(queryParams);
     }
   }
@@ -194,7 +246,9 @@ export class FilterPane {
   private async loadAndSetOptionsAt(idx: number, parentId?: string) {
     const type = this.activeChain[idx];
     if (!type) return;
-    const values = await firstValueFrom(this.collectionService.getFilterableByType(type, parentId));
+    const values = await firstValueFrom(
+      this.collectionService.getFilterableByType(type, parentId),
+    );
     this.setOptions(idx, values);
   }
 
@@ -210,7 +264,9 @@ export class FilterPane {
     const cfGroup = this.form.controls.collectionFilter;
 
     // Options leeren
-    const nextOptions = this.collectionFilterOptions().map((o, i) => (i >= startIdx ? { ...o, values: [] } : o));
+    const nextOptions = this.collectionFilterOptions().map((o, i) =>
+      i >= startIdx ? { ...o, values: [] } : o,
+    );
     this.collectionFilterOptions.set(nextOptions);
 
     // Controls zurücksetzen & disablen
@@ -238,7 +294,7 @@ export class FilterPane {
   }
 
   protected onItemSelect(e: AutoCompleteSelectEvent) {
-    this.form.controls['label'].setValue(e.value.label);
+    this.form.controls.label.setValue(e.value.label);
   }
 
   private fillForm(form: FormGroup, values: Record<string, never>) {

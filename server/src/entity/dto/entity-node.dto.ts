@@ -9,9 +9,10 @@ export class EntityNodeDto extends NodeDto {
     type: 'string',
   })
   @IsString()
-  ramenType: string = 'Entity';
+  ramenType: string;
 
-  constructor(properties: Record<string, any>, types?: string[]) {
+  constructor(properties: Record<string, unknown>, types?: string[]) {
     super(properties, types);
+    this.ramenType = 'Entity';
   }
 }

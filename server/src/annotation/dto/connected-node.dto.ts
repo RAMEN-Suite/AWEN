@@ -9,7 +9,7 @@ export class ConnectedNodeDto {
   properties!: NodePropertyDto[];
 
   @ApiProperty()
-  relationshipProperties!: Record<string, any>;
+  relationshipProperties!: Record<string, unknown>;
 
   @ApiProperty()
   direction!: string;

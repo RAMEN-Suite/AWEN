@@ -1,10 +1,6 @@
 import { Integer, Node, Relationship } from 'neo4j-driver';
 import { EntityNodeDto } from '../entity/dto/entity-node.dto';
-import {
-  ANNOTATION_TYPE_NAME,
-  ENTITY_LABEL_NAME,
-  ENTITY_NAME_PROPERTY,
-} from '../constants';
+import { ANNOTATION_TYPE_NAME, ENTITY_LABEL_NAME, ENTITY_NAME_PROPERTY } from '../constants';
 import { EntityNamesDto } from '../entity/dto/entity-names.dto';
 import { EntityDto } from '../entity/dto/entity.dto';
 import { EntityPropertyDto } from '../entity/dto/entity-property.dto';
@@ -14,46 +10,34 @@ import { NodePropertyDto } from '../annotation/dto/node-property.dto';
 import { RAMENError } from '../schema/RAMENError';
 import { ConnectedNodeDto } from '../annotation/dto/connected-node.dto';
 
-export const transformNodeToEntityNodeDTO = (
-  node: Node<Integer, Record<string, any>>,
-): EntityNodeDto => {
+export const transformNodeToEntityNodeDTO = (node: Node<Integer, Record<string, unknown>>): EntityNodeDto => {
   const types = node.labels.filter((l) => l !== ENTITY_LABEL_NAME);
   return new EntityNodeDto(node.properties, types);
 };
 
-export const transformNodesToEntityNodeDTOs = (
-  nodes: Node<Integer, Record<string, any>>[],
-): EntityNodeDto[] => {
+export const transformNodesToEntityNodeDTOs = (nodes: Node<Integer, Record<string, unknown>>[]): EntityNodeDto[] => {
   return nodes.map((node) => {
     return transformNodeToEntityNodeDTO(node);
   });
 };
 
 export const transformNodeToNameEntityDTO = (
-  node: Node<Integer, Record<string, any>>,
+  node: Node<Integer, Record<string, unknown>>,
   labelKey: string,
   idKey: string,
 ): EntityNamesDto => {
-  return new EntityNamesDto(
-    node.properties[idKey] as string,
-    node.properties[labelKey] as string,
-  );
+  return new EntityNamesDto(node.properties[idKey] as string, node.properties[labelKey] as string);
 };
 
 export const transformNodesToNameEntityDTOs = (
-  nodes: Node<Integer, Record<string, any>>[],
+  nodes: Node<Integer, Record<string, unknown>>[],
   labelKey: string,
   idKey: string,
 ): EntityNamesDto[] => {
-  return nodes.map((node) =>
-    transformNodeToNameEntityDTO(node, labelKey, idKey),
-  );
+  return nodes.map((node) => transformNodeToNameEntityDTO(node, labelKey, idKey));
 };
 
-export const transformNodeToEntityDTO = (
-  node: Node<Integer, Record<string, any>>,
-  gNode: NodeType,
-): EntityDto => {
+export const transformNodeToEntityDTO = (node: Node<Integer, Record<string, unknown>>, gNode: NodeType): EntityDto => {
   let label: string | undefined;
   const props: EntityPropertyDto[] = [];
 
@@ -64,14 +48,14 @@ export const transformNodeToEntityDTO = (
 
   gNode.attributes.forEach((attribute) => {
     if (attribute.name === ENTITY_NAME_PROPERTY) {
-      label = node.properties[ENTITY_NAME_PROPERTY] as string | undefined;
+      label = node.properties[ENTITY_NAME_PROPERTY] as string | undefined; // TODO: better type check
     } else if (attribute.name in node.properties) {
       props.push(
         new EntityPropertyDto({
           ...attribute,
           isKey: attribute.isKey ?? false,
           isReadOnly: attribute.isKey ?? false,
-          value: node.properties[attribute.name],
+          value: node.properties[attribute.name] as string, // TODO: better type check
         }),
       );
     } else {
@@ -98,19 +82,13 @@ export const transformNodeToEntityDTO = (
   });
 };
 
-export const transformNodesToEntityDTOs = (
-  nodes: Node<Integer, Record<string, any>>[],
-  gNode: NodeType,
-): EntityDto[] => {
+export const transformNodesToEntityDTOs = (nodes: Node<Integer, Record<string, unknown>>[], gNode: NodeType): EntityDto[] => {
   return nodes.map((node) => {
     return transformNodeToEntityDTO(node, gNode);
   });
 };
 
-export const transformNodeToAnnotationDTO = (
-  node: Node<Integer, Record<string, any>>,
-  gNode: NodeType,
-): AnnotationDto => {
+export const transformNodeToAnnotationDTO = (node: Node<Integer, Record<string, unknown>>, gNode: NodeType): AnnotationDto => {
   let type: string | undefined;
   const props: NodePropertyDto[] = [];
 
@@ -121,14 +99,14 @@ export const transformNodeToAnnotationDTO = (
 
   gNode.attributes.forEach((attribute) => {
     if (attribute.name === ANNOTATION_TYPE_NAME) {
-      type = node.properties[ANNOTATION_TYPE_NAME] as string | undefined;
+      type = node.properties[ANNOTATION_TYPE_NAME] as string | undefined; // TODO: better type check
     } else if (attribute.name in node.properties) {
       props.push(
         new NodePropertyDto({
           ...attribute,
           isKey: attribute.isKey ?? false,
           isReadOnly: attribute.isKey ?? false,
-          value: node.properties[attribute.name],
+          value: node.properties[attribute.name] as string, //TODO
         }),
       );
     } else {
@@ -157,7 +135,7 @@ export const transformNodeToAnnotationDTO = (
 };
 
 export const transformNodesToAnnotationDTOs = (
-  nodes: Node<Integer, Record<string, any>>[],
+  nodes: Node<Integer, Record<string, unknown>>[],
   gNode: NodeType,
 ): AnnotationDto[] => {
   return nodes.map((node) => {
@@ -166,8 +144,8 @@ export const transformNodesToAnnotationDTOs = (
 };
 
 export const transformConnectedNodeToDto = (
-  node: Node<Integer, Record<string, any>>,
-  relationship: Relationship<Integer, Record<string, any>>,
+  node: Node<Integer, Record<string, unknown>>,
+  relationship: Relationship<Integer, Record<string, unknown>>,
   direction: string,
   gNode: NodeType,
 ): ConnectedNodeDto => {
@@ -182,7 +160,7 @@ export const transformConnectedNodeToDto = (
     props.push(
       new NodePropertyDto({
         name: attribute.name,
-        value: (node.properties[attribute.name] as string) ?? '',
+        value: (node.properties[attribute.name] as string) ?? '', // TODO: better type check
         bounds: attribute.bounds,
         typeId: attribute.typeId,
         isKey: attribute.isKey ?? false,
@@ -201,7 +179,7 @@ export const transformConnectedNodeToDto = (
 };
 
 export const transformNodeToAnnotationWithContentDTO = (
-  node: Node<Integer, Record<string, any>>,
+  node: Node<Integer, Record<string, unknown>>,
   gNode: NodeType,
   connectedNodes: ConnectedNodeDto[] = [],
 ): AnnotationDto => {
@@ -215,14 +193,14 @@ export const transformNodeToAnnotationWithContentDTO = (
 
   gNode.attributes.forEach((attribute) => {
     if (attribute.name === ANNOTATION_TYPE_NAME) {
-      type = node.properties[ANNOTATION_TYPE_NAME] as string | undefined;
+      type = node.properties[ANNOTATION_TYPE_NAME] as string | undefined; // TODO: better type check
     } else if (attribute.name in node.properties) {
       props.push(
         new NodePropertyDto({
           ...attribute,
           isKey: attribute.isKey ?? false,
           isReadOnly: attribute.isKey ?? false,
-          value: node.properties[attribute.name],
+          value: node.properties[attribute.name] as string, // TODO: better type check
         }),
       );
     } else {

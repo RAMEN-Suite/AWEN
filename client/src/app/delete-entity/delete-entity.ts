@@ -20,7 +20,7 @@ export class DeleteEntity {
 
   protected clickDeleteBtn(event: PointerEvent) {
     this.confirmationService.confirm({
-      target: event.target as EventTarget,
+      target: event.target!,
       message: 'Do you want to delete this Entity?',
       header: 'Danger Zone',
       icon: 'pi pi-info-circle',
@@ -53,6 +53,10 @@ export class DeleteEntity {
 
   private async deleteEntity(id: string) {
     await this.entityAPI.deleteEntity(id);
-    this.messageService.add({ severity: 'info', summary: 'Entity deleted', detail: 'The Entity was deleted successfully' });
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Entity deleted',
+      detail: 'The Entity was deleted successfully',
+    });
   }
 }

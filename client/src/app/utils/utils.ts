@@ -1,9 +1,15 @@
 import { NodePropertyDto } from '../../interfaces';
 
-const castValues = <T extends number | string | boolean>(value: unknown[], dataTypeName: string): T[] => {
+const castValues = <T extends number | string | boolean>(
+  value: unknown[],
+  dataTypeName: string,
+): T[] => {
   return value.map((v) => castValue(v, dataTypeName));
 };
-const castValue = <T extends number | string | boolean>(value: unknown, dataTypeName: string): T => {
+const castValue = <T extends number | string | boolean>(
+  value: unknown,
+  dataTypeName: string,
+): T => {
   switch (dataTypeName.toLowerCase()) {
     case 'integer':
       return parseInt(String(value), 10) as T;
@@ -18,7 +24,9 @@ const castValue = <T extends number | string | boolean>(value: unknown, dataType
   }
 };
 
-const visibleProperties = (properties: NodePropertyDto[]): NodePropertyDto[] => {
+const visibleProperties = (
+  properties: NodePropertyDto[],
+): NodePropertyDto[] => {
   return properties.filter((p) => !p.isKey && p.value !== '');
 };
 

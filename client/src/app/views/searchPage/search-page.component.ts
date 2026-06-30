@@ -20,10 +20,10 @@ import { Router } from '@angular/router';
 })
 export class SearchPage {
   private router = inject(Router);
-  searchService = inject(SearchEntityService);
+  private searchService = inject(SearchEntityService);
 
-  entities = this.searchService.getEntities();
-  loading = this.searchService.getEntitiesLoading();
+  protected entities = this.searchService.getEntities();
+  protected loading = this.searchService.getEntitiesLoading();
 
   protected navigateToDetailPage = async (entity: OldEntity) => {
     await this.router.navigate(['entity', entity.id]);
