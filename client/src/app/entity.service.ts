@@ -11,9 +11,13 @@ import { EntityApiService } from './api/entity-api.service';
 export class EntityService {
   private readonly entityApi = inject(EntityApiService);
 
-  private _entity: WritableSignal<Entity | undefined> = signal<Entity | undefined>(undefined);
+  private _entity: WritableSignal<Entity | undefined> = signal<
+    Entity | undefined
+  >(undefined);
   private _annotations: WritableSignal<Annotation[]> = signal<Annotation[]>([]);
-  private _entityId: WritableSignal<string | undefined> = signal<string | undefined>(undefined);
+  private _entityId: WritableSignal<string | undefined> = signal<
+    string | undefined
+  >(undefined);
   private _loading: WritableSignal<boolean> = signal<boolean>(false);
 
   public entity = this._entity.asReadonly();
@@ -37,7 +41,8 @@ export class EntityService {
 
   private async loadAndSet(id: string) {
     const entity = await this.entityApi.getById(id);
-    const annotations = await this.entityApi.getAnnotationsWithConnectionsOf(id);
+    const annotations =
+      await this.entityApi.getAnnotationsWithConnectionsOf(id);
     this._entity.set(entity);
     this._annotations.set(annotations);
   }

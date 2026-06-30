@@ -11,7 +11,10 @@ export class UtilsService {
   private readonly configService = inject(ConfigService);
   private readonly messageService = inject(MessageService);
 
-  createPayload = (values: Partial<Record<string, unknown>>, properties: (GAttribute | EntityPropertyDto)[]) => {
+  createPayload = (
+    values: Partial<Record<string, unknown>>,
+    properties: (GAttribute | EntityPropertyDto)[],
+  ) => {
     const payload: Record<string, unknown> = {};
 
     Object.entries(values).forEach(([key, value]) => {
@@ -27,7 +30,8 @@ export class UtilsService {
       console.log(dataType);
       if (!dataType) return;
 
-      const isArray = prop.bounds.upperBound === -1 || prop.bounds.upperBound > 1;
+      const isArray =
+        prop.bounds.upperBound === -1 || prop.bounds.upperBound > 1;
 
       if (isArray && Array.isArray(value)) {
         if (value.length > 0) {

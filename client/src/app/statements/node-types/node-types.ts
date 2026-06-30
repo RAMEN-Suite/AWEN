@@ -10,5 +10,7 @@ export class NodeTypes {
   nodeTypes = input.required<string[]>();
   asChips = input(false, { transform: booleanAttribute });
 
-  protected readonly formatedTypes = computed(() => [...this.nodeTypes()].reverse());
+  protected readonly formatedTypes = computed(() =>
+    [...this.nodeTypes()].reverse(),
+  );
 }

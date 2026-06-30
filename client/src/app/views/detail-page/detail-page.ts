@@ -14,7 +14,16 @@ import { Statements } from '../../statements/statements';
 @Component({
   selector: 'app-detail-page',
   providers: [DialogService],
-  imports: [TableModule, Chip, DeleteEntity, EditEntity, ProgressSpinner, CreateAnnotation, NodeTypes, Statements],
+  imports: [
+    TableModule,
+    Chip,
+    DeleteEntity,
+    EditEntity,
+    ProgressSpinner,
+    CreateAnnotation,
+    NodeTypes,
+    Statements,
+  ],
   templateUrl: './detail-page.html',
 })
 export class DetailPage implements OnDestroy {

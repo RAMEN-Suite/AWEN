@@ -18,8 +18,13 @@ export class ConfigPane {
   loaded = this.configService.getLoaded();
 
   configForm = new FormGroup({
-    filterableCollections: new FormControl<string[]>({ value: [], disabled: true }, { nonNullable: true }),
-    selectedCollectionChain: new FormControl<string[]>([], { nonNullable: true }),
+    filterableCollections: new FormControl<string[]>(
+      { value: [], disabled: true },
+      { nonNullable: true },
+    ),
+    selectedCollectionChain: new FormControl<string[]>([], {
+      nonNullable: true,
+    }),
     entityTypes: new FormControl<string[]>([], { nonNullable: true }),
   });
 
@@ -44,9 +49,13 @@ export class ConfigPane {
       }
 
       if (this.configForm.controls.selectedCollectionChain.value.length > 0) {
-        this.configForm.controls.filterableCollections.enable({ emitEvent: false });
+        this.configForm.controls.filterableCollections.enable({
+          emitEvent: false,
+        });
       } else {
-        this.configForm.controls.filterableCollections.disable({ emitEvent: false });
+        this.configForm.controls.filterableCollections.disable({
+          emitEvent: false,
+        });
       }
     });
 

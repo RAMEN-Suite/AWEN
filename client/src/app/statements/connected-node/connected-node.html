@@ -10,18 +10,18 @@
     <div class="flex flex-row align-items-end">
       <!-- Key Property – mit Link wenn Entity -->
       @if (node().entityLink) {
-      <p-split-button
-        label="Open Entity"
-        (onClick)="navigate(node().entityLink!)"
-        severity="primary"
-        [model]="annotationConnectionOptions"
-        outlined
-        size="small"
-        dropdownIcon="pi pi-ellipsis-v"
-      />
+        <p-split-button
+          label="Open Entity"
+          (onClick)="navigate(node().entityLink!)"
+          severity="primary"
+          [model]="annotationConnectionOptions"
+          outlined
+          size="small"
+          dropdownIcon="pi pi-ellipsis-v"
+        />
       } @else {
-      <p-menu #menuConnectedNode [model]="annotationConnectionOptions" [popup]="true" appendTo="body" />
-      <p-button (onClick)="menuConnectedNode.toggle($event)" icon="pi pi-ellipsis-v" text rounded size="small" />
+        <p-menu #menuConnectedNode [model]="annotationConnectionOptions" [popup]="true" appendTo="body" />
+        <p-button (onClick)="menuConnectedNode.toggle($event)" icon="pi pi-ellipsis-v" text rounded size="small" />
       }
     </div>
   </div>

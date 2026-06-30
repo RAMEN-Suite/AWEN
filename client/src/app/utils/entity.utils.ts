@@ -1,6 +1,8 @@
 import { NodePropertyDto } from '../../interfaces';
 
-const getKeyProperty = (properties: NodePropertyDto[]): NodePropertyDto | undefined => {
+const getKeyProperty = (
+  properties: NodePropertyDto[],
+): NodePropertyDto | undefined => {
   return properties.find((p) => p.isKey);
 };
 

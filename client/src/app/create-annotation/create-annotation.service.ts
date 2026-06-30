@@ -13,8 +13,16 @@ export class CreateAnnotationService {
   private readonly annotationAPI = inject(AnnotationApiService);
   private readonly entityService = inject(EntityService);
 
-  async createAnnotationForEntity(entityId: string, type: string, payload: Record<string, unknown>) {
-    const id = await this.annotationAPI.createAnnotationForEntity(entityId, type, payload);
+  async createAnnotationForEntity(
+    entityId: string,
+    type: string,
+    payload: Record<string, unknown>,
+  ) {
+    const id = await this.annotationAPI.createAnnotationForEntity(
+      entityId,
+      type,
+      payload,
+    );
     // Reload Entity on Detail page
     await this.entityService.reloadEntity();
     return id;

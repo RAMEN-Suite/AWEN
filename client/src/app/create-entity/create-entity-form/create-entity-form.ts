@@ -1,4 +1,14 @@
-import { Component, computed, effect, inject, input, signal, Signal, viewChild, WritableSignal } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  signal,
+  Signal,
+  viewChild,
+  WritableSignal,
+} from '@angular/core';
 import { CreateEntityService } from '../create-entity.service';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Select } from 'primeng/select';
@@ -13,7 +23,13 @@ import { UtilsService } from '../../utils/utils.service';
 
 @Component({
   selector: 'app-create-entity-form',
-  imports: [Select, ReactiveFormsModule, FloatLabel, AttributeForm, ButtonDirective],
+  imports: [
+    Select,
+    ReactiveFormsModule,
+    FloatLabel,
+    AttributeForm,
+    ButtonDirective,
+  ],
   templateUrl: './create-entity-form.html',
 })
 export class CreateEntityForm {
@@ -27,7 +43,8 @@ export class CreateEntityForm {
   preselectedType = input<string>();
 
   readonly types: Signal<string[]> = this.createEntityService.getEntityTypes();
-  readonly typesLoaded: Signal<boolean> = this.createEntityService.getEntityTypesLoaded();
+  readonly typesLoaded: Signal<boolean> =
+    this.createEntityService.getEntityTypesLoaded();
   readonly properties: WritableSignal<GAttribute[]> = signal<GAttribute[]>([]);
   readonly propertiesLoaded: WritableSignal<boolean> = signal<boolean>(true); // TODO: UI Loading state
   loading = signal<boolean>(false);
@@ -53,7 +70,8 @@ export class CreateEntityForm {
 
   private async loadAndDisplayPropertyInputs(type: string) {
     this.propertiesLoaded.set(false);
-    const props: GAttribute[] = await this.createEntityService.getEntityProperties(type);
+    const props: GAttribute[] =
+      await this.createEntityService.getEntityProperties(type);
     this.properties.set(props);
     this.propertiesLoaded.set(true);
   }
@@ -64,7 +82,10 @@ export class CreateEntityForm {
       this.loading.set(true);
       const createdId = await this.createEntityService.createEntity(
         this.typeInput.value,
-        this.utilService.createPayload(this.propertiesForm().value, this.properties()),
+        this.utilService.createPayload(
+          this.propertiesForm().value,
+          this.properties(),
+        ),
       );
       this.confirmationService.confirm({
         message: 'The Entity was successfully created!',

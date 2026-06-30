@@ -3,11 +3,20 @@ import { EntityService } from '../entity.service';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { AnnotationApiService } from '../api/annotation-api.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { Annotation, ConnectedNodeDto, StatementNodeView } from '../../interfaces';
+import {
+  Annotation,
+  ConnectedNodeDto,
+  StatementNodeView,
+} from '../../interfaces';
 import { CreateAnnotationConnection } from '../create-annotation-connection/create-annotation-connection';
 import { getKeyProperty } from '../utils/entity.utils';
 import { ENTITY_LABEL_NAME } from '../../constants';
-import { Accordion, AccordionContent, AccordionHeader, AccordionPanel } from 'primeng/accordion';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionHeader,
+  AccordionPanel,
+} from 'primeng/accordion';
 import { Chip } from 'primeng/chip';
 import { Button } from 'primeng/button';
 import { UpdateAnnotation } from '../edit-annotation/update-annotation';
@@ -73,29 +82,37 @@ export class Statements {
   annotations = input.required<Annotation[]>();
   entity = this.entityService.entity;
 
-  private createAnnotationConnectionDialogRef: DynamicDialogRef<CreateAnnotationConnection> | null = null;
+  private createAnnotationConnectionDialogRef: DynamicDialogRef<CreateAnnotationConnection> | null =
+    null;
 
-  protected readonly groupedAnnotations = computed<AnnotationGroupView[]>(() => {
-    const groups = new Map<string, StatementAnnotationView[]>();
+  protected readonly groupedAnnotations = computed<AnnotationGroupView[]>(
+    () => {
+      const groups = new Map<string, StatementAnnotationView[]>();
 
-    for (const annotation of this.annotations()) {
-      const view = this.toAnnotationView(annotation);
-      const annotations = groups.get(annotation.type);
+      for (const annotation of this.annotations()) {
+        const view = this.toAnnotationView(annotation);
+        const annotations = groups.get(annotation.type);
 
-      if (annotations) {
-        annotations.push(view);
-      } else {
-        groups.set(annotation.type, [view]);
+        if (annotations) {
+          annotations.push(view);
+        } else {
+          groups.set(annotation.type, [view]);
+        }
       }
-    }
 
-    return Array.from(groups, ([type, annotations]) => ({ type, annotations }));
-  });
+      return Array.from(groups, ([type, annotations]) => ({
+        type,
+        annotations,
+      }));
+    },
+  );
 
   private toAnnotationView(annotation: Annotation): StatementAnnotationView {
     return {
       annotation,
-      id: this.propertyValueAsString(getKeyProperty(annotation.properties)?.value),
+      id: this.propertyValueAsString(
+        getKeyProperty(annotation.properties)?.value,
+      ),
       nodes: annotation.connectedNodes.map((node) => this.toNodeView(node)),
     };
   }
@@ -109,7 +126,9 @@ export class Statements {
   }
 
   private toNodeView(node: ConnectedNodeDto): StatementNodeView {
-    const keyValue = this.propertyValueAsString(getKeyProperty(node.properties)?.value);
+    const keyValue = this.propertyValueAsString(
+      getKeyProperty(node.properties)?.value,
+    );
     const isEntity = node.types.includes(ENTITY_LABEL_NAME);
 
     return {
@@ -121,20 +140,23 @@ export class Statements {
   }
 
   protected clickCreateAnnotationConnection(annotation: Annotation) {
-    this.createAnnotationConnectionDialogRef = this.dialogService.open(CreateAnnotationConnection, {
-      inputValues: {
-        annotation: annotation,
+    this.createAnnotationConnectionDialogRef = this.dialogService.open(
+      CreateAnnotationConnection,
+      {
+        inputValues: {
+          annotation: annotation,
+        },
+        header: 'Create Annotation Connection',
+        styleClass: 'w-11 md:w-9 lg:w-8',
+        style: {
+          'min-height': '50vh',
+        },
+        contentStyle: {
+          'padding-top': '0.5rem',
+        },
+        closable: true,
       },
-      header: 'Create Annotation Connection',
-      styleClass: 'w-11 md:w-9 lg:w-8',
-      style: {
-        'min-height': '50vh',
-      },
-      contentStyle: {
-        'padding-top': '0.5rem',
-      },
-      closable: true,
-    });
+    );
   }
 
   protected async clickDeleteAnnotation(id: string, event?: Event) {
@@ -154,12 +176,14 @@ export class Statements {
       },
       accept: async () => {
         await this.deleteAnnotation(id);
-        this.messageService.add({ severity: 'success', summary: 'Annotation deleted' });
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Annotation deleted',
+        });
         await this.entityService.reloadEntity();
       },
     });
   }
-
 
   private async deleteAnnotation(id: string) {
     await this.annotationApi.delete(id);

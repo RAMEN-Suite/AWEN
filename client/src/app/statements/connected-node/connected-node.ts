@@ -37,7 +37,11 @@ export class ConnectedNode implements OnInit {
         icon: 'pi pi-trash',
         label: 'Delete Connection',
         command: async ($event) => {
-          await this.clickDeleteAnnotationRelation(this.annotationId(), this.node().id!, $event.originalEvent);
+          await this.clickDeleteAnnotationRelation(
+            this.annotationId(),
+            this.node().id!,
+            $event.originalEvent,
+          );
         },
       },
       {
@@ -54,7 +58,11 @@ export class ConnectedNode implements OnInit {
     await this.router.navigate([entityLink]);
   }
 
-  protected async clickDeleteAnnotationRelation(id: string, connectedNodeId: string, event?: Event) {
+  protected async clickDeleteAnnotationRelation(
+    id: string,
+    connectedNodeId: string,
+    event?: Event,
+  ) {
     this.confirmationService.confirm({
       target: event?.target as EventTarget,
       message: `Are you sure you want to delete the relation to this annotation?`,
@@ -71,7 +79,10 @@ export class ConnectedNode implements OnInit {
       },
       accept: async () => {
         await this.deleteAnnotationRelation(id, connectedNodeId);
-        this.messageService.add({ severity: 'success', summary: 'Relation deleted' });
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Relation deleted',
+        });
         await this.entityService.reloadEntity();
       },
     });

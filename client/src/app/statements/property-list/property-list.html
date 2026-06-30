@@ -1,16 +1,16 @@
 @for (property of visibleProperties(properties()); track property.name) {
-<div class="flex flex-column gap-1">
-  <span class="text-xs text-gray-500">{{ property.name }}</span>
-  @if (isArrayValue(property.value)) {
-  <div class="flex flex-wrap gap-1">
-    @for (value of property.value; track $index) {
-    <p-chip [label]="displayValue(value)" class="py-1" />
+  <div class="flex flex-column gap-1">
+    <span class="text-xs text-gray-500">{{ property.name }}</span>
+    @if (isArrayValue(property.value)) {
+      <div class="flex flex-wrap gap-1">
+        @for (value of property.value; track $index) {
+          <p-chip [label]="displayValue(value)" class="py-1" />
+        }
+      </div>
+    } @else {
+      <span>{{ displayValue(property.value) }}</span>
     }
   </div>
-  } @else {
-  <span>{{ displayValue(property.value) }}</span>
-  }
-</div>
 } @empty {
-<span class="text-sm text-gray-500">No properties</span>
+  <span class="text-sm text-gray-500">No properties</span>
 }

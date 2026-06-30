@@ -2,22 +2,27 @@
   <div class="col-12">
     <h1 class="w-12 flex justify-content-center">
       @if (status) {
-      <span class="bg">Error - {{status}}</span>
+        <span class="bg">Error - {{ status }}</span>
       } @else {
-      <span class="bg">Unknown Error</span>
+        <span class="bg">Unknown Error</span>
       }
     </h1>
   </div>
   <div class="col-5 flex justify-content-center gap-4">
-    @switch (status) { @case ('404') {
-    <span>The page you are looking for cannot be found. Try something different or contact support.</span>
-    } @case ('500') {
-    <span>It seems that the server is currently unavailable. Please try again later.</span>
-    } @case ('unknown') {
-    <span>You have encountered an unknown error.</span>
-    } @default {
-    <span>Oops! Something went wrong!</span>
-    } }
+    @switch (status) {
+      @case ("404") {
+        <span>The page you are looking for cannot be found. Try something different or contact support.</span>
+      }
+      @case ("500") {
+        <span>It seems that the server is currently unavailable. Please try again later.</span>
+      }
+      @case ("unknown") {
+        <span>You have encountered an unknown error.</span>
+      }
+      @default {
+        <span>Oops! Something went wrong!</span>
+      }
+    }
   </div>
   <div class="col-12 flex justify-content-center gap-4">
     <p-button [routerLink]="'/'" label="Homepage" />

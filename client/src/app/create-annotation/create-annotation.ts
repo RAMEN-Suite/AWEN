@@ -16,22 +16,26 @@ export class CreateAnnotation {
   label = input<string>('Add Annotation');
   icon = input<string>();
 
-  private createAnnotationDialogRef: DynamicDialogRef<CreateAnnotationForm> | null = null;
+  private createAnnotationDialogRef: DynamicDialogRef<CreateAnnotationForm> | null =
+    null;
 
   protected clickCreate() {
-    this.createAnnotationDialogRef = this.dialogService.open(CreateAnnotationForm, {
-      inputValues: {
-        entityId: this.entityId(),
+    this.createAnnotationDialogRef = this.dialogService.open(
+      CreateAnnotationForm,
+      {
+        inputValues: {
+          entityId: this.entityId(),
+        },
+        header: 'Create Annotation',
+        styleClass: 'w-11 md:w-9 lg:w-8',
+        style: {
+          'min-height': '20vh',
+        },
+        contentStyle: {
+          'padding-top': '0.5rem',
+        },
+        closable: true,
       },
-      header: 'Create Annotation',
-      styleClass: 'w-11 md:w-9 lg:w-8',
-      style: {
-        'min-height': '20vh',
-      },
-      contentStyle: {
-        'padding-top': '0.5rem',
-      },
-      closable: true,
-    });
+    );
   }
 }

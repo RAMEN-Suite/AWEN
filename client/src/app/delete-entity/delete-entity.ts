@@ -53,6 +53,10 @@ export class DeleteEntity {
 
   private async deleteEntity(id: string) {
     await this.entityAPI.deleteEntity(id);
-    this.messageService.add({ severity: 'info', summary: 'Entity deleted', detail: 'The Entity was deleted successfully' });
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Entity deleted',
+      detail: 'The Entity was deleted successfully',
+    });
   }
 }

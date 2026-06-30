@@ -25,15 +25,17 @@ export class GuidelinesService {
   }
 
   getNodeProperties(type: string) {
-    const temp = this.http.get<GAttribute[]>('/api/guidelines/config/node/properties/' + type).pipe(
-      catchError((err) => {
-        this.messageService.add({
-          severity: 'error',
-          detail: `Could not load Attributes of node type ${type}. Reload the page, or try again later.`,
-        });
-        throw err;
-      }),
-    );
+    const temp = this.http
+      .get<GAttribute[]>('/api/guidelines/config/node/properties/' + type)
+      .pipe(
+        catchError((err) => {
+          this.messageService.add({
+            severity: 'error',
+            detail: `Could not load Attributes of node type ${type}. Reload the page, or try again later.`,
+          });
+          throw err;
+        }),
+      );
     return firstValueFrom(temp);
   }
 }

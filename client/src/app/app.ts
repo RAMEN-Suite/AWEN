@@ -1,5 +1,16 @@
-import { Component, computed, ElementRef, inject, ViewChild } from '@angular/core';
-import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
+import {
+  Component,
+  computed,
+  ElementRef,
+  inject,
+  ViewChild,
+} from '@angular/core';
+import {
+  NavigationEnd,
+  Router,
+  RouterLink,
+  RouterOutlet,
+} from '@angular/router';
 import { Toast } from 'primeng/toast';
 import { ConfigService } from './config-module/config.service';
 import { ProgressSpinner } from 'primeng/progressspinner';
@@ -13,7 +24,18 @@ import { Navbar } from './navbar/navbar';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Toast, ProgressSpinner, MenubarModule, Button, RouterLink, ButtonDirective, ButtonLabel, ConfirmDialog, Navbar],
+  imports: [
+    RouterOutlet,
+    Toast,
+    ProgressSpinner,
+    MenubarModule,
+    Button,
+    RouterLink,
+    ButtonDirective,
+    ButtonLabel,
+    ConfirmDialog,
+    Navbar,
+  ],
   styleUrl: './app.scss',
   templateUrl: './app.html',
 })
@@ -27,9 +49,11 @@ export class App {
   showScrollTop = false;
 
   constructor() {
-    this.router.events.pipe(filter((e) => e instanceof NavigationEnd)).subscribe(() => {
-      this.scrollToTop('instant');
-    });
+    this.router.events
+      .pipe(filter((e) => e instanceof NavigationEnd))
+      .subscribe(() => {
+        this.scrollToTop('instant');
+      });
   }
 
   onContentScroll(event: Event): void {
