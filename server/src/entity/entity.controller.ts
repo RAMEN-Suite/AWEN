@@ -37,9 +37,7 @@ export class EntityController {
 
   @ApiResponse({ type: [OldEntityDto] })
   @Get('')
-  async getAutoCompleteF(
-    @Query() params: EntitySearchDto,
-  ): Promise<EntityCollectionNameDto[]> {
+  async getAutoCompleteF(@Query() params: EntitySearchDto): Promise<EntityCollectionNameDto[]> {
     const { label } = params;
 
     const searchQuery = parseStringToSearchQueryString(label);
@@ -111,42 +109,30 @@ export class EntityController {
 
   @ApiResponse({ type: [AnnotationDto] })
   @Get(':id/annotations')
-  async getAnnotationsOfEntity(
-    @Param() params: IdDto,
-  ): Promise<AnnotationDto[]> {
+  async getAnnotationsOfEntity(@Param() params: IdDto): Promise<AnnotationDto[]> {
     const { id } = params;
 
-    const annotations: AnnotationDto[] =
-      await this.annotationService.getAnnotationsOfEntity(id);
+    const annotations: AnnotationDto[] = await this.annotationService.getAnnotationsOfEntity(id);
 
     return annotations;
   }
 
   @ApiResponse({ type: [AnnotationDto] })
   @Get(':id/annotations/content')
-  async getAnnotationsWithContentOfContent(
-    @Param() params: IdDto,
-  ): Promise<AnnotationDto[]> {
+  async getAnnotationsWithContentOfContent(@Param() params: IdDto): Promise<AnnotationDto[]> {
     const { id } = params;
 
-    const annotations: AnnotationDto[] =
-      await this.annotationService.getAnnotationsWithReferencesOfContent(id);
+    const annotations: AnnotationDto[] = await this.annotationService.getAnnotationsWithReferencesOfContent(id);
 
     return annotations;
   }
 
   @ApiResponse({ type: [EntityNamesDto] })
   @Get('auto-complete/:label')
-  async getAutoComplete(
-    @Param() params: LabelDto,
-    @Query() qParams: EntityAutocompleteQueryDto,
-  ): Promise<EntityNamesDto[]> {
+  async getAutoComplete(@Param() params: LabelDto, @Query() qParams: EntityAutocompleteQueryDto): Promise<EntityNamesDto[]> {
     const { label } = params;
     const searchQuery = parseStringToSearchQueryString(label);
-    const entities = await this.entityService.findNamesByName(
-      searchQuery,
-      qParams,
-    );
+    const entities = await this.entityService.findNamesByName(searchQuery, qParams);
 
     return entities;
   }

@@ -1,9 +1,4 @@
-import {
-  Catch,
-  ExceptionFilter,
-  InternalServerErrorException,
-  Logger,
-} from '@nestjs/common';
+import { Catch, ExceptionFilter, InternalServerErrorException, Logger } from '@nestjs/common';
 import { Neo4jError } from 'neo4j-driver-core';
 
 @Catch(Neo4jError)

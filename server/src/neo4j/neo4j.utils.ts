@@ -5,9 +5,7 @@ import { Logger } from '@nestjs/common';
 export const createDriver = async (config: Neo4jConfig): Promise<Driver> => {
   const logger = new Logger('Neo4j Driver');
   for (let j = 1; j <= 5; j++) {
-    logger.log(
-      `${config.scheme}://${config.host}:${config.port}/${config.database}`,
-    );
+    logger.log(`${config.scheme}://${config.host}:${config.port}/${config.database}`);
     const driver = neo4j.driver(
       `${config.scheme}://${config.host}:${config.port}`,
       neo4j.auth.basic(config.username, config.password, config.database),
@@ -17,15 +15,10 @@ export const createDriver = async (config: Neo4jConfig): Promise<Driver> => {
     try {
       await driver.getServerInfo();
     } catch (e) {
-      logger.error(
-        'Neo4j Driver could not connect to the neo4j server',
-        e instanceof Error ? e.stack : undefined,
-      );
+      logger.error('Neo4j Driver could not connect to the neo4j server', e instanceof Error ? e.stack : undefined);
       logger.log(`Attempt Nr. ${j}`);
       for (let i = 5; i > 0; i--) {
-        logger.warn(
-          `Neo4j-Driver could not start. It will try again in ${i}...`,
-        );
+        logger.warn(`Neo4j-Driver could not start. It will try again in ${i}...`);
         await new Promise((resolve) => setTimeout(resolve, 1000));
       }
       continue;

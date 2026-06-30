@@ -28,31 +28,21 @@ async function bootstrap() {
   const APP_NAME = envOrDefault('AWEN_APP_NAME', 'CRANN');
   const APP_HOST = envOrDefault('AWEN_APP_HOST');
   const APP_FAVICON = envOrDefault('AWEN_APP_FAVICON', 'favicon-default.jpg');
-  const serverSideClient = process.env['SERVER_SIDE_CLIENT']
-    ? process.env['SERVER_SIDE_CLIENT'] === 'true'
-    : false;
+  const serverSideClient = process.env['SERVER_SIDE_CLIENT'] ? process.env['SERVER_SIDE_CLIENT'] === 'true' : false;
 
   if (serverSideClient) {
     console.log(`serverSideClient enabled. Prefixed with "${APP_PREFIX}". `);
     if (APP_PREFIX !== '/') {
-      app.use(
-        '/',
-        (
-          req: express.Request,
-          res: express.Response,
-          next: express.NextFunction,
-        ) => {
-          if (!['GET', 'HEAD'].includes(req.method) || req.path !== '/') {
-            return next();
-          }
+      app.use('/', (req: express.Request, res: express.Response, next: express.NextFunction) => {
+        if (!['GET', 'HEAD'].includes(req.method) || req.path !== '/') {
+          return next();
+        }
 
-          const queryIndex = req.originalUrl.indexOf('?');
-          const query =
-            queryIndex === -1 ? '' : req.originalUrl.slice(queryIndex);
-          console.log(`client redirected to ${APP_PREFIX + query}`);
-          res.redirect(302, APP_PREFIX + query);
-        },
-      );
+        const queryIndex = req.originalUrl.indexOf('?');
+        const query = queryIndex === -1 ? '' : req.originalUrl.slice(queryIndex);
+        console.log(`client redirected to ${APP_PREFIX + query}`);
+        res.redirect(302, APP_PREFIX + query);
+      });
     }
 
     app.use(
@@ -62,31 +52,21 @@ async function bootstrap() {
       }),
     );
 
-    const raw = fs.readFileSync(
-      path.join(__dirname, '..', 'client', 'index.html'),
-      'utf-8',
-    );
+    const raw = fs.readFileSync(path.join(__dirname, '..', 'client', 'index.html'), 'utf-8');
     const indexHtml = raw
       .replace('${AWEN_APP_PREFIX}', APP_PREFIX)
       .replace('${AWEN_APP_NAME}', APP_NAME)
       .replace('${AWEN_APP_HOST}', APP_HOST)
       .replace('${AWEN_APP_FAVICON}', APP_FAVICON);
 
-    app.use(
-      APP_PREFIX,
-      (
-        req: express.Request,
-        res: express.Response,
-        next: express.NextFunction,
-      ) => {
-        if (!['GET', 'HEAD'].includes(req.method)) return next();
-        if (req.path.startsWith('/api')) return next();
-        if (req.path.startsWith('/docs')) return next();
-        if (path.extname(req.path)) return next();
-        res.setHeader('Content-Type', 'text/html');
-        res.send(indexHtml);
-      },
-    );
+    app.use(APP_PREFIX, (req: express.Request, res: express.Response, next: express.NextFunction) => {
+      if (!['GET', 'HEAD'].includes(req.method)) return next();
+      if (req.path.startsWith('/api')) return next();
+      if (req.path.startsWith('/docs')) return next();
+      if (path.extname(req.path)) return next();
+      res.setHeader('Content-Type', 'text/html');
+      res.send(indexHtml);
+    });
   } else {
     app.enableCors({
       origin: true,
@@ -105,9 +85,7 @@ async function bootstrap() {
     }),
   );
 
-  const config = new DocumentBuilder()
-    .setTitle(envOrDefault('AWEN_APP_NAME', 'AWEN'))
-    .build();
+  const config = new DocumentBuilder().setTitle(envOrDefault('AWEN_APP_NAME', 'AWEN')).build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, documentFactory);
 

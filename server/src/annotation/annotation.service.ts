@@ -38,9 +38,7 @@ export class AnnotationService {
     private readonly model: RamenModelService,
     private readonly nodes: NodeRepository,
   ) {
-    this.ANNOTATION_KEY_PROPERTY = this.model.getNodeKeyField(
-      ANNOTATION_LABEL_NAME,
-    );
+    this.ANNOTATION_KEY_PROPERTY = this.model.getNodeKeyField(ANNOTATION_LABEL_NAME);
     this.ENTITY_KEY_PROPERTY = this.model.getNodeKeyField(ENTITY_LABEL_NAME);
     this.CONTENT_KEY_PROPERTY = this.model.getNodeKeyField(CONTENT_LABEL_NAME);
   }
@@ -51,15 +49,10 @@ export class AnnotationService {
     return transformNodeToAnnotationDTO(annotationNode, gNode);
   }
 
-  async createForEntity(
-    entityId: string,
-    type: string,
-    properties: Record<string, unknown>,
-  ) {
+  async createForEntity(entityId: string, type: string, properties: Record<string, unknown>) {
     const nodeType = this.model.getNodeType(type);
     this.logger.debug('got ' + nodeType.name);
-    const [valid, message]: [valid: boolean, message: string[]] =
-      this.model.validateAttributes(nodeType, properties);
+    const [valid, message]: [valid: boolean, message: string[]] = this.model.validateAttributes(nodeType, properties);
 
     if (!valid) {
       throw new Error('Invalid Attributes', { cause: message });
@@ -116,8 +109,7 @@ export class AnnotationService {
 
     const nodeType = this.model.getMostSpecificType(annotation.labels);
 
-    const [valid, message]: [valid: boolean, message: string[]] =
-      this.model.validateAttributes(nodeType, properties);
+    const [valid, message]: [valid: boolean, message: string[]] = this.model.validateAttributes(nodeType, properties);
 
     if (!valid) {
       throw new Error('Invalid Attributes', { cause: message });
@@ -163,10 +155,7 @@ export class AnnotationService {
         labels: ANNOTATION_LABEL_NAME,
       });
 
-    const clause = new Cypher.Match(searchPattern).return([
-      aNode,
-      'annotation',
-    ]);
+    const clause = new Cypher.Match(searchPattern).return([aNode, 'annotation']);
     const { cypher, params } = clause.build();
 
     const res = await this.neo4jService.read<{
@@ -217,34 +206,27 @@ export class AnnotationService {
           connectedNode.hasLabels(COLLECTION_LABEL_NAME),
           and(
             connectedNode.hasLabels(ENTITY_LABEL_NAME),
-            not(
-              eq(
-                connectedNode.property(this.ENTITY_KEY_PROPERTY),
-                new Cypher.Param(entityId),
-              ),
-            ),
+            not(eq(connectedNode.property(this.ENTITY_KEY_PROPERTY), new Cypher.Param(entityId))),
           ),
         ),
       );
 
-    const clause = new Cypher.Match(searchPattern)
-      .optionalMatch(optionalConnectedNodePattern)
-      .return(
-        [aNode, 'annotation'],
-        [
-          Cypher.collect(
-            new Cypher.Map({
-              node: connectedNode,
-              relationship: relConnectedNode,
-              direction: new Cypher.Case()
-                .when(Cypher.eq(Cypher.startNode(relConnectedNode), aNode))
-                .then(new Cypher.Literal('OUTGOING'))
-                .else(new Cypher.Literal('INCOMING')),
-            }),
-          ),
-          'connectedNodes',
-        ],
-      );
+    const clause = new Cypher.Match(searchPattern).optionalMatch(optionalConnectedNodePattern).return(
+      [aNode, 'annotation'],
+      [
+        Cypher.collect(
+          new Cypher.Map({
+            node: connectedNode,
+            relationship: relConnectedNode,
+            direction: new Cypher.Case()
+              .when(Cypher.eq(Cypher.startNode(relConnectedNode), aNode))
+              .then(new Cypher.Literal('OUTGOING'))
+              .else(new Cypher.Literal('INCOMING')),
+          }),
+        ),
+        'connectedNodes',
+      ],
+    );
 
     const { cypher, params } = clause.build();
 
@@ -270,25 +252,12 @@ export class AnnotationService {
         const transformedConnectedNodes: ConnectedNodeDto[] = connectedNodes
           .filter((c) => !!c.node) // optionalMatch kann null liefern
           .flatMap((c) => {
-            const connectedGNode = this.model.getMostSpecificType(
-              c.node.labels,
-            );
+            const connectedGNode = this.model.getMostSpecificType(c.node.labels);
             if (!connectedGNode) return [];
-            return [
-              transformConnectedNodeToDto(
-                c.node,
-                c.relationship,
-                c.direction,
-                connectedGNode,
-              ),
-            ];
+            return [transformConnectedNodeToDto(c.node, c.relationship, c.direction, connectedGNode)];
           });
 
-        return transformNodeToAnnotationWithContentDTO(
-          annotation,
-          gNode,
-          transformedConnectedNodes,
-        );
+        return transformNodeToAnnotationWithContentDTO(annotation, gNode, transformedConnectedNodes);
       })
       .filter((annotation) => !!annotation);
   }
@@ -301,9 +270,7 @@ export class AnnotationService {
         [this.ANNOTATION_KEY_PROPERTY]: new Cypher.Param(id),
       },
     });
-    const { cypher, params } = new Cypher.Match(pattern)
-      .detachDelete(aNode)
-      .build();
+    const { cypher, params } = new Cypher.Match(pattern).detachDelete(aNode).build();
     await this.neo4jService.write(cypher, params);
   }
 
@@ -331,24 +298,13 @@ export class AnnotationService {
             connectedNode.hasLabels(COLLECTION_LABEL_NAME),
           ),
           or(
-            eq(
-              connectedNode.property(this.ANNOTATION_KEY_PROPERTY),
-              new Cypher.Param(connectedNodeId),
-            ),
-            eq(
-              connectedNode.property(this.ENTITY_KEY_PROPERTY),
-              new Cypher.Param(connectedNodeId),
-            ),
-            eq(
-              connectedNode.property(this.CONTENT_KEY_PROPERTY),
-              new Cypher.Param(connectedNodeId),
-            ),
+            eq(connectedNode.property(this.ANNOTATION_KEY_PROPERTY), new Cypher.Param(connectedNodeId)),
+            eq(connectedNode.property(this.ENTITY_KEY_PROPERTY), new Cypher.Param(connectedNodeId)),
+            eq(connectedNode.property(this.CONTENT_KEY_PROPERTY), new Cypher.Param(connectedNodeId)),
           ),
         ),
       );
-    const { cypher, params } = new Cypher.Match(pattern)
-      .delete(relation)
-      .build();
+    const { cypher, params } = new Cypher.Match(pattern).delete(relation).build();
     await this.neo4jService.write(cypher, params);
   }
 
@@ -374,18 +330,9 @@ export class AnnotationService {
           connectedNode.hasLabels(COLLECTION_LABEL_NAME),
         ),
         or(
-          eq(
-            connectedNode.property(this.ANNOTATION_KEY_PROPERTY),
-            new Cypher.Param(connectedNodeId),
-          ),
-          eq(
-            connectedNode.property(this.ENTITY_KEY_PROPERTY),
-            new Cypher.Param(connectedNodeId),
-          ),
-          eq(
-            connectedNode.property(this.CONTENT_KEY_PROPERTY),
-            new Cypher.Param(connectedNodeId),
-          ),
+          eq(connectedNode.property(this.ANNOTATION_KEY_PROPERTY), new Cypher.Param(connectedNodeId)),
+          eq(connectedNode.property(this.ENTITY_KEY_PROPERTY), new Cypher.Param(connectedNodeId)),
+          eq(connectedNode.property(this.CONTENT_KEY_PROPERTY), new Cypher.Param(connectedNodeId)),
         ),
       ),
     );
@@ -397,10 +344,7 @@ export class AnnotationService {
       })
       .to(connectedNode);
 
-    const { cypher, params } = new Cypher.Match(matchAnnotation)
-      .match(matchConnectedNode)
-      .merge(mergePattern)
-      .build();
+    const { cypher, params } = new Cypher.Match(matchAnnotation).match(matchConnectedNode).merge(mergePattern).build();
     await this.neo4jService.write(cypher, params);
   }
 

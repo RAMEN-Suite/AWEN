@@ -1,17 +1,5 @@
-import {
-  BeforeApplicationShutdown,
-  Inject,
-  Injectable,
-  InternalServerErrorException,
-  Logger,
-} from '@nestjs/common';
-import {
-  Driver,
-  ManagedTransaction,
-  Result,
-  session,
-  Session,
-} from 'neo4j-driver';
+import { BeforeApplicationShutdown, Inject, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { Driver, ManagedTransaction, Result, session, Session } from 'neo4j-driver';
 import type { Neo4jConfig } from './neo4j-config.interface';
 import { RecordShape } from 'neo4j-driver-core/types/record';
 
@@ -24,16 +12,10 @@ export class Neo4jService implements BeforeApplicationShutdown {
     @Inject('NEO4J_DRIVER') private readonly driver: Driver,
   ) {}
 
-  async write<T extends RecordShape>(
-    cypher: string,
-    params?: Record<string, any>,
-    database?: string,
-  ): Promise<Result<T>> {
+  async write<T extends RecordShape>(cypher: string, params?: Record<string, any>, database?: string): Promise<Result<T>> {
     const session = this.getWriteSession(database);
     try {
-      return await session.executeWrite((tx: ManagedTransaction) =>
-        tx.run<T>(cypher, params),
-      );
+      return await session.executeWrite((tx: ManagedTransaction) => tx.run<T>(cypher, params));
     } catch (e) {
       this.logger.error('Could not run a query, because:', e);
       throw new InternalServerErrorException('Database could not run a query.');
@@ -42,16 +24,10 @@ export class Neo4jService implements BeforeApplicationShutdown {
     }
   }
 
-  async read<T extends RecordShape>(
-    cypher: string,
-    params?: Record<string, any>,
-    database?: string,
-  ): Promise<Result<T>> {
+  async read<T extends RecordShape>(cypher: string, params?: Record<string, any>, database?: string): Promise<Result<T>> {
     const session = this.getReadSession(database);
     try {
-      return await session.executeRead((tx: ManagedTransaction) =>
-        tx.run<T>(cypher, params),
-      );
+      return await session.executeRead((tx: ManagedTransaction) => tx.run<T>(cypher, params));
     } catch (e) {
       this.logger.error('Could not run a query, because:', e);
       throw new InternalServerErrorException('Database could not run a query.');
@@ -75,11 +51,7 @@ export class Neo4jService implements BeforeApplicationShutdown {
   }
 
   async beforeApplicationShutdown(signal?: string): Promise<void> {
-    this.logger.log(
-      '[Neo4j Driver]',
-      'Neo4j-Driver Closed with signal: ',
-      signal,
-    );
+    this.logger.log('[Neo4j Driver]', 'Neo4j-Driver Closed with signal: ', signal);
     await this.driver.close();
   }
 }

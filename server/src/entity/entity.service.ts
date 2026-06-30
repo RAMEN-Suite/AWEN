@@ -2,11 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Neo4jService } from '../neo4j/neo4j.service';
 import { GuidelinesService } from '../guidelines/guidelines.service';
 import { EntityNamesDto } from './dto/entity-names.dto';
-import Cypher, {
-  PartialPattern,
-  Pattern,
-  type SetParam,
-} from '@neo4j/cypher-builder';
+import Cypher, { PartialPattern, Pattern, type SetParam } from '@neo4j/cypher-builder';
 import { EntitySearchDto } from './dto/entity-search.dto';
 import { EntityCollectionNameDto } from './dto/entity-collection-name.dto';
 import { CollectionService } from '../collection/collection.service';
@@ -49,11 +45,10 @@ export class EntityService {
   }
 
   async getById(id: string): Promise<EntityDto | undefined> {
-    const entityNode: Node<Integer, Record<string, any>> | undefined =
-      await this.nodes.getById(id, {
-        labels: ENTITY_LABEL_NAME,
-        keyName: this.ENTITY_KEY_PROPERTY,
-      });
+    const entityNode: Node<Integer, Record<string, any>> | undefined = await this.nodes.getById(id, {
+      labels: ENTITY_LABEL_NAME,
+      keyName: this.ENTITY_KEY_PROPERTY,
+    });
     if (!entityNode) return undefined;
 
     const gNode = this.model.getMostSpecificType(entityNode.labels);
@@ -63,10 +58,9 @@ export class EntityService {
   }
 
   async getByProperty(key: string, value: string): Promise<EntityNodeDto[]> {
-    const entityNodes: Node<Integer, Record<string, any>>[] =
-      await this.nodes.getByProperty(key, value, {
-        labels: ENTITY_LABEL_NAME,
-      });
+    const entityNodes: Node<Integer, Record<string, any>>[] = await this.nodes.getByProperty(key, value, {
+      labels: ENTITY_LABEL_NAME,
+    });
 
     // TODO: zum normalen DTO
     return transformNodesToEntityNodeDTOs(entityNodes);
@@ -74,17 +68,12 @@ export class EntityService {
 
   async findNamesByNameNew(name: string): Promise<EntityNamesDto[]> {
     const { fulltextIndexes } = await this.guidelinesService.get();
-    const results = await this.nodes.indexFulltextQueryNodes(
-      fulltextIndexes.search,
-      name,
-    );
+    const results = await this.nodes.indexFulltextQueryNodes(fulltextIndexes.search, name);
     const label = this.model.getAttribute(ENTITY_LABEL_NAME, 'label');
 
     if (!label) {
       this.logger.error('There is no param named "label" for entity nodes."');
-      throw new RAMENError(
-        'There is no param named "label" for entity nodes."',
-      );
+      throw new RAMENError('There is no param named "label" for entity nodes."');
     }
     return transformNodesToNameEntityDTOs(
       results.map((r) => r.node),
@@ -93,10 +82,7 @@ export class EntityService {
     );
   }
 
-  async findNamesByName(
-    name: string,
-    queryParams: EntityAutocompleteQueryDto,
-  ): Promise<EntityNamesDto[]> {
+  async findNamesByName(name: string, queryParams: EntityAutocompleteQueryDto): Promise<EntityNamesDto[]> {
     const eNode = new Cypher.Node();
     const score = new Cypher.Variable();
 
@@ -104,14 +90,8 @@ export class EntityService {
 
     let collPattern: undefined | Pattern = undefined;
 
-    if (
-      queryParams.collectionFilter &&
-      Object.keys(queryParams.collectionFilter).length > 0
-    ) {
-      collPattern = this.addFilterByCollection(
-        eNode,
-        queryParams.collectionFilter,
-      );
+    if (queryParams.collectionFilter && Object.keys(queryParams.collectionFilter).length > 0) {
+      collPattern = this.addFilterByCollection(eNode, queryParams.collectionFilter);
     }
 
     let typePatten: undefined | Pattern = undefined;
@@ -125,35 +105,21 @@ export class EntityService {
     query = await this.addOrderByProperty(query, eNode, [[score, 'ASC']]);
 
     if (typePatten) {
-      query = query
-        .with(eNode, score)
-        .match(typePatten)
-        .with(eNode, score)
-        .distinct();
+      query = query.with(eNode, score).match(typePatten).with(eNode, score).distinct();
     }
 
     // Wenn ein Collection-Filter existiert, erweitern wir den Query mit MATCH
     if (collPattern) {
-      query = query
-        .with(eNode, score)
-        .match(collPattern)
-        .with(eNode, score)
-        .distinct();
+      query = query.with(eNode, score).match(collPattern).with(eNode, score).distinct();
     }
 
     query = await this.addOrderByProperty(query, eNode, [[score, 'ASC']]);
 
     const { cypher, params } = query
-      .return(
-        [eNode.property(ENTITY_NAME_PROPERTY), 'label'],
-        [eNode.property(this.ENTITY_KEY_PROPERTY), 'id'],
-      )
+      .return([eNode.property(ENTITY_NAME_PROPERTY), 'label'], [eNode.property(this.ENTITY_KEY_PROPERTY), 'id'])
       .build();
 
-    const res = await this.neo4jService.read<{ label: string; id: string }>(
-      cypher,
-      params,
-    );
+    const res = await this.neo4jService.read<{ label: string; id: string }>(cypher, params);
 
     const entities = res.records.map((record) => ({
       label: record.get('label'),
@@ -163,20 +129,11 @@ export class EntityService {
     return entities;
   }
 
-  private async runSearch(
-    eNode: Cypher.Node,
-    score: Cypher.Variable,
-    query: string,
-  ) {
+  private async runSearch(eNode: Cypher.Node, score: Cypher.Variable, query: string) {
     const guidelines = await this.guidelinesService.get();
 
     return new Cypher.With('*')
-      .callProcedure(
-        Cypher.db.index.fulltext.queryNodes(
-          guidelines.fulltextIndexes.search,
-          new Cypher.Literal(query),
-        ),
-      )
+      .callProcedure(Cypher.db.index.fulltext.queryNodes(guidelines.fulltextIndexes.search, new Cypher.Literal(query)))
       .yield(['node', eNode], ['score', score])
       .with(eNode, score);
   }
@@ -188,17 +145,10 @@ export class EntityService {
       .where(Cypher.neq(l, new Cypher.Literal(ENTITY_LABEL_NAME)));
 
     const propsExpr = Cypher.properties(eNode);
-    const keysExpr = new Cypher.List([
-      new Cypher.Literal(this.ENTITY_KEY_PROPERTY),
-      new Cypher.Literal(ENTITY_NAME_PROPERTY),
-    ]);
-    const cleanedProps = new Cypher.Function('apoc.map.removeKeys', [
-      propsExpr,
-      keysExpr,
-    ]);
+    const keysExpr = new Cypher.List([new Cypher.Literal(this.ENTITY_KEY_PROPERTY), new Cypher.Literal(ENTITY_NAME_PROPERTY)]);
+    const cleanedProps = new Cypher.Function('apoc.map.removeKeys', [propsExpr, keysExpr]);
 
-    const [clause, collections] =
-      await this.collectionService.getCollectionsOfEntityNode(eNode, query);
+    const [clause, collections] = await this.collectionService.getCollectionsOfEntityNode(eNode, query);
 
     const returnMap = new Cypher.Map({
       nodeLabel: new Cypher.Literal(ENTITY_LABEL_NAME),
@@ -219,14 +169,8 @@ export class EntityService {
     const searchPattern = await this.runSearch(eNode, score, queryParams.label);
     let collPattern: undefined | Pattern = undefined;
 
-    if (
-      queryParams.collectionFilter &&
-      Object.keys(queryParams.collectionFilter).length > 0
-    ) {
-      collPattern = this.addFilterByCollection(
-        eNode,
-        queryParams.collectionFilter,
-      );
+    if (queryParams.collectionFilter && Object.keys(queryParams.collectionFilter).length > 0) {
+      collPattern = this.addFilterByCollection(eNode, queryParams.collectionFilter);
     }
 
     let typePatten: undefined | Pattern = undefined;
@@ -240,20 +184,12 @@ export class EntityService {
     query = await this.addOrderByProperty(query, eNode, [[score, 'ASC']]);
 
     if (typePatten) {
-      query = query
-        .with(eNode, score)
-        .match(typePatten)
-        .with(eNode, score)
-        .distinct();
+      query = query.with(eNode, score).match(typePatten).with(eNode, score).distinct();
     }
 
     // Wenn ein Collection-Filter existiert, erweitern wir den Query mit MATCH
     if (collPattern) {
-      query = query
-        .with(eNode, score)
-        .match(collPattern)
-        .with(eNode, score)
-        .distinct();
+      query = query.with(eNode, score).match(collPattern).with(eNode, score).distinct();
     }
 
     // // Rückgabe als Liste
@@ -274,10 +210,7 @@ export class EntityService {
     return entities;
   }
 
-  private addFilterByCollection(
-    eNode: Cypher.Node,
-    collectionFilters: Record<string, string[]>,
-  ) {
+  private addFilterByCollection(eNode: Cypher.Node, collectionFilters: Record<string, string[]>) {
     const collectionChains = this.model.getCollectionChains();
     const collectionChain = collectionChains.find((chain) => {
       let match = false;
@@ -304,10 +237,7 @@ export class EntityService {
       .to(aNode, { labels: ANNOTATION_LABEL_NAME })
       .related(aToC, { type: TO_ANNOTATION_REL_TYPE, direction: 'left' });
 
-    const collections: Map<string, Cypher.Node> = new Map<
-      string,
-      Cypher.Node
-    >();
+    const collections: Map<string, Cypher.Node> = new Map<string, Cypher.Node>();
 
     collectionChain.toReversed().forEach((col, index) => {
       const collection = new Cypher.Node();
@@ -332,9 +262,7 @@ export class EntityService {
       const colIDs = collectionFilters[collection];
 
       if (colIDs !== undefined) {
-        newPattern = newPattern.where(
-          Cypher.in(col.property(colIdLabel), new Cypher.Literal(colIDs)),
-        );
+        newPattern = newPattern.where(Cypher.in(col.property(colIdLabel), new Cypher.Literal(colIDs)));
       }
     }
 
@@ -392,8 +320,7 @@ export class EntityService {
   async create(type: string, properties: Record<string, unknown>) {
     const nodeType = this.model.getNodeType(type);
 
-    const [valid, message]: [valid: boolean, message: string[]] =
-      this.model.validateAttributes(nodeType, properties);
+    const [valid, message]: [valid: boolean, message: string[]] = this.model.validateAttributes(nodeType, properties);
 
     if (!valid) {
       throw new Error('Invalid Attributes', { cause: message });
@@ -434,8 +361,7 @@ export class EntityService {
 
     const nodeType = this.model.getMostSpecificType(entityNode.labels);
 
-    const [valid, message]: [valid: boolean, message: string[]] =
-      this.model.validateAttributes(nodeType, properties);
+    const [valid, message]: [valid: boolean, message: string[]] = this.model.validateAttributes(nodeType, properties);
 
     if (!valid) {
       throw new Error('Invalid Attributes', { cause: message });

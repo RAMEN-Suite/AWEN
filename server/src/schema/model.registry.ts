@@ -108,26 +108,16 @@ export class ModelRegistry {
         id: formatedId,
         name: node.name,
         superTypes: this.formatSuperTypes(node.superTypes, modelId),
-        attributes: this.mergeAttributes(
-          node.attributes,
-          node.superTypes,
-          modelId,
-        ),
+        attributes: this.mergeAttributes(node.attributes, node.superTypes, modelId),
       });
       return;
     }
 
     this.nodeAliases.set(formatedId, existing.id);
 
-    existing.attributes = this.mergeAttributeOverrides(
-      existing.attributes,
-      node.attributes,
-    );
+    existing.attributes = this.mergeAttributeOverrides(existing.attributes, node.attributes);
 
-    const additionalSuperTypes = this.formatSuperTypes(
-      node.superTypes,
-      modelId,
-    );
+    const additionalSuperTypes = this.formatSuperTypes(node.superTypes, modelId);
     additionalSuperTypes.forEach((name, id) => {
       const resolvedId = this.resolveNodeId(id);
 
@@ -137,10 +127,7 @@ export class ModelRegistry {
     });
   }
 
-  private mergeAttributeOverrides(
-    baseAttributes: GAttribute[],
-    overlayAttributes: GAttribute[],
-  ): GAttribute[] {
+  private mergeAttributeOverrides(baseAttributes: GAttribute[], overlayAttributes: GAttribute[]): GAttribute[] {
     const attributesByName = new Map<string, GAttribute>();
 
     baseAttributes.forEach((attribute) => {
@@ -243,9 +230,7 @@ export class ModelRegistry {
 
   /** Alle Subtypen (z.B. Collection o. Entity */
   getTypes(name: string): string[] {
-    return this.allNodes
-      .map((n) => n.name)
-      .filter((n) => this.isSubtypeOf(n, name));
+    return this.allNodes.map((n) => n.name).filter((n) => this.isSubtypeOf(n, name));
   }
 
   getDataTypes() {
@@ -309,10 +294,7 @@ export class ModelRegistry {
       ensureSet(childrenByParent, fromName);
     }
 
-    const allNodes = new Set<string>([
-      ...childrenByParent.keys(),
-      ...parentsByChild.keys(),
-    ]);
+    const allNodes = new Set<string>([...childrenByParent.keys(), ...parentsByChild.keys()]);
 
     const roots = Array.from(allNodes).filter((n) => {
       const parents = parentsByChild.get(n);
@@ -363,11 +345,7 @@ export class ModelRegistry {
     return superTypes;
   }
 
-  private mergeAttributes(
-    attributes: GAttribute[],
-    superTypes: string[],
-    modelId: string,
-  ) {
+  private mergeAttributes(attributes: GAttribute[], superTypes: string[], modelId: string) {
     const mergedAttributes: GAttribute[] = [...attributes];
 
     superTypes.forEach((typeId) => {

@@ -39,10 +39,7 @@ export class AnnotationController {
   }
 
   @Put(':id')
-  async put(
-    @Param() params: IdDto,
-    @Body() body: UpdateAnnotationDto,
-  ): Promise<void> {
+  async put(@Param() params: IdDto, @Body() body: UpdateAnnotationDto): Promise<void> {
     const { id } = params;
     try {
       await this.annotationService.update(id, body.properties);
@@ -55,19 +52,14 @@ export class AnnotationController {
   }
 
   @Post(':id/connection')
-  async createConnection(
-    @Param() params: IdDto,
-    @Body() body: CreateAnnotationConnectionReqDto,
-  ): Promise<void> {
+  async createConnection(@Param() params: IdDto, @Body() body: CreateAnnotationConnectionReqDto): Promise<void> {
     const { id } = params;
     const { connectionId } = body;
     await this.annotationService.createConnection(id, connectionId);
   }
 
   @Delete(':id/connection/:connectedId')
-  async deleteConnection(
-    @Param() params: DeleteAnnotationConnectionReqDto,
-  ): Promise<void> {
+  async deleteConnection(@Param() params: DeleteAnnotationConnectionReqDto): Promise<void> {
     const { id, connectedId } = params;
     await this.annotationService.deleteConnection(id, connectedId);
   }
@@ -81,11 +73,7 @@ export class AnnotationController {
       throw new BadRequestException('There is no entity with the given id.');
     }
     try {
-      const annotationId = await this.annotationService.createForEntity(
-        entityId,
-        type,
-        properties,
-      );
+      const annotationId = await this.annotationService.createForEntity(entityId, type, properties);
       return {
         id: annotationId,
       };
