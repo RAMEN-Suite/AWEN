@@ -7,7 +7,7 @@ import { Accordion, AccordionContent, AccordionHeader, AccordionPanel } from 'pr
 import { Chip } from 'primeng/chip';
 import { AnnotationCard } from './annotation-card/annotation-card';
 import { Button } from 'primeng/button';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SelectButton } from 'primeng/selectbutton';
 import { ConfigService } from '../config-module/config.service';
 
