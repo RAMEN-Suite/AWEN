@@ -26,30 +26,34 @@ export class AnnotationCard {
   private readonly utils = inject(UtilsService);
   private readonly entityService = inject(EntityService);
 
-  annotation = input.required<StatementAnnotationView>();
+  public annotation = input.required<StatementAnnotationView>();
 
-  private createAnnotationConnectionDialogRef: DynamicDialogRef<CreateAnnotationConnection> | null = null;
+  private createAnnotationConnectionDialogRef: DynamicDialogRef<CreateAnnotationConnection> | null =
+    null;
 
   protected clickCreateAnnotationConnection(annotation: Annotation) {
-    this.createAnnotationConnectionDialogRef = this.dialogService.open(CreateAnnotationConnection, {
-      inputValues: {
-        annotation: annotation,
+    this.createAnnotationConnectionDialogRef = this.dialogService.open(
+      CreateAnnotationConnection,
+      {
+        inputValues: {
+          annotation: annotation,
+        },
+        header: 'Create Annotation Connection',
+        styleClass: 'w-11 md:w-9 lg:w-8',
+        style: {
+          'min-height': '50vh',
+        },
+        contentStyle: {
+          'padding-top': '0.5rem',
+        },
+        closable: true,
       },
-      header: 'Create Annotation Connection',
-      styleClass: 'w-11 md:w-9 lg:w-8',
-      style: {
-        'min-height': '50vh',
-      },
-      contentStyle: {
-        'padding-top': '0.5rem',
-      },
-      closable: true,
-    });
+    );
   }
 
-  protected async clickDeleteAnnotation(id: string, event?: Event) {
+  protected clickDeleteAnnotation(id: string, event?: Event) {
     this.confirmationService.confirm({
-      target: event?.target as EventTarget,
+      target: event?.target ?? undefined,
       message: `Are you sure you want to delete this annotation?\n Doing so will delete the annotation and disconnect all associated nodes.`,
       header: 'Danger Zone',
       icon: 'pi pi-info-circle',
@@ -64,7 +68,10 @@ export class AnnotationCard {
       },
       accept: async () => {
         await this.deleteAnnotation(id);
-        this.messageService.add({ severity: 'success', summary: 'Annotation deleted' });
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Annotation deleted',
+        });
         await this.entityService.reloadEntity();
       },
     });

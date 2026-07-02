@@ -11,6 +11,7 @@ import { EntityService } from '../entity.service';
 import {
   AnnotationOfEntityWithContent,
   ConnectedNodeDto,
+  Direction,
   StatementNodeView,
 } from '../../interfaces';
 import { getKeyProperty } from '../utils/entity.utils';
@@ -40,6 +41,11 @@ interface AnnotationGroupView {
   annotations: StatementAnnotationView[];
 }
 
+interface AnnotationGroupViews {
+  refersTo: AnnotationGroupView[];
+  isReferredTo: AnnotationGroupView[];
+}
+
 @Component({
   selector: 'app-annotations-list',
   imports: [
@@ -61,6 +67,14 @@ export class AnnotationList {
   private readonly entityService = inject(EntityService);
   private readonly configService = inject(ConfigService);
   private previousAnnotationTypeOptions: string[] = [];
+  public annotationDirectionOptions: {
+    label: string;
+    value: Direction;
+    icon: string;
+  }[] = [
+    { label: 'refers to', value: 'OUTGOING', icon: 'pi pi-arrow-right' },
+    { label: 'is referred to', value: 'INCOMING', icon: 'pi pi-arrow-left' },
+  ];
 
   public annotations = input.required<AnnotationOfEntityWithContent[]>();
   public entity = this.entityService.entity;
@@ -69,30 +83,56 @@ export class AnnotationList {
     this.configService.getAnnotationTypes();
   protected readonly selectedTypes = signal<string[]>([]);
   protected readonly selectedNodeLabel = signal<string>(ANNOTATION_LABEL_NAME);
+  protected readonly selectedAnnotationDirection =
+    signal<Direction>('OUTGOING');
   protected readonly activeAccordionPanels = signal<string[]>([]);
 
   protected readonly annotationTypeOptions = computed<string[]>(() => {
-    return this.allAnnotationGroups().map((group) => group.type);
+    if (this.selectedAnnotationDirection() === 'OUTGOING') {
+      return this.allAnnotationGroups().refersTo.map((group) => group.type);
+    } else {
+      return this.allAnnotationGroups().isReferredTo.map((group) => group.type);
+    }
   });
 
   private readonly selectedTypeSet = computed(
     () => new Set(this.selectedTypes()),
   );
 
-  private readonly allAnnotationGroups = computed<AnnotationGroupView[]>(() => {
-    const groups = new Map<string, StatementAnnotationView[]>();
+  private readonly allAnnotationGroups = computed<AnnotationGroupViews>(() => {
+    const refersToGroups = new Map<string, StatementAnnotationView[]>();
+    const isReferredToGroups = new Map<string, StatementAnnotationView[]>();
 
     for (const annotation of this.annotations()) {
       const view = this.toAnnotationView(annotation);
-      const annotations = groups.get(annotation.type) ?? [];
-      annotations.push(view);
-      groups.set(annotation.type, annotations);
+
+      if (annotation.direction === 'OUTGOING') {
+        const annotations = refersToGroups.get(annotation.type) ?? [];
+        annotations.push(view);
+        refersToGroups.set(annotation.type, annotations);
+      } else {
+        const annotations = isReferredToGroups.get(annotation.type) ?? [];
+        annotations.push(view);
+        isReferredToGroups.set(annotation.type, annotations);
+      }
     }
 
-    return Array.from(groups, ([type, annotations]) => ({
+    const refersTo = Array.from(refersToGroups, ([type, annotations]) => ({
       type,
       annotations,
     })).sort((a, b) => a.type.localeCompare(b.type));
+    const isReferredTo = Array.from(
+      isReferredToGroups,
+      ([type, annotations]) => ({
+        type,
+        annotations,
+      }),
+    ).sort((a, b) => a.type.localeCompare(b.type));
+
+    return {
+      refersTo: refersTo,
+      isReferredTo: isReferredTo,
+    };
   });
 
   protected readonly groupedAnnotations = computed<AnnotationGroupView[]>(
@@ -100,7 +140,14 @@ export class AnnotationList {
       const selectedTypeSet = this.selectedTypeSet();
       const selectedNodeLabel = this.selectedNodeLabel();
 
-      return this.allAnnotationGroups()
+      console.log(this.allAnnotationGroups());
+      const groups =
+        this.selectedAnnotationDirection() === 'INCOMING'
+          ? this.allAnnotationGroups().isReferredTo
+          : this.allAnnotationGroups().refersTo;
+      console.log(groups);
+
+      return groups
         .filter((group) => selectedTypeSet.has(group.type))
         .map((group): AnnotationGroupView => {
           return {
@@ -178,6 +225,10 @@ export class AnnotationList {
 
   protected setSelectedNodeLabel(value: string) {
     this.selectedNodeLabel.set(value);
+  }
+
+  protected setSelectedDirection(value: Direction) {
+    this.selectedAnnotationDirection.set(value);
   }
 
   private syncSelectedTypes(options: string[]) {

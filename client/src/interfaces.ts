@@ -16,6 +16,8 @@ export interface EntityPropertyDto {
   typeId: string;
 }
 
+export type Direction = 'INCOMING' | 'OUTGOING';
+
 export interface Annotation {
   type: string;
   types: string[];
@@ -23,7 +25,7 @@ export interface Annotation {
 }
 
 export interface AnnotationOfEntity extends Annotation {
-  direction: string;
+  direction: Direction;
 }
 
 export interface AnnotationOfEntityWithContent extends AnnotationOfEntity {
@@ -34,7 +36,7 @@ export interface ConnectedNodeDto {
   types: string[];
   properties: NodePropertyDto[];
   relationshipProperties: Record<string, never>;
-  direction: string;
+  direction: Direction;
 }
 
 export interface DataType {
