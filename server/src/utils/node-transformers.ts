@@ -9,6 +9,8 @@ import { AnnotationDto } from '../annotation/dto/annotation.dto';
 import { NodePropertyDto } from '../annotation/dto/node-property.dto';
 import { RAMENError } from '../schema/RAMENError';
 import { ConnectedNodeDto } from '../annotation/dto/connected-node.dto';
+import { AnnotationsOfEntityWithContentDto } from '../annotation/dto/annotations_of_entity_with_content.dto';
+import { AnnotationsOfEntityDto } from '../annotation/dto/annotations_of_entity.dto';
 
 export const transformNodeToEntityNodeDTO = (node: Node<Integer, Record<string, unknown>>): EntityNodeDto => {
   const types = node.labels.filter((l) => l !== ENTITY_LABEL_NAME);
@@ -130,7 +132,6 @@ export const transformNodeToAnnotationDTO = (node: Node<Integer, Record<string, 
     type: type,
     types: types,
     properties: props,
-    connectedNodes: [],
   });
 };
 
@@ -140,6 +141,20 @@ export const transformNodesToAnnotationDTOs = (
 ): AnnotationDto[] => {
   return nodes.map((node) => {
     return transformNodeToAnnotationDTO(node, gNode);
+  });
+};
+
+export const transformNodeToAnnotationOfEntityDTO = (
+  node: Node<Integer, Record<string, unknown>>,
+  direction: string,
+  gNode: NodeType,
+) => {
+  const annotation = transformNodeToAnnotationDTO(node, gNode);
+  return new AnnotationsOfEntityDto({
+    type: annotation.type,
+    types: annotation.types,
+    properties: annotation.properties,
+    direction: direction,
   });
 };
 
@@ -180,9 +195,10 @@ export const transformConnectedNodeToDto = (
 
 export const transformNodeToAnnotationWithContentDTO = (
   node: Node<Integer, Record<string, unknown>>,
+  direction: string,
   gNode: NodeType,
   connectedNodes: ConnectedNodeDto[] = [],
-): AnnotationDto => {
+): AnnotationsOfEntityWithContentDto => {
   let type: string | undefined;
   const props: NodePropertyDto[] = [];
 
@@ -219,10 +235,11 @@ export const transformNodeToAnnotationWithContentDTO = (
     throw new RAMENError();
   }
 
-  return new AnnotationDto({
+  return new AnnotationsOfEntityWithContentDto({
     type: type,
     types: types,
     properties: props,
-    connectedNodes,
+    direction: direction,
+    connectedNodes: connectedNodes,
   });
 };

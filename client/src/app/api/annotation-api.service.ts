@@ -40,7 +40,7 @@ export class AnnotationApiService {
       .pipe(
         catchError((err) => {
           if (err instanceof HttpErrorResponse) {
-            const error = err as {
+            const error = err.error as {
               statusCode?: number;
               message?: string | string[];
             };
@@ -125,7 +125,7 @@ export class AnnotationApiService {
     const res = this.http.put(`/api/annotation/${annotationId}`, body).pipe(
       catchError((err: unknown) => {
         if (err instanceof HttpErrorResponse) {
-          const error = err as {
+          const error = err.error as {
             statusCode?: number;
             message?: string | string[];
           };

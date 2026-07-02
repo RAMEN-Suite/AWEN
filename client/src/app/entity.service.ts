@@ -1,5 +1,5 @@
 import { inject, Injectable, signal, WritableSignal } from '@angular/core';
-import { Annotation, Entity } from '../interfaces';
+import { AnnotationOfEntityWithContent, Entity } from '../interfaces';
 import { EntityApiService } from './api/entity-api.service';
 
 /**
@@ -14,7 +14,8 @@ export class EntityService {
   private _entity: WritableSignal<Entity | undefined> = signal<
     Entity | undefined
   >(undefined);
-  private _annotations: WritableSignal<Annotation[]> = signal<Annotation[]>([]);
+  private _annotations: WritableSignal<AnnotationOfEntityWithContent[]> =
+    signal<AnnotationOfEntityWithContent[]>([]);
   private _entityId: WritableSignal<string | undefined> = signal<
     string | undefined
   >(undefined);
@@ -24,7 +25,7 @@ export class EntityService {
   public annotations = this._annotations.asReadonly();
   public loading = this._loading.asReadonly();
 
-  async loadNewEntity(id: string) {
+  public async loadNewEntity(id: string) {
     this._loading.set(true);
     this.resetState();
     await this.loadAndSet(id);
@@ -32,7 +33,7 @@ export class EntityService {
     this._loading.set(false);
   }
 
-  async reloadEntity() {
+  public async reloadEntity() {
     const id = this._entityId();
     if (id) {
       await this.loadAndSet(id);

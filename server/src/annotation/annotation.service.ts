@@ -17,6 +17,7 @@ import { Integer, Node, Relationship } from 'neo4j-driver';
 import {
   transformConnectedNodeToDto,
   transformNodeToAnnotationDTO,
+  transformNodeToAnnotationOfEntityDTO,
   transformNodeToAnnotationWithContentDTO,
 } from '../utils/node-transformers';
 import { ConnectedNodeDto } from './dto/connected-node.dto';
@@ -141,6 +142,7 @@ export class AnnotationService {
   async getAnnotationsOfEntity(entityId: string) {
     const eNode = new Cypher.Node();
     const aNode = new Cypher.Node();
+    const relToAnnotation = new Cypher.Relationship();
 
     const searchPattern = new Cypher.Pattern(eNode, {
       labels: ENTITY_LABEL_NAME,
@@ -148,27 +150,40 @@ export class AnnotationService {
         [this.ENTITY_KEY_PROPERTY]: new Cypher.Param(entityId),
       },
     })
-      .related({
+      .related(relToAnnotation, {
         direction: 'undirected',
       })
       .to(aNode, {
         labels: ANNOTATION_LABEL_NAME,
       });
 
-    const clause = new Cypher.Match(searchPattern).return([aNode, 'annotation']);
+    const clause = new Cypher.Match(searchPattern).return(
+      [aNode, 'annotation'],
+      [
+        new Cypher.Case()
+          .when(Cypher.eq(Cypher.startNode(relToAnnotation), eNode))
+          .then(new Cypher.Literal('OUTGOING'))
+          .else(new Cypher.Literal('INCOMING')),
+        'direction',
+      ],
+    );
     const { cypher, params } = clause.build();
 
     const res = await this.neo4jService.read<{
       annotation: Node<Integer, Record<string, unknown>>;
+      direction: string;
     }>(cypher, params);
     const annotations = res.records.map((record) => {
-      return record.get('annotation');
+      return {
+        annotation: record.get('annotation'),
+        direction: record.get('direction'),
+      };
     });
 
     return annotations
-      .map((annotation) => {
-        const gNode = this.model.getMostSpecificType(annotation.labels);
-        return transformNodeToAnnotationDTO(annotation, gNode);
+      .map((a) => {
+        const gNode = this.model.getMostSpecificType(a.annotation.labels);
+        return transformNodeToAnnotationOfEntityDTO(a.annotation, a.direction, gNode);
       })
       .filter((annotation) => !!annotation);
   }
@@ -212,6 +227,13 @@ export class AnnotationService {
       );
 
     const clause = new Cypher.Match(searchPattern).optionalMatch(optionalConnectedNodePattern).return(
+      [
+        new Cypher.Case()
+          .when(Cypher.eq(Cypher.startNode(relToAnnotation), eNode))
+          .then(new Cypher.Literal('OUTGOING'))
+          .else(new Cypher.Literal('INCOMING')),
+        'direction',
+      ],
       [aNode, 'annotation'],
       [
         Cypher.collect(
@@ -231,6 +253,7 @@ export class AnnotationService {
     const { cypher, params } = clause.build();
 
     const res = await this.neo4jService.read<{
+      direction: string;
       annotation: Node<Integer, Record<string, unknown>>;
       connectedNodes: {
         node: Node;
@@ -241,13 +264,14 @@ export class AnnotationService {
 
     const annotations = res.records.map((record) => {
       return {
+        direction: record.get('direction'),
         annotation: record.get('annotation'),
         connectedNodes: record.get('connectedNodes'),
       };
     });
 
     return annotations
-      .map(({ annotation, connectedNodes }) => {
+      .map(({ annotation, direction, connectedNodes }) => {
         const gNode = this.model.getMostSpecificType(annotation.labels);
         const transformedConnectedNodes: ConnectedNodeDto[] = connectedNodes
           .filter((c) => !!c.node) // optionalMatch kann null liefern
@@ -257,7 +281,7 @@ export class AnnotationService {
             return [transformConnectedNodeToDto(c.node, c.relationship, c.direction, connectedGNode)];
           });
 
-        return transformNodeToAnnotationWithContentDTO(annotation, gNode, transformedConnectedNodes);
+        return transformNodeToAnnotationWithContentDTO(annotation, direction, gNode, transformedConnectedNodes);
       })
       .filter((annotation) => !!annotation);
   }

@@ -20,6 +20,13 @@ export interface Annotation {
   type: string;
   types: string[];
   properties: NodePropertyDto[];
+}
+
+export interface AnnotationOfEntity extends Annotation {
+  direction: string;
+}
+
+export interface AnnotationOfEntityWithContent extends AnnotationOfEntity {
   connectedNodes: ConnectedNodeDto[];
 }
 

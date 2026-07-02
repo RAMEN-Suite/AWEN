@@ -5,10 +5,11 @@ import {
   EntityNames,
   EntitySearchQuery,
   Entity,
-  Annotation,
+  AnnotationOfEntityWithContent,
+  AnnotationOfEntity,
 } from '../../interfaces';
 import { catchError, firstValueFrom, map, of } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { QueryParamsService } from '../utils/query-params.service';
 import { MessageService } from 'primeng/api';
 
@@ -20,7 +21,7 @@ export class EntityApiService {
   private queryParamService = inject(QueryParamsService);
   private readonly messageService = inject(MessageService);
 
-  searchEntities(query: EntitySearchQuery) {
+  public searchEntities(query: EntitySearchQuery) {
     const httpParams = this.queryParamService.transformQueryParams(query);
 
     const res = this.http
@@ -39,7 +40,7 @@ export class EntityApiService {
     return firstValueFrom(res);
   }
 
-  async getById(id: string) {
+  public async getById(id: string) {
     const res = this.http.get<Entity>('/api/entity/' + id).pipe(
       catchError((err) => {
         this.messageService.add({
@@ -52,7 +53,7 @@ export class EntityApiService {
     return firstValueFrom(res);
   }
 
-  async getAutocomplete(
+  public async getAutocomplete(
     search: string,
     query?: EntityAutocompleteQuery,
   ): Promise<EntityNames[]> {
@@ -76,9 +77,9 @@ export class EntityApiService {
     return firstValueFrom(temp);
   }
 
-  async getAnnotationsOf(entityId: string) {
+  public async getAnnotationsOf(entityId: string) {
     const res = this.http
-      .get<Annotation[]>(`/api/entity/${entityId}/annotations`)
+      .get<AnnotationOfEntity[]>(`/api/entity/${entityId}/annotations`)
       .pipe(
         catchError((err) => {
           this.messageService.add({
@@ -91,9 +92,11 @@ export class EntityApiService {
     return firstValueFrom(res);
   }
 
-  async getAnnotationsWithConnectionsOf(entityId: string) {
+  public async getAnnotationsWithConnectionsOf(entityId: string) {
     const res = this.http
-      .get<Annotation[]>(`/api/entity/${entityId}/annotations/content`)
+      .get<AnnotationOfEntityWithContent[]>(
+        `/api/entity/${entityId}/annotations/content`,
+      )
       .pipe(
         catchError((err) => {
           this.messageService.add({
@@ -106,29 +109,35 @@ export class EntityApiService {
     return firstValueFrom(res);
   }
 
-  async createEntity(type: string, payload: Record<string, unknown>) {
+  public async createEntity(type: string, payload: Record<string, unknown>) {
     const body = {
       type: type,
       properties: payload,
     };
 
     const res = this.http.post<{ id: string }>(`/api/entity`, body).pipe(
-      catchError((err) => {
-        if (err.error.statusCode === 400) {
-          this.messageService.add({
-            severity: 'error',
-            summary: `Error while creating a new entity. Please try again.`,
-            detail: Array.isArray(err.error.message)
-              ? err.error.message.join('\n')
-              : err.error.message,
-            closable: true,
-            sticky: true,
-          });
-        } else {
-          this.messageService.add({
-            severity: 'error',
-            summary: `Error while creating a new entity. Please try again.`,
-          });
+      catchError((err: unknown) => {
+        if (err instanceof HttpErrorResponse) {
+          const error = err.error as {
+            statusCode?: number;
+            message?: string | string[];
+          };
+          if (error.statusCode === 400) {
+            this.messageService.add({
+              severity: 'error',
+              summary: `Error while creating a new entity. Please try again.`,
+              detail: Array.isArray(error.message)
+                ? error.message.join('\n')
+                : error.message,
+              closable: true,
+              sticky: true,
+            });
+          } else {
+            this.messageService.add({
+              severity: 'error',
+              summary: `Error while creating a new entity. Please try again.`,
+            });
+          }
         }
         throw err;
       }),
@@ -139,7 +148,7 @@ export class EntityApiService {
     return firstValueFrom(res);
   }
 
-  async deleteEntity(id: string) {
+  public async deleteEntity(id: string) {
     const res = this.http.delete('/api/entity/' + id).pipe(
       catchError((err) => {
         this.messageService.add({
@@ -153,29 +162,34 @@ export class EntityApiService {
     return;
   }
 
-  async updateEntity(id: string, payload: Record<string, unknown>) {
+  public async updateEntity(id: string, payload: Record<string, unknown>) {
     const body = {
       properties: payload,
     };
 
-    const res = this.http.put<void>(`/api/entity/${id}`, body).pipe(
+    const res = this.http.put(`/api/entity/${id}`, body).pipe(
       catchError((err) => {
-        console.log(err);
-        if (err.error.statusCode === 400) {
-          this.messageService.add({
-            severity: 'error',
-            summary: `Error while updating a entity. Please try again.`,
-            detail: Array.isArray(err.error.message)
-              ? err.error.message.join('\n')
-              : err.error.message,
-            closable: true,
-            sticky: true,
-          });
-        } else {
-          this.messageService.add({
-            severity: 'error',
-            summary: `Error while updating a entity. Please try again.`,
-          });
+        if (err instanceof HttpErrorResponse) {
+          const error = err.error as {
+            statusCode?: number;
+            message?: string | string[];
+          };
+          if (error.statusCode === 400) {
+            this.messageService.add({
+              severity: 'error',
+              summary: `Error while updating a entity. Please try again.`,
+              detail: Array.isArray(error.message)
+                ? error.message.join('\n')
+                : error.message,
+              closable: true,
+              sticky: true,
+            });
+          } else {
+            this.messageService.add({
+              severity: 'error',
+              summary: `Error while updating a entity. Please try again.`,
+            });
+          }
         }
         throw err;
       }),
