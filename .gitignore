@@ -9,5 +9,5 @@
 /nginx/logs
 *temp*
 .env*
-
+node_modules
 /config/
