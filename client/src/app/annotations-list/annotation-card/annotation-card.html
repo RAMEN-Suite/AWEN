@@ -2,7 +2,7 @@
   @let annotationId = annotation().id!;
 
   <div class="card p-0 w-full flex flex-row" style="min-height: 12rem">
-    <div class="col-4 flex flex-column p-3 pr-2 border-right-1 border-gray-200">
+    <div class="col-6 flex flex-column p-3 pr-2 border-right-1 border-gray-200">
       <div class="mb-3">
         <app-node-types [nodeTypes]="annotation().annotation.types" asChips class="flex flex-column gap-1" />
       </div>
@@ -22,7 +22,7 @@
       </div>
     </div>
     <div
-      class="col-8 p-0 max-h-30rem overflow-y-auto"
+      class="col-6 p-0 max-h-30rem overflow-y-auto"
       [ngClass]="{
         'align-items-center justify-content-center flex': annotation().nodes.length <= 0,
       }"
