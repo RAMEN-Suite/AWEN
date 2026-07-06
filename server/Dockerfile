@@ -1,6 +1,5 @@
 # Use the official Node.js image as the base image
 FROM node:24-alpine AS base
-ARG APP_VERSION=0.0.0
 ENV NPM_CONFIG_UPDATE_NOTIFIER=false \
   NPM_CONFIG_FUND=false
 
@@ -28,7 +27,7 @@ RUN npm install
 # Copy the rest of the application files
 COPY . .
 
-ENV APP_VERSION=$APP_VERSION
+RUN echo "APP_VERSION=$(npm pkg get version)" >> ./.env
 ENV NODE_ENV=development
 # Expose the application port
 EXPOSE 3000
@@ -50,7 +49,7 @@ RUN npm run build
 FROM base AS prod
 WORKDIR /usr/src/app
 ENV NODE_ENV=production
-ENV APP_VERSION=$APP_VERSION
+RUN echo "APP_VERSION=$(npm pkg get version)" >> ./.env
 ENV PORT=3000
 
 RUN addgroup -S nodeapp && adduser -S nodeapp -G nodeapp && \
