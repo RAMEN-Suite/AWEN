@@ -12,7 +12,7 @@ export class HealthController {
   @Get()
   getServerStatus() {
     return {
-      version: this.configService.get<string>('APP_VERSION') || '0.0.0',
+      version: this.configService.get<string>('APP_VERSION') ?? '0.0.0',
       ramenVersion: this.ramenService.ramenVersion,
       healthy: true,
     };

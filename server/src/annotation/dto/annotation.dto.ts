@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { NodePropertyDto } from './node-property.dto';
-import { ConnectedNodeDto } from './connected-node.dto';
 
 export class AnnotationDto {
   @ApiProperty()
@@ -11,9 +10,6 @@ export class AnnotationDto {
 
   @ApiProperty()
   properties!: NodePropertyDto[];
-
-  @ApiProperty()
-  connectedNodes!: ConnectedNodeDto[];
 
   constructor(value: AnnotationDto) {
     Object.assign(this, value);

@@ -1,4 +1,12 @@
-import { Component, computed, inject, input, signal, Signal, viewChild } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  input,
+  signal,
+  Signal,
+  viewChild,
+} from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Entity, EntityPropertyDto, GAttribute } from '../../../interfaces';
 import { ButtonDirective } from 'primeng/button';
@@ -13,7 +21,10 @@ import { ENTITY_NAME_PROPERTY } from '../../../constants';
 import { EntityService } from '../../entity.service';
 import { UtilsService } from '../../utils/utils.service';
 
-interface AttributeWithOptValue extends Omit<EntityPropertyDto, 'value'>, Partial<Pick<EntityPropertyDto, 'value'>> {}
+interface AttributeWithOptValue
+  extends
+    Omit<EntityPropertyDto, 'value'>,
+    Partial<Pick<EntityPropertyDto, 'value'>> {}
 
 @Component({
   selector: 'app-create-entity-form',
@@ -32,8 +43,16 @@ export class EditEntityForm {
 
   readonly properties: Signal<(GAttribute | EntityPropertyDto)[]> = toSignal(
     toObservable(this.entity).pipe(
-      switchMap((entity) => from(this.editEntityService.getEntityProperties(entity.types[entity.types.length - 1]))),
-      map((attributes) => this.mergePropArrays(this.entity().properties, attributes)),
+      switchMap((entity) =>
+        from(
+          this.editEntityService.getEntityProperties(
+            entity.types[entity.types.length - 1],
+          ),
+        ),
+      ),
+      map((attributes) =>
+        this.mergePropArrays(this.entity().properties, attributes),
+      ),
     ),
     { initialValue: [] },
   );
@@ -55,7 +74,10 @@ export class EditEntityForm {
     }
     try {
       this.loading.set(true);
-      const payload = this.utilService.createPayload(this.propertiesForm().value, this.properties());
+      const payload = this.utilService.createPayload(
+        this.propertiesForm().value,
+        this.properties(),
+      );
       await this.editEntityService.updateEntity(key.value as string, payload);
       this.messageService.add({
         severity: 'success',
@@ -71,7 +93,10 @@ export class EditEntityForm {
     }
   }
 
-  private mergePropArrays(props: EntityPropertyDto[], attributes: AttributeWithOptValue[]) {
+  private mergePropArrays(
+    props: EntityPropertyDto[],
+    attributes: AttributeWithOptValue[],
+  ) {
     const arr: AttributeWithOptValue[] = [...props];
     let nameAttribute: AttributeWithOptValue | undefined;
 

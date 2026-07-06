@@ -60,9 +60,7 @@ export class RamenModelService {
     const type = this.schema.getRegistry().getMostSpecificType(names);
     if (!type) {
       this.logger.error(`There is no node of the types "${names.join(', ')}".`);
-      throw new RAMENError(
-        `There is no node of the types "${names.join(', ')}".`,
-      );
+      throw new RAMENError(`There is no node of the types "${names.join(', ')}".`);
     }
     return type;
   }
@@ -98,9 +96,7 @@ export class RamenModelService {
     attributes: Record<string, unknown>,
     ret: [valid: boolean, message: string[]],
   ): void {
-    const allowedAttributeNames = new Set(
-      type.attributes.map((attribute) => attribute.name),
-    );
+    const allowedAttributeNames = new Set(type.attributes.map((attribute) => attribute.name));
 
     for (const key of Object.keys(attributes)) {
       if (!allowedAttributeNames.has(key)) {
@@ -110,10 +106,7 @@ export class RamenModelService {
     }
   }
 
-  validateAttributes(
-    type: NodeType,
-    attributes: Record<string, unknown>,
-  ): [valid: boolean, message: string[]] {
+  validateAttributes(type: NodeType, attributes: Record<string, unknown>): [valid: boolean, message: string[]] {
     const ret: [valid: boolean, message: string[]] = [true, []];
 
     this.validateForUnknownAttributes(type, attributes, ret);
@@ -131,14 +124,10 @@ export class RamenModelService {
     attributeValue: unknown,
     ret: [valid: boolean, message: string[]] = [true, []],
   ): [valid: boolean, message: string[]] {
-    const attribute = type.attributes.find(
-      (attribute) => attribute.name === attributeKey,
-    );
+    const attribute = type.attributes.find((attribute) => attribute.name === attributeKey);
     if (!attribute) {
       ret[0] = false;
-      ret[1].push(
-        `Attribute "${attributeKey}" is not valid for a ${type.name}`,
-      );
+      ret[1].push(`Attribute "${attributeKey}" is not valid for a ${type.name}`);
       return ret;
     }
     if (attribute.isKey) {
@@ -150,17 +139,13 @@ export class RamenModelService {
     if (Array.isArray(attributeValue)) {
       if (attributeValue.length < lowerBound) {
         ret[0] = false;
-        ret[1].push(
-          `Attribute "${attribute.name}" requires at least ${lowerBound} entries, but got ${attributeValue.length}.`,
-        );
+        ret[1].push(`Attribute "${attribute.name}" requires at least ${lowerBound} entries, but got ${attributeValue.length}.`);
         return ret;
       }
 
       if (upperBound !== -1 && attributeValue.length > upperBound) {
         ret[0] = false;
-        ret[1].push(
-          `Attribute "${attribute.name}" allows at most ${upperBound} entries, but got ${attributeValue.length}.`,
-        );
+        ret[1].push(`Attribute "${attribute.name}" allows at most ${upperBound} entries, but got ${attributeValue.length}.`);
         return ret;
       }
 
@@ -170,22 +155,15 @@ export class RamenModelService {
     } else {
       if (upperBound > 1 && lowerBound > 0) {
         ret[0] = false;
-        ret[1].push(
-          `Attribute "${attribute.name}" requires ${lowerBound} to ${upperBound} entries, but got one.`,
-        );
+        ret[1].push(`Attribute "${attribute.name}" requires ${lowerBound} to ${upperBound} entries, but got one.`);
         return ret;
       }
 
-      const isEmpty =
-        attributeValue === null ||
-        attributeValue === undefined ||
-        attributeValue === '';
+      const isEmpty = attributeValue === null || attributeValue === undefined || attributeValue === '';
 
       if (lowerBound > 0 && isEmpty) {
         ret[0] = false;
-        ret[1].push(
-          `Attribute "${attribute.name}" is required but got an empty value.`,
-        );
+        ret[1].push(`Attribute "${attribute.name}" is required but got an empty value.`);
         return ret;
       }
 
@@ -207,10 +185,7 @@ export class RamenModelService {
       this.validateStringAttribute(attribute, value, ret);
     } else if (dataType.name.toLowerCase() === 'boolean') {
       this.validateBooleanAttribute(attribute, value, ret);
-    } else if (
-      dataType.name.toLowerCase() === 'integer' ||
-      dataType.name.toLowerCase() === 'float'
-    ) {
+    } else if (dataType.name.toLowerCase() === 'integer' || dataType.name.toLowerCase() === 'float') {
       this.validateNumberAttribute(attribute, value, ret);
     }
 
@@ -240,9 +215,7 @@ export class RamenModelService {
     const dataType = this.getDataType(attribute.typeId);
     if (typeof attributeValue !== 'boolean') {
       ret[0] = false;
-      ret[1].push(
-        `Attribute "${attribute.name}" is expected to be typeof "${dataType.name}", but is "Boolean".`,
-      );
+      ret[1].push(`Attribute "${attribute.name}" is expected to be typeof "${dataType.name}", but is "Boolean".`);
       return ret;
     }
     return ret;
@@ -275,19 +248,12 @@ export class RamenModelService {
     const dataType = this.getDataType(attribute.typeId);
     if (typeof attributeValue !== 'number') {
       ret[0] = false;
-      ret[1].push(
-        `Attribute "${attribute.name}" is expected to be typeof "${dataType.name}", but is "Integer" or "Float".`,
-      );
+      ret[1].push(`Attribute "${attribute.name}" is expected to be typeof "${dataType.name}", but is "Integer" or "Float".`);
       return ret;
     }
-    if (
-      dataType.name.toLowerCase() === 'integer' &&
-      !Number.isInteger(attributeValue)
-    ) {
+    if (dataType.name.toLowerCase() === 'integer' && !Number.isInteger(attributeValue)) {
       ret[0] = false;
-      ret[1].push(
-        `Attribute "${attribute.name}" is expected to be typeof "${dataType.name}", but is "Float".`,
-      );
+      ret[1].push(`Attribute "${attribute.name}" is expected to be typeof "${dataType.name}", but is "Float".`);
       return ret;
     }
     return ret;

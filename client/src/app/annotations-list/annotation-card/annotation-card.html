@@ -1,0 +1,32 @@
+@if (annotation().id) { @let annotationId = annotation().id!;
+
+<div class="card p-0 w-full flex flex-row" style="min-height: 12rem">
+  <div class="col-4 flex flex-column p-3 pr-2 border-right-1 border-gray-200">
+    <div class="text-lg font-bold mb-2" style="word-break: normal; overflow-wrap: anywhere">{{annotation().annotation.type}}</div>
+    <div class="mb-3">
+      <app-node-types [nodeTypes]="annotation().annotation.types" asChips class="flex flex-column gap-1" />
+    </div>
+    <div>
+      <app-property-list [properties]="annotation().annotation.properties" />
+    </div>
+    <div class="flex flex-row gap-1 justify-content-start align-content-end mt-auto">
+      <p-button icon="pi pi-trash" severity="danger" outlined size="small" (onClick)="clickDeleteAnnotation(annotationId, $event)" />
+      <app-update-annotation [annotation]="annotation().annotation" />
+      <p-button
+        icon="pi pi-plus-circle"
+        severity="primary"
+        outlined
+        size="small"
+        (onClick)="clickCreateAnnotationConnection(annotation().annotation)"
+      />
+    </div>
+  </div>
+  <div class="col-8 p-3 pl-2 max-h-30rem overflow-y-auto">
+    @for (node of annotation().nodes; track node.id; let first = $first; let last = $last) {
+    <app-connected-node [annotationId]="annotationId" [node]="node" [firstEntry]="first" [lastEntry]="last" />
+    } @empty {
+    <span class="text-gray-500">No connected nodes</span>
+    }
+  </div>
+</div>
+}

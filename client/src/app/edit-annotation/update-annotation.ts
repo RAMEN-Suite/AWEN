@@ -18,22 +18,26 @@ export class UpdateAnnotation {
   label = input<string>();
   icon = input<string>('pi pi-pencil');
 
-  private updateAnnotationDialogRef: DynamicDialogRef<UpdateAnnotationForm> | null = null;
+  private updateAnnotationDialogRef: DynamicDialogRef<UpdateAnnotationForm> | null =
+    null;
 
   protected clickUpdateBtn() {
-    this.updateAnnotationDialogRef = this.dialogService.open(UpdateAnnotationForm, {
-      inputValues: {
-        annotation: this.annotation(),
+    this.updateAnnotationDialogRef = this.dialogService.open(
+      UpdateAnnotationForm,
+      {
+        inputValues: {
+          annotation: this.annotation(),
+        },
+        header: 'Update Annotation',
+        styleClass: 'w-11 md:w-9 lg:w-8',
+        style: {
+          'min-height': '20vh',
+        },
+        contentStyle: {
+          'padding-top': '0.5rem',
+        },
+        closable: true,
       },
-      header: 'Update Annotation',
-      styleClass: 'w-11 md:w-9 lg:w-8',
-      style: {
-        'min-height': '20vh',
-      },
-      contentStyle: {
-        'padding-top': '0.5rem',
-      },
-      closable: true,
-    });
+    );
   }
 }

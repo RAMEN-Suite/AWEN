@@ -17,15 +17,15 @@ export class ModelRegistry {
   private readonly _modelVersion!: string;
   private readonly _collectionChains!: string[][];
 
-  private get allDataTypes(): Array<DataType> {
+  private get allDataTypes(): DataType[] {
     return Array.from(this.dataTypes.values());
   }
 
-  private get allNodes(): Array<NodeType> {
+  private get allNodes(): NodeType[] {
     return Array.from(this.nodes.values());
   }
 
-  private get allRelations(): Array<RelationType> {
+  private get allRelations(): RelationType[] {
     return Array.from(this.relations.values());
   }
 
@@ -108,26 +108,16 @@ export class ModelRegistry {
         id: formatedId,
         name: node.name,
         superTypes: this.formatSuperTypes(node.superTypes, modelId),
-        attributes: this.mergeAttributes(
-          node.attributes,
-          node.superTypes,
-          modelId,
-        ),
+        attributes: this.mergeAttributes(node.attributes, node.superTypes, modelId),
       });
       return;
     }
 
     this.nodeAliases.set(formatedId, existing.id);
 
-    existing.attributes = this.mergeAttributeOverrides(
-      existing.attributes,
-      node.attributes,
-    );
+    existing.attributes = this.mergeAttributeOverrides(existing.attributes, node.attributes);
 
-    const additionalSuperTypes = this.formatSuperTypes(
-      node.superTypes,
-      modelId,
-    );
+    const additionalSuperTypes = this.formatSuperTypes(node.superTypes, modelId);
     additionalSuperTypes.forEach((name, id) => {
       const resolvedId = this.resolveNodeId(id);
 
@@ -137,10 +127,7 @@ export class ModelRegistry {
     });
   }
 
-  private mergeAttributeOverrides(
-    baseAttributes: GAttribute[],
-    overlayAttributes: GAttribute[],
-  ): GAttribute[] {
+  private mergeAttributeOverrides(baseAttributes: GAttribute[], overlayAttributes: GAttribute[]): GAttribute[] {
     const attributesByName = new Map<string, GAttribute>();
 
     baseAttributes.forEach((attribute) => {
@@ -171,9 +158,7 @@ export class ModelRegistry {
       if (node.name !== name) {
         continue;
       }
-      if (!type) {
-        type = node;
-      }
+      type ??= node;
       if (node.superTypes.size > type.superTypes.size) {
         type = node;
       }
@@ -203,9 +188,7 @@ export class ModelRegistry {
 
   resolveNodeNameFromRef(ref: string): string | undefined {
     const node = this.nodes.get(ref);
-    if (node) {
-      return node.name;
-    }
+    return node?.name;
   }
 
   /** Transitive subtype-Prüfung via superTypes */
@@ -216,7 +199,8 @@ export class ModelRegistry {
     const stack = [typeName];
 
     while (stack.length) {
-      const cur = stack.pop()!;
+      const cur = stack.pop();
+      if (!cur) continue;
       if (visited.has(cur)) continue;
       visited.add(cur);
 
@@ -245,9 +229,7 @@ export class ModelRegistry {
 
   /** Alle Subtypen (z.B. Collection o. Entity */
   getTypes(name: string): string[] {
-    return this.allNodes
-      .map((n) => n.name)
-      .filter((n) => this.isSubtypeOf(n, name));
+    return this.allNodes.map((n) => n.name).filter((n) => this.isSubtypeOf(n, name));
   }
 
   getDataTypes() {
@@ -264,9 +246,7 @@ export class ModelRegistry {
       if (!names.includes(node.name)) {
         continue;
       }
-      if (!type) {
-        type = node;
-      }
+      type ??= node;
       if (node.superTypes.size > type.superTypes.size) {
         type = node;
       }
@@ -311,10 +291,7 @@ export class ModelRegistry {
       ensureSet(childrenByParent, fromName);
     }
 
-    const allNodes = new Set<string>([
-      ...childrenByParent.keys(),
-      ...parentsByChild.keys(),
-    ]);
+    const allNodes = new Set<string>([...childrenByParent.keys(), ...parentsByChild.keys()]);
 
     const roots = Array.from(allNodes).filter((n) => {
       const parents = parentsByChild.get(n);
@@ -365,11 +342,7 @@ export class ModelRegistry {
     return superTypes;
   }
 
-  private mergeAttributes(
-    attributes: GAttribute[],
-    superTypes: string[],
-    modelId: string,
-  ) {
+  private mergeAttributes(attributes: GAttribute[], superTypes: string[], modelId: string) {
     const mergedAttributes: GAttribute[] = [...attributes];
 
     superTypes.forEach((typeId) => {

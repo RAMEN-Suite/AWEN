@@ -1,16 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsArray,
-  IsNotEmpty,
-  IsObject,
-  IsString,
-  MinLength,
-} from 'class-validator';
+import { IsArray, IsNotEmpty, IsObject, IsString, MinLength } from 'class-validator';
 
 export class CollectionDto {
   @ApiProperty({
-    description:
-      'The collection node label as defined by the guidelines. Normally `Collection`.',
+    description: 'The collection node label as defined by the guidelines. Normally `Collection`.',
     example: 'Collection',
   })
   @IsString()
@@ -51,8 +44,7 @@ export class CollectionDto {
   label!: string;
 
   @ApiProperty({
-    description:
-      'Any key/value properties of the collection. Keys are strings; values can be anything.',
+    description: 'Any key/value properties of the collection. Keys are strings; values can be anything.',
     example: {
       rank: 'Captain',
       positions: ['CAG', 'Lawyer'],

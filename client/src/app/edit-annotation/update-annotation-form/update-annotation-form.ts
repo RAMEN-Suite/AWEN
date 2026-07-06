@@ -1,4 +1,12 @@
-import { Component, computed, inject, input, Signal, signal, viewChild } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  input,
+  Signal,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { UpdateAnnotationService } from '../update-annotation.service';
 import { FormsModule } from '@angular/forms';
 import { ButtonDirective } from 'primeng/button';
@@ -12,7 +20,10 @@ import { from, map, switchMap } from 'rxjs';
 import { ANNOTATION_TYPE_NAME, ENTITY_NAME_PROPERTY } from '../../../constants';
 import { UtilsService } from '../../utils/utils.service';
 
-interface AttributeWithOptValue extends Omit<EntityPropertyDto, 'value'>, Partial<Pick<EntityPropertyDto, 'value'>> {}
+interface AttributeWithOptValue
+  extends
+    Omit<EntityPropertyDto, 'value'>,
+    Partial<Pick<EntityPropertyDto, 'value'>> {}
 
 @Component({
   selector: 'app-update-annotation-form',
@@ -38,8 +49,16 @@ export class UpdateAnnotationForm {
 
   readonly properties: Signal<(GAttribute | EntityPropertyDto)[]> = toSignal(
     toObservable(this.annotation).pipe(
-      switchMap((annotation) => from(this.updateAnnotationService.getAnnotationProperties(annotation.types[annotation.types.length - 1]))),
-      map((attributes) => this.mergePropArrays(this.annotation().properties, attributes)),
+      switchMap((annotation) =>
+        from(
+          this.updateAnnotationService.getAnnotationProperties(
+            annotation.types[annotation.types.length - 1],
+          ),
+        ),
+      ),
+      map((attributes) =>
+        this.mergePropArrays(this.annotation().properties, attributes),
+      ),
     ),
     { initialValue: [] },
   );
@@ -48,7 +67,10 @@ export class UpdateAnnotationForm {
 
   propertiesForm = computed(() => this.attributeForm().propertiesForm());
 
-  private mergePropArrays(props: EntityPropertyDto[], attributes: AttributeWithOptValue[]) {
+  private mergePropArrays(
+    props: EntityPropertyDto[],
+    attributes: AttributeWithOptValue[],
+  ) {
     const arr: AttributeWithOptValue[] = [...props];
     let nameAttribute: AttributeWithOptValue | undefined;
 
@@ -77,13 +99,17 @@ export class UpdateAnnotationForm {
       this.messageService.add({
         severity: 'danger',
         summary: 'Failed to update annotation',
-        detail: 'Please reload the page and try again. If this problem is recurring notify your administrator.',
+        detail:
+          'Please reload the page and try again. If this problem is recurring notify your administrator.',
       });
       return;
     }
     try {
       this.loading.set(true);
-      const payload = this.utilService.createPayload(this.propertiesForm().value, this.properties());
+      const payload = this.utilService.createPayload(
+        this.propertiesForm().value,
+        this.properties(),
+      );
       await this.updateAnnotationService.update(annotationId, payload);
       this.dialogRef.close();
     } finally {

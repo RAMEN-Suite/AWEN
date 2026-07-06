@@ -3,19 +3,13 @@ import { Transform } from 'class-transformer';
 import { ApiProperty, PickType } from '@nestjs/swagger';
 import { OldEntityDto } from './old-entity.dto';
 
-export class EntitySearchDto extends PickType(OldEntityDto, [
-  'label',
-  'types',
-] as const) {
+export class EntitySearchDto extends PickType(OldEntityDto, ['label', 'types'] as const) {
   @ApiProperty({
     description:
       'An object containing the names of existing collection types as keys and the UUIDs of the collections being searched for as values in an array.',
     example: {
       Department: ['efc22c81-fb22-4f90-81d0-d3790b41b908'],
-      Volume: [
-        '6daa7b3d-0cf1-4b76-8138-d8fadca514f9',
-        '7061836f-592f-461e-bc04-081faf4d9f01',
-      ],
+      Volume: ['6daa7b3d-0cf1-4b76-8138-d8fadca514f9', '7061836f-592f-461e-bc04-081faf4d9f01'],
     },
   })
   @IsOptional()

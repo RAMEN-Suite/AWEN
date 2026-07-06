@@ -1,10 +1,4 @@
-import {
-  IsArray,
-  IsNotEmpty,
-  IsObject,
-  IsString,
-  MinLength,
-} from 'class-validator';
+import { IsArray, IsNotEmpty, IsObject, IsString, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { BadRequestException } from '@nestjs/common';
@@ -15,8 +9,7 @@ export class OldEntityDto {
    * @example 'Entity'
    */
   @ApiProperty({
-    description:
-      'The entities node label as defined by the guidelines. Normally `Entity`.',
+    description: 'The entities node label as defined by the guidelines. Normally `Entity`.',
     example: 'Entity',
   })
   @IsString()
@@ -92,8 +85,7 @@ export class OldEntityDto {
    * @example {label: 'Aachen', department: ['RI05', 'RI13']}
    */
   @ApiProperty({
-    description:
-      'Any key/value properties of the entity. Keys are strings; values can be anything.',
+    description: 'Any key/value properties of the entity. Keys are strings; values can be anything.',
     example: {
       rank: 'Captain',
       positions: ['CAG', 'Lawyer'],

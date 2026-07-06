@@ -2,15 +2,22 @@ import { Component, computed, inject } from '@angular/core';
 import { Menubar } from 'primeng/menubar';
 import { MenuItem } from 'primeng/api';
 import { BackButtonComponent } from '../utils/back-button.component';
-import { isActive, Router } from '@angular/router';
+import { isActive, Router, RouterLink } from '@angular/router';
 import { EntityService } from '../entity.service';
-import { Skeleton } from 'primeng/skeleton';
+import { CreateEntity } from '../create-entity/create-entity';
+import { ButtonDirective } from 'primeng/button';
 
 const HEADER_MAX_LENGTH = 20;
 
 @Component({
   selector: 'app-navbar',
-  imports: [Menubar, BackButtonComponent, Skeleton],
+  imports: [
+    Menubar,
+    BackButtonComponent,
+    RouterLink,
+    CreateEntity,
+    ButtonDirective,
+  ],
   templateUrl: './navbar.html',
 })
 export class Navbar {
@@ -23,7 +30,9 @@ export class Navbar {
   protected header = computed(() => {
     const label = this.entity()?.label;
     if (label && label.length > HEADER_MAX_LENGTH) {
-      return label.slice(0, HEADER_MAX_LENGTH).padEnd(HEADER_MAX_LENGTH + 3, '...');
+      return label
+        .slice(0, HEADER_MAX_LENGTH)
+        .padEnd(HEADER_MAX_LENGTH + 3, '...');
     }
     return label;
   });
@@ -35,11 +44,5 @@ export class Navbar {
     matrixParams: 'ignored',
   });
 
-  protected items: MenuItem[] = [
-    {
-      label: 'Home',
-      icon: 'pi pi-home',
-      routerLink: '/',
-    },
-  ];
+  protected items: MenuItem[] = [];
 }

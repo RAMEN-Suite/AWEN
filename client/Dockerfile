@@ -2,7 +2,8 @@ ARG NODE_VERSION=24-alpine
 ARG CADDY_VERSION=2.11.2-alpine
 
 FROM node:${NODE_VERSION} AS base
-
+ENV NPM_CONFIG_UPDATE_NOTIFIER=false \
+  NPM_CONFIG_FUND=false
 
 # =========================================
 # Dev
@@ -17,6 +18,9 @@ WORKDIR /app
 
 # Copy only the dependency files first to optimize Docker caching
 COPY package.json package-lock.json* ./
+
+# Copy .npmrc for supplychain security
+COPY .npmrc ./
 
 # Install dependencies using npm with caching to speed up subsequent builds
 RUN --mount=type=cache,target=/root/.npm npm install
@@ -43,6 +47,9 @@ WORKDIR /app
 
 # Copy package-related files first to leverage Docker's caching mechanism
 COPY package.json package-lock.json* ./
+
+# Copy .npmrc for supplychain security
+COPY .npmrc ./
 
 # Install project dependencies using npm ci (ensures a clean, reproducible install)
 RUN --mount=type=cache,target=/root/.npm npm ci
@@ -98,6 +105,9 @@ EOF
 
 USER webuser
 EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD wget -q -O /dev/null http://127.0.0.1:8080 || exit 1
 
 CMD ["awen-entrypoint"]
 

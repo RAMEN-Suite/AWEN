@@ -1,7 +1,14 @@
 import { NodePropertyDto } from '../../interfaces';
+import { ENTITY_NAME_PROPERTY } from '../../constants';
 
-const getKeyProperty = (properties: NodePropertyDto[]): NodePropertyDto | undefined => {
+const getKeyProperty = (
+  properties: NodePropertyDto[],
+): NodePropertyDto | undefined => {
   return properties.find((p) => p.isKey);
 };
 
-export { getKeyProperty };
+const getLabelProperty = (properties: NodePropertyDto[]): NodePropertyDto | undefined => {
+  return properties.find((p) => p.name === ENTITY_NAME_PROPERTY);
+};
+
+export { getKeyProperty, getLabelProperty };

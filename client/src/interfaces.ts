@@ -16,10 +16,19 @@ export interface EntityPropertyDto {
   typeId: string;
 }
 
+export type Direction = 'INCOMING' | 'OUTGOING';
+
 export interface Annotation {
   type: string;
   types: string[];
   properties: NodePropertyDto[];
+}
+
+export interface AnnotationOfEntity extends Annotation {
+  direction: Direction;
+}
+
+export interface AnnotationOfEntityWithContent extends AnnotationOfEntity {
   connectedNodes: ConnectedNodeDto[];
 }
 
@@ -27,7 +36,7 @@ export interface ConnectedNodeDto {
   types: string[];
   properties: NodePropertyDto[];
   relationshipProperties: Record<string, never>;
-  direction: string;
+  direction: Direction;
 }
 
 export interface DataType {
@@ -140,11 +149,19 @@ export interface PropertyConfig {
   maxLength?: number;
 }
 
-export type PropertyConfigDataType = 'array' | 'boolean' | 'date' | 'date-time' | 'integer' | 'number' | 'string' | 'time';
+export type PropertyConfigDataType =
+  | 'array'
+  | 'boolean'
+  | 'date'
+  | 'date-time'
+  | 'integer'
+  | 'number'
+  | 'string'
+  | 'time';
 
 export interface StatementNodeView {
   node: ConnectedNodeDto;
   id: string | null;
   entityLink: string | null;
-  directionSeverity: 'success' | 'info';
+  directionIcon: string;
 }

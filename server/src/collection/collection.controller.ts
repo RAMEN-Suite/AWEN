@@ -30,9 +30,6 @@ export class CollectionController {
     const { parentId } = queryParams;
     const collectionType = type;
 
-    return await this.collectionService.getCollectionNamesOfType(
-      collectionType,
-      parentId,
-    );
+    return await this.collectionService.getCollectionNamesOfType(collectionType, parentId);
   }
 }

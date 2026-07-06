@@ -23,10 +23,11 @@ import { EntityCollectionNameDto } from './dto/entity-collection-name.dto';
 import { EntityAutocompleteQueryDto } from './dto/entity-autocomplete-query.dto';
 import { EntityDto } from './dto/entity.dto';
 import { AnnotationService } from '../annotation/annotation.service';
-import { AnnotationDto } from '../annotation/dto/annotation.dto';
 import { CreateEntityDto } from './dto/create-entity.dto';
 import { RAMENError } from '../schema/RAMENError';
 import { UpdateEntityDto } from './dto/update-entity.dto';
+import { AnnotationsOfEntityDto } from '../annotation/dto/annotations_of_entity.dto';
+import { AnnotationsOfEntityWithContentDto } from '../annotation/dto/annotations_of_entity_with_content.dto';
 
 @Controller('entity')
 export class EntityController {
@@ -37,14 +38,13 @@ export class EntityController {
 
   @ApiResponse({ type: [OldEntityDto] })
   @Get('')
-  async getAutoCompleteF(
-    @Query() params: EntitySearchDto,
-  ): Promise<EntityCollectionNameDto[]> {
+  async getAutoCompleteF(@Query() params: EntitySearchDto): Promise<EntityCollectionNameDto[]> {
     const { label } = params;
 
     const searchQuery = parseStringToSearchQueryString(label);
     const entities = await this.entityService.find({
-      ...params,
+      collectionFilter: params.collectionFilter,
+      types: params.types,
       label: searchQuery,
     });
 
@@ -109,27 +109,22 @@ export class EntityController {
     }
   }
 
-  @ApiResponse({ type: [AnnotationDto] })
+  @ApiResponse({ type: [AnnotationsOfEntityDto] })
   @Get(':id/annotations')
-  async getAnnotationsOfEntity(
-    @Param() params: IdDto,
-  ): Promise<AnnotationDto[]> {
+  async getAnnotationsOfEntity(@Param() params: IdDto): Promise<AnnotationsOfEntityDto[]> {
     const { id } = params;
 
-    const annotations: AnnotationDto[] =
-      await this.annotationService.getAnnotationsOfEntity(id);
+    const annotations: AnnotationsOfEntityDto[] = await this.annotationService.getAnnotationsOfEntity(id);
 
     return annotations;
   }
 
-  @ApiResponse({ type: [AnnotationDto] })
+  @ApiResponse({ type: [AnnotationsOfEntityWithContentDto] })
   @Get(':id/annotations/content')
-  async getAnnotationsWithContentOfContent(
-    @Param() params: IdDto,
-  ): Promise<AnnotationDto[]> {
+  async getAnnotationsWithContentOfContent(@Param() params: IdDto): Promise<AnnotationsOfEntityWithContentDto[]> {
     const { id } = params;
 
-    const annotations: AnnotationDto[] =
+    const annotations: AnnotationsOfEntityWithContentDto[] =
       await this.annotationService.getAnnotationsWithReferencesOfContent(id);
 
     return annotations;
@@ -137,16 +132,10 @@ export class EntityController {
 
   @ApiResponse({ type: [EntityNamesDto] })
   @Get('auto-complete/:label')
-  async getAutoComplete(
-    @Param() params: LabelDto,
-    @Query() qParams: EntityAutocompleteQueryDto,
-  ): Promise<EntityNamesDto[]> {
+  async getAutoComplete(@Param() params: LabelDto, @Query() qParams: EntityAutocompleteQueryDto): Promise<EntityNamesDto[]> {
     const { label } = params;
     const searchQuery = parseStringToSearchQueryString(label);
-    const entities = await this.entityService.findNamesByName(
-      searchQuery,
-      qParams,
-    );
+    const entities = await this.entityService.findNamesByName(searchQuery, qParams);
 
     return entities;
   }

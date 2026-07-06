@@ -11,7 +11,7 @@ export class GuidelinesService {
   private readonly http = inject(HttpClient);
   private readonly messageService = inject(MessageService);
 
-  getConfig() {
+  public getConfig() {
     const temp = this.http.get<EmConfigRemote>('/api/guidelines/config').pipe(
       catchError((err) => {
         this.messageService.add({
@@ -24,16 +24,18 @@ export class GuidelinesService {
     return firstValueFrom(temp);
   }
 
-  getNodeProperties(type: string) {
-    const temp = this.http.get<GAttribute[]>('/api/guidelines/config/node/properties/' + type).pipe(
-      catchError((err) => {
-        this.messageService.add({
-          severity: 'error',
-          detail: `Could not load Attributes of node type ${type}. Reload the page, or try again later.`,
-        });
-        throw err;
-      }),
-    );
+  public getNodeProperties(type: string) {
+    const temp = this.http
+      .get<GAttribute[]>('/api/guidelines/config/node/properties/' + type)
+      .pipe(
+        catchError((err) => {
+          this.messageService.add({
+            severity: 'error',
+            detail: `Could not load Attributes of node type ${type}. Reload the page, or try again later.`,
+          });
+          throw err;
+        }),
+      );
     return firstValueFrom(temp);
   }
 }

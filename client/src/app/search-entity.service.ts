@@ -1,6 +1,10 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { EntityApiService } from './api/entity-api.service';
-import { OldEntity, EntityAutocompleteQuery, EntitySearchQuery } from '../interfaces';
+import {
+  OldEntity,
+  EntityAutocompleteQuery,
+  EntitySearchQuery,
+} from '../interfaces';
 
 @Injectable({
   providedIn: 'root',

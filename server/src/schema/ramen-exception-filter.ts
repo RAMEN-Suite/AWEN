@@ -1,9 +1,4 @@
-import {
-  Catch,
-  ExceptionFilter,
-  InternalServerErrorException,
-  Logger,
-} from '@nestjs/common';
+import { Catch, ExceptionFilter, InternalServerErrorException, Logger } from '@nestjs/common';
 import { RAMENError } from './RAMENError';
 
 @Catch(RAMENError)

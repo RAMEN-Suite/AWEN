@@ -11,7 +11,15 @@ import { UtilsService } from '../utils/utils.service';
 
 @Component({
   selector: 'app-entity-list',
-  imports: [Scroller, NgClass, PrimeTemplate, ProgressSpinner, Chip, Button, Tooltip],
+  imports: [
+    Scroller,
+    NgClass,
+    PrimeTemplate,
+    ProgressSpinner,
+    Chip,
+    Button,
+    Tooltip,
+  ],
   templateUrl: './entity-list.html',
   styles: `
     :host {
