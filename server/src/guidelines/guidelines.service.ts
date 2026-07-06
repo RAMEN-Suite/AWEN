@@ -6,10 +6,14 @@ import { RamenModelService } from '../schema/ramen-model.service';
 import { ANNOTATION_LABEL_NAME, ENTITY_LABEL_NAME } from '../constants';
 import { RelationType } from '../schema/interfaces/relation-type.interface';
 import { NodeType } from '../schema/interfaces/node-type.interface';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class GuidelinesService {
-  constructor(private readonly model: RamenModelService) {}
+  constructor(
+    private readonly model: RamenModelService,
+    private readonly config: ConfigService,
+  ) {}
 
   // eslint-disable-next-line
   async get(): Promise<IGuidelines> {
@@ -22,6 +26,7 @@ export class GuidelinesService {
       entityTypes: this.model.getSubtypes(ENTITY_LABEL_NAME),
       annotationTypes: this.getAnnotationTypes(),
       dataTypes: this.model.getDataTypes(),
+      camiHost: this.config.get('AWEN_CAMI_HOST'),
     } satisfies EmConfig;
   }
 
