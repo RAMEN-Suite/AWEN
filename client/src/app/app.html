@@ -46,7 +46,11 @@
     >
       <div pButtonLabel class="flex flex-column justify-content-center text-center gap-1">
         <span>AWEN</span>
-        <small>v{{ version() }}</small>
+        @if (healthStatusLoaded()) {
+          <small>v{{ version() }}</small>
+        } @else {
+          <p-skeleton />
+        }
       </div>
     </a>
   </ng-template>
@@ -56,7 +60,11 @@
       <a pButton class="no-underline h-3rem" size="small" severity="secondary" outlined [href]="'https://ramen-schema.org'" target="_blank">
         <div pButtonLabel class="flex flex-column justify-content-center text-center gap-1">
           <span>RAMEN</span>
-          <small>v{{ ramenVersion() }}</small>
+          @if (healthStatusLoaded()) {
+            <small>v{{ ramenVersion() }}</small>
+          } @else {
+            <p-skeleton />
+          }
         </div>
       </a>
     </div>
