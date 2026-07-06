@@ -1,12 +1,4 @@
-import {
-  Component,
-  computed,
-  effect,
-  inject,
-  input,
-  signal,
-  untracked,
-} from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { EntityService } from '../entity.service';
 import {
   AnnotationOfEntityWithContent,
@@ -28,7 +20,7 @@ import { Button } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
 import { SelectButton } from 'primeng/selectbutton';
 import { ConfigService } from '../config-module/config.service';
-import { MultiSelect } from 'primeng/multiselect';
+import { castUnknownToString } from '../utils/utils';
 
 export interface StatementAnnotationView {
   annotation: AnnotationOfEntityWithContent;
@@ -58,7 +50,6 @@ interface AnnotationGroupViews {
     Button,
     SelectButton,
     FormsModule,
-    MultiSelect,
   ],
   templateUrl: './annotation-list.html',
   styleUrl: './annotation-list.scss',
@@ -66,7 +57,6 @@ interface AnnotationGroupViews {
 export class AnnotationList {
   private readonly entityService = inject(EntityService);
   private readonly configService = inject(ConfigService);
-  private previousAnnotationTypeOptions: string[] = [];
   public annotationDirectionOptions: {
     label: string;
     value: Direction;
@@ -81,23 +71,10 @@ export class AnnotationList {
 
   protected readonly annotationNodeLabels =
     this.configService.getAnnotationTypes();
-  protected readonly selectedTypes = signal<string[]>([]);
   protected readonly selectedNodeLabel = signal<string>(ANNOTATION_LABEL_NAME);
   protected readonly selectedAnnotationDirection =
     signal<Direction>('OUTGOING');
   protected readonly activeAccordionPanels = signal<string[]>([]);
-
-  protected readonly annotationTypeOptions = computed<string[]>(() => {
-    if (this.selectedAnnotationDirection() === 'OUTGOING') {
-      return this.allAnnotationGroups().refersTo.map((group) => group.type);
-    } else {
-      return this.allAnnotationGroups().isReferredTo.map((group) => group.type);
-    }
-  });
-
-  private readonly selectedTypeSet = computed(
-    () => new Set(this.selectedTypes()),
-  );
 
   private readonly allAnnotationGroups = computed<AnnotationGroupViews>(() => {
     const refersToGroups = new Map<string, StatementAnnotationView[]>();
@@ -137,7 +114,6 @@ export class AnnotationList {
 
   protected readonly groupedAnnotations = computed<AnnotationGroupView[]>(
     () => {
-      const selectedTypeSet = this.selectedTypeSet();
       const selectedNodeLabel = this.selectedNodeLabel();
 
       console.log(this.allAnnotationGroups());
@@ -145,10 +121,8 @@ export class AnnotationList {
         this.selectedAnnotationDirection() === 'INCOMING'
           ? this.allAnnotationGroups().isReferredTo
           : this.allAnnotationGroups().refersTo;
-      console.log(groups);
 
       return groups
-        .filter((group) => selectedTypeSet.has(group.type))
         .map((group): AnnotationGroupView => {
           return {
             ...group,
@@ -160,13 +134,6 @@ export class AnnotationList {
         .filter((group) => group.annotations.length > 0);
     },
   );
-
-  public constructor() {
-    effect(() => {
-      const options = this.annotationTypeOptions();
-      untracked(() => this.syncSelectedTypes(options));
-    });
-  }
 
   private toAnnotationView(
     annotation: AnnotationOfEntityWithContent,
@@ -185,7 +152,7 @@ export class AnnotationList {
       return null;
     }
 
-    return String(value);
+    return castUnknownToString(value);
   }
 
   private toNodeView(node: ConnectedNodeDto): StatementNodeView {
@@ -219,10 +186,6 @@ export class AnnotationList {
     this.activeAccordionPanels.set(this.toStringArray(value));
   }
 
-  protected setSelectedTypes(value: unknown) {
-    this.selectedTypes.set(this.toStringArray(value));
-  }
-
   protected setSelectedNodeLabel(value: string) {
     this.selectedNodeLabel.set(value);
   }
@@ -231,45 +194,13 @@ export class AnnotationList {
     this.selectedAnnotationDirection.set(value);
   }
 
-  private syncSelectedTypes(options: string[]) {
-    const selectedTypes = this.selectedTypes();
-    const previousOptions = this.previousAnnotationTypeOptions;
-    this.previousAnnotationTypeOptions = options;
-
-    if (options.length === 0) {
-      if (selectedTypes.length > 0) {
-        this.selectedTypes.set([]);
-      }
-      return;
-    }
-
-    const optionSet = new Set(options);
-    const previousOptionSet = new Set(previousOptions);
-    const stillAvailableSelectedTypes = selectedTypes.filter((type) =>
-      optionSet.has(type),
-    );
-    const newTypes = options.filter((type) => !previousOptionSet.has(type));
-    const nextSelectedTypes =
-      previousOptions.length === 0
-        ? options
-        : [...stillAvailableSelectedTypes, ...newTypes];
-
-    if (!this.arraysEqual(selectedTypes, nextSelectedTypes)) {
-      this.selectedTypes.set(nextSelectedTypes);
-    }
-  }
-
   private toStringArray(value: unknown): string[] {
     if (Array.isArray(value)) {
-      return value.map(String);
+      return value.map(castUnknownToString);
     }
 
-    return value === null || value === undefined ? [] : [String(value)];
-  }
-
-  private arraysEqual(a: string[], b: string[]) {
-    return (
-      a.length === b.length && a.every((value, index) => value === b[index])
-    );
+    return value === null || value === undefined
+      ? []
+      : [castUnknownToString(value)];
   }
 }

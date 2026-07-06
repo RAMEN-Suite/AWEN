@@ -1,6 +1,6 @@
 import { Component, computed, input } from '@angular/core';
 import { Chip } from 'primeng/chip';
-import { visibleProperties } from '../../utils/utils';
+import { castUnknownToString, visibleProperties } from '../../utils/utils';
 import { NodePropertyDto } from '../../../interfaces';
 
 type TextSize = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
@@ -28,33 +28,7 @@ export class AttributeList {
     return Array.isArray(value);
   }
 
-  protected displayValue(value: unknown): string {
-    if (value == null) {
-      return '';
-    }
-
-    if (typeof value === 'string') {
-      return value;
-    }
-
-    if (
-      typeof value === 'number' ||
-      typeof value === 'boolean' ||
-      typeof value === 'bigint'
-    ) {
-      return value.toString();
-    }
-
-    if (value instanceof Date) {
-      return value.toISOString();
-    }
-
-    try {
-      return JSON.stringify(value);
-    } catch {
-      return '';
-    }
-  }
+  protected displayValue = castUnknownToString;
 
   private getTextSizeClass(textSize: number) {
     switch (textSize) {
