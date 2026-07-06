@@ -1,8 +1,18 @@
 import { booleanAttribute, Component, computed, input } from '@angular/core';
 import { Chip } from 'primeng/chip';
-import { ANNOTATION_LABEL_NAME, COLLECTION_LABEL_NAME, CONTENT_LABEL_NAME, ENTITY_LABEL_NAME } from '../../../constants';
+import {
+  ANNOTATION_LABEL_NAME,
+  COLLECTION_LABEL_NAME,
+  CONTENT_LABEL_NAME,
+  ENTITY_LABEL_NAME,
+} from '../../../constants';
 
-const RAMEN_CORE_TYPES = [ENTITY_LABEL_NAME, ANNOTATION_LABEL_NAME, CONTENT_LABEL_NAME, COLLECTION_LABEL_NAME];
+const RAMEN_CORE_TYPES = [
+  ENTITY_LABEL_NAME,
+  ANNOTATION_LABEL_NAME,
+  CONTENT_LABEL_NAME,
+  COLLECTION_LABEL_NAME,
+];
 
 @Component({
   selector: 'app-node-types',

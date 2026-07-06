@@ -16,13 +16,21 @@ import { HealthService } from './health.service';
 import { filter } from 'rxjs';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Navbar } from './navbar/navbar';
+import { Skeleton } from 'primeng/skeleton';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Toast, ProgressSpinner, MenubarModule, Button, ButtonDirective,
+  imports: [
+    RouterOutlet,
+    Toast,
+    ProgressSpinner,
+    MenubarModule,
+    Button,
+    ButtonDirective,
     ButtonLabel,
     ConfirmDialog,
     Navbar,
+    Skeleton,
   ],
   styleUrl: './app.scss',
   templateUrl: './app.html',
@@ -53,13 +61,16 @@ export class App {
     this.appContent.nativeElement.scrollTo({ top: 0, behavior: behavior });
   }
 
+  protected readonly healthStatusLoaded = this.status.getHealthStatusLoaded();
+
   protected loaded = computed(() => {
     const loaded = this.config.getLoaded();
     const healthy = this.status.getHealthStatus();
-    return loaded() && healthy();
+    const healthStatusLoaded = this.healthStatusLoaded();
+    return loaded() && healthy() && healthStatusLoaded;
   });
 
-  protected version = this.status.getVersion();
+  protected version = this.status.getServerVersion();
   protected ramenVersion = this.status.getRamenVersion();
 
   protected menuItems: MenuItem[] = [

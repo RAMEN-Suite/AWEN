@@ -1,21 +1,25 @@
 import { Component, computed, input } from '@angular/core';
 import { Chip } from 'primeng/chip';
-import { visibleProperties } from '../../utils/utils';
+import { castUnknownToString, visibleProperties } from '../../utils/utils';
 import { NodePropertyDto } from '../../../interfaces';
 
 type TextSize = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 
 @Component({
-  selector: 'app-property-list',
+  selector: 'app-attribute-list',
   imports: [Chip],
-  templateUrl: './property-list.html',
+  templateUrl: './attribute-list.html',
 })
-export class PropertyList {
-  properties = input.required<NodePropertyDto[]>();
-  textSize = input<TextSize>(3);
+export class AttributeList {
+  public properties = input.required<NodePropertyDto[]>();
+  public textSize = input<TextSize>(3);
 
   protected textSizeClass = computed(() => {
     return this.getTextSizeClass(this.textSize());
+  });
+
+  protected iconSizeClass = computed(() => {
+    return this.getTextSizeClass(this.textSize() - 1);
   });
 
   protected readonly visibleProperties = visibleProperties;
@@ -24,9 +28,7 @@ export class PropertyList {
     return Array.isArray(value);
   }
 
-  protected displayValue(value: unknown): string {
-    return String(value ?? '');
-  }
+  protected displayValue = castUnknownToString;
 
   private getTextSizeClass(textSize: number) {
     switch (textSize) {
@@ -49,6 +51,9 @@ export class PropertyList {
       case 9:
         return 'text-5xl';
       default:
+        if (textSize < 1) {
+          return 'text-xs';
+        }
         return 'text-base';
     }
   }

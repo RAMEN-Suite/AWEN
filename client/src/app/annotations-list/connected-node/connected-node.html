@@ -1,8 +1,6 @@
 <div
-  class="flex flex-row w-full align-items-center border-1 border-gray-300 text-color"
-  [class.border-top-none]="!firstEntry()"
-  [class.border-round-top]="firstEntry()"
-  [class.border-round-bottom]="lastEntry()"
+  class="flex flex-row w-full align-items-center border-bottom-1 border-gray-300 text-color"
+  [class.border-bottom-none]="!firstEntry()"
   [class.hover:bg-gray-100]="node().entityLink"
   style="min-height: 2rem"
 >
@@ -12,7 +10,7 @@
     </div>
 
     <div class="flex flex-row w-full px-2 align-items-center align-content-center">
-      <div class="flex flex-column w-5">
+      <div class="flex flex-column w-4">
         <app-node-types [nodeTypes]="node().node.types" asChips hideRamenCoreTypes />
       </div>
 
@@ -21,14 +19,14 @@
   </a>
 
   @if (node().id; as nodeId) {
-  <div class="flex flex-column justify-content-end px-2">
-    <p-button
-      (onClick)="clickDeleteAnnotationRelation(annotationId(), nodeId, $event)"
-      icon="pi pi-trash"
-      severity="danger"
-      outlined
-      size="small"
-    />
-  </div>
+    <div class="flex flex-column justify-content-end px-2">
+      <p-button
+        (onClick)="clickDeleteAnnotationRelation(annotationId(), nodeId, $event)"
+        icon="pi pi-trash"
+        severity="danger"
+        outlined
+        size="small"
+      />
+    </div>
   }
 </div>

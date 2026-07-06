@@ -6,6 +6,8 @@ const castValues = <T extends number | string | boolean>(
 ): T[] => {
   return value.map((v) => castValue(v, dataTypeName));
 };
+
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
 const castValue = <T extends number | string | boolean>(
   value: unknown,
   dataTypeName: string,
@@ -30,8 +32,45 @@ const visibleProperties = (
   return properties.filter((p) => !p.isKey && p.value !== '');
 };
 
-const getProperty = (properties: NodePropertyDto[], name: string): NodePropertyDto | undefined => {
+const getProperty = (
+  properties: NodePropertyDto[],
+  name: string,
+): NodePropertyDto | undefined => {
   return properties.find((p) => p.name === name);
 };
 
-export { castValue, castValues, visibleProperties, getProperty };
+const castUnknownToString = (value: unknown): string => {
+  if (value == null) {
+    return '';
+  }
+
+  if (typeof value === 'string') {
+    return value;
+  }
+
+  if (
+    typeof value === 'number' ||
+    typeof value === 'boolean' ||
+    typeof value === 'bigint'
+  ) {
+    return value.toString();
+  }
+
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return '';
+  }
+};
+
+export {
+  castValue,
+  castValues,
+  visibleProperties,
+  getProperty,
+  castUnknownToString,
+};

@@ -5,6 +5,7 @@ import {
   Delete,
   Get,
   InternalServerErrorException,
+  Logger,
   Param,
   Post,
   Put,
@@ -21,6 +22,8 @@ import { CreateAnnotationConnectionReqDto } from './dto/create-annotation-connec
 
 @Controller('annotation')
 export class AnnotationController {
+  private readonly logger = new Logger(AnnotationController.name);
+
   constructor(
     private readonly annotationService: AnnotationService,
     private readonly entityService: EntityService,
@@ -44,7 +47,11 @@ export class AnnotationController {
     try {
       await this.annotationService.update(id, body.properties);
     } catch (error) {
+      if (error instanceof Error && error.message === 'Invalid Attributes') {
+        throw new BadRequestException(error.cause);
+      }
       if (!(error instanceof RAMENError)) {
+        this.logger.error(error);
         throw new InternalServerErrorException('Could not delete entity');
       }
       throw error;

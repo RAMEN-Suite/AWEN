@@ -2,7 +2,7 @@ import { Component, inject, input } from '@angular/core';
 import { Button } from 'primeng/button';
 import { ConnectedNode } from '../connected-node/connected-node';
 import { NodeTypes } from '../node-types/node-types';
-import { PropertyList } from '../property-list/property-list';
+import { AttributeList } from '../attribute-list/attribute-list';
 import { UpdateAnnotation } from '../../edit-annotation/update-annotation';
 import { StatementAnnotationView } from '../annotation-list';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
@@ -12,10 +12,18 @@ import { AnnotationApiService } from '../../api/annotation-api.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { UtilsService } from '../../utils/utils.service';
 import { EntityService } from '../../entity.service';
+import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-annotation-card',
-  imports: [Button, ConnectedNode, NodeTypes, PropertyList, UpdateAnnotation],
+  imports: [
+    Button,
+    ConnectedNode,
+    NodeTypes,
+    AttributeList,
+    UpdateAnnotation,
+    NgClass,
+  ],
   templateUrl: './annotation-card.html',
 })
 export class AnnotationCard {
