@@ -21,11 +21,19 @@
         />
       </div>
     </div>
-    <div class="col-8 p-3 pl-2 max-h-30rem overflow-y-auto">
+    <div
+      class="col-8 p-3 pl-2 max-h-30rem overflow-y-auto"
+      [ngClass]="{
+        'align-items-center justify-content-center flex': annotation().nodes.length <= 0,
+      }"
+    >
       @for (node of annotation().nodes; track node.id; let first = $first; let last = $last) {
         <app-connected-node [annotationId]="annotationId" [node]="node" [firstEntry]="first" [lastEntry]="last" />
       } @empty {
-        <span class="text-gray-500">No connected nodes</span>
+        <span class="text-base text-gray-500 h-min">
+          No connected nodes. Try adding some by selecting the
+          <span class="pi pi-plus-circle text-primary text-sm"></span> button.
+        </span>
       }
     </div>
   </div>

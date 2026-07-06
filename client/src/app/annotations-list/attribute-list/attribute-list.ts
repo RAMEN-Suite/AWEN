@@ -18,6 +18,10 @@ export class AttributeList {
     return this.getTextSizeClass(this.textSize());
   });
 
+  protected iconSizeClass = computed(() => {
+    return this.getTextSizeClass(this.textSize() - 1);
+  });
+
   protected readonly visibleProperties = visibleProperties;
 
   protected isArrayValue(value: unknown): value is unknown[] {
@@ -73,6 +77,9 @@ export class AttributeList {
       case 9:
         return 'text-5xl';
       default:
+        if (textSize < 1) {
+          return 'text-xs';
+        }
         return 'text-base';
     }
   }

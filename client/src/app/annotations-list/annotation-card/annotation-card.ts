@@ -12,10 +12,18 @@ import { AnnotationApiService } from '../../api/annotation-api.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { UtilsService } from '../../utils/utils.service';
 import { EntityService } from '../../entity.service';
+import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-annotation-card',
-  imports: [Button, ConnectedNode, NodeTypes, AttributeList, UpdateAnnotation],
+  imports: [
+    Button,
+    ConnectedNode,
+    NodeTypes,
+    AttributeList,
+    UpdateAnnotation,
+    NgClass,
+  ],
   templateUrl: './annotation-card.html',
 })
 export class AnnotationCard {

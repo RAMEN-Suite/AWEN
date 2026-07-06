@@ -24,6 +24,9 @@
       </div>
     </div>
   } @empty {
-    <span class="text-gray-500" [class]="textSizeClass()">No properties</span>
+    <span class="text-gray-500" [class]="textSizeClass()">
+      No properties. Try adding some by selecting the
+      <span [class]="iconSizeClass()" class="pi pi-pencil text-color-secondary"></span> button.
+    </span>
   }
 </div>
