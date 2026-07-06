@@ -2,6 +2,29 @@
 
 All notable changes to this project are documented here.
 
+## [0.0.3](https://github.com/RAMEN-Suite/AWEN/compare/v0.0.2...v0.0.3) (2026-07-06)
+
+
+### Features
+
+* add error logger on internal server errors ([6da281a](https://github.com/RAMEN-Suite/AWEN/commit/6da281a8ad13e1faee7fc3b1ab3c3d619dd3cd68))
+* added tooltip if connected nodes / annotation attributes are empty ([716f2cb](https://github.com/RAMEN-Suite/AWEN/commit/716f2cb32583513902d2b34c7290d6a729e9f2a3))
+* added ui loading indikator to annotation list ([975d260](https://github.com/RAMEN-Suite/AWEN/commit/975d260d0578b8b7da81851bc5c4e3e9ba69a2a2))
+* **client:** remove annotation type filter and refactor castUnknownToString function ([cbf86b4](https://github.com/RAMEN-Suite/AWEN/commit/cbf86b4e157975a2986651e50e601871c6bdafce))
+* removed Annotation.type from annotation-card head ([f7797d6](https://github.com/RAMEN-Suite/AWEN/commit/f7797d6d8c95c99029b340aeeaaebe4cc8d3d5ba))
+
+
+### Bug Fixes
+
+* align attribute key start ([1bff84d](https://github.com/RAMEN-Suite/AWEN/commit/1bff84de7e5aa72185b3bab747609267d41dbfbe))
+
+
+### Refactoring
+
+* **client:** linted and formated ([fb3145d](https://github.com/RAMEN-Suite/AWEN/commit/fb3145d67290a61162abf43e8670264b1f43a332))
+* ramen and app version display ([0a1271e](https://github.com/RAMEN-Suite/AWEN/commit/0a1271eea5b8d9edda34f45a72a8b3a02bcb8054))
+* rename property-list to attribute-list ([13a415c](https://github.com/RAMEN-Suite/AWEN/commit/13a415c93368e19ddda73f67ed2b84d8b4d0a2a1))
+
 ## [0.0.2](https://github.com/RAMEN-Suite/AWEN/compare/v0.0.1...v0.0.2) (2026-07-06)
 
 ## 0.0.1 (2026-07-06)
