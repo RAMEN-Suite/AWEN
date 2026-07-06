@@ -7,7 +7,7 @@
         <app-node-types [nodeTypes]="annotation().annotation.types" asChips class="flex flex-column gap-1" />
       </div>
       <div>
-        <app-property-list [properties]="annotation().annotation.properties" />
+        <app-attribute-list [properties]="annotation().annotation.properties" />
       </div>
       <div class="flex flex-row gap-1 justify-content-start align-content-end mt-auto">
         <p-button icon="pi pi-trash" severity="danger" outlined size="small" (onClick)="clickDeleteAnnotation(annotationId, $event)" />

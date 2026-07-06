@@ -6,13 +6,13 @@ import { NodePropertyDto } from '../../../interfaces';
 type TextSize = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 
 @Component({
-  selector: 'app-property-list',
+  selector: 'app-attribute-list',
   imports: [Chip],
-  templateUrl: './property-list.html',
+  templateUrl: './attribute-list.html',
 })
-export class PropertyList {
-  properties = input.required<NodePropertyDto[]>();
-  textSize = input<TextSize>(3);
+export class AttributeList {
+  public properties = input.required<NodePropertyDto[]>();
+  public textSize = input<TextSize>(3);
 
   protected textSizeClass = computed(() => {
     return this.getTextSizeClass(this.textSize());
@@ -25,7 +25,31 @@ export class PropertyList {
   }
 
   protected displayValue(value: unknown): string {
-    return String(value ?? '');
+    if (value == null) {
+      return '';
+    }
+
+    if (typeof value === 'string') {
+      return value;
+    }
+
+    if (
+      typeof value === 'number' ||
+      typeof value === 'boolean' ||
+      typeof value === 'bigint'
+    ) {
+      return value.toString();
+    }
+
+    if (value instanceof Date) {
+      return value.toISOString();
+    }
+
+    try {
+      return JSON.stringify(value);
+    } catch {
+      return '';
+    }
   }
 
   private getTextSizeClass(textSize: number) {

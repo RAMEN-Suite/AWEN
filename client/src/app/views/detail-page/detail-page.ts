@@ -9,7 +9,7 @@ import { DialogService } from 'primeng/dynamicdialog';
 import { visibleProperties } from '../../utils/utils';
 import { NodeTypes } from '../../annotations-list/node-types/node-types';
 import { AnnotationList } from '../../annotations-list/annotation-list';
-import { PropertyList } from '../../annotations-list/property-list/property-list';
+import { AttributeList } from '../../annotations-list/attribute-list/attribute-list';
 
 @Component({
   selector: 'app-detail-page',
@@ -22,7 +22,7 @@ import { PropertyList } from '../../annotations-list/property-list/property-list
     CreateAnnotation,
     NodeTypes,
     AnnotationList,
-    PropertyList,
+    AttributeList,
   ],
   styleUrl: './detail-page.scss',
   templateUrl: './detail-page.html',

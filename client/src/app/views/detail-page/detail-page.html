@@ -11,37 +11,37 @@
 
     <!--  </div>-->
     <div class="detail-layout grid flex justify-content-center">
-    <div class="detail-columns col-12 px-5 flex-order-2 md:flex-order-1 grid flex md:gap-6 align-content-start">
-      <section class="detail-card col-12 md:col-5 card flex flex-column gap-3 h-min">
-        <div class="detail-card-header col-12 flex flex-row gap-2 justify-content-between">
-          <div class="w-8 flex flex-column gap-2">
-            <span class="text-4xl font-bold w-12"> {{ entity.label }} </span>
-            <div class="flex">
-              <app-node-types [nodeTypes]="entity.types" asChips class="flex gap-2" />
+      <div class="detail-columns col-12 px-5 flex-order-2 md:flex-order-1 grid flex md:gap-6 align-content-start">
+        <section class="detail-card col-12 md:col-5 card flex flex-column gap-3 h-min">
+          <div class="detail-card-header col-12 flex flex-row gap-2 justify-content-between">
+            <div class="w-8 flex flex-column gap-2">
+              <span class="text-4xl font-bold w-12"> {{ entity.label }} </span>
+              <div class="flex">
+                <app-node-types [nodeTypes]="entity.types" asChips class="flex gap-2" />
+              </div>
+            </div>
+            <div class="flex w-auto gap-2">
+              <app-edit-entity [entity]="entity" />
+              <app-delete-entity [entityId]="entityId()" />
             </div>
           </div>
-          <div class="flex w-auto gap-2">
-            <app-edit-entity [entity]="entity" />
-            <app-delete-entity [entityId]="entityId()" />
-          </div>
-        </div>
-        @if(visibleProperties(entity.properties).length > 0) {
-        <div class="entity-properties-scroll col-12 flex flex-column gap-3 h-min">
-          <app-property-list [properties]="entity.properties" [textSize]="5" />
-        </div>
+          @if (visibleProperties(entity.properties).length > 0) {
+            <div class="entity-properties-scroll col-12 flex flex-column gap-3 h-min">
+              <app-attribute-list [properties]="entity.properties" [textSize]="5" />
+            </div>
+          }
+        </section>
+        @if (annotations().length > 0) {
+          <section class="detail-card col-12 md:col card">
+            <div class="detail-card-header col-12 flex justify-content-between">
+              <span class="text-4xl font-bold">Annotations</span>
+              <app-create-annotation [entityId]="entityId()" label="" icon="pi pi-plus" />
+            </div>
+            <div class="annotations-scroll w-full">
+              <app-annotations-list [annotations]="annotations()" class="w-full" />
+            </div>
+          </section>
         }
-      </section>
-      @if(annotations().length > 0) {
-      <section class="detail-card col-12 md:col card">
-        <div class="detail-card-header col-12 flex justify-content-between">
-          <span class="text-4xl font-bold">Annotations</span>
-          <app-create-annotation [entityId]="entityId()" label="" icon="pi pi-plus" />
-        </div>
-        <div class="annotations-scroll w-full">
-          <app-annotations-list [annotations]="annotations()" class="w-full" />
-        </div>
-      </section>
-      }
       </div>
     </div>
   </div>
