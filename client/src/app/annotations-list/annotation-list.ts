@@ -1,4 +1,11 @@
-import { Component, computed, inject, input, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
 import { EntityService } from '../entity.service';
 import {
   AnnotationOfEntityWithContent,
@@ -21,6 +28,7 @@ import { FormsModule } from '@angular/forms';
 import { SelectButton } from 'primeng/selectbutton';
 import { ConfigService } from '../config-module/config.service';
 import { castUnknownToString } from '../utils/utils';
+import { Skeleton } from 'primeng/skeleton';
 
 export interface StatementAnnotationView {
   annotation: AnnotationOfEntityWithContent;
@@ -50,6 +58,7 @@ interface AnnotationGroupViews {
     Button,
     SelectButton,
     FormsModule,
+    Skeleton,
   ],
   templateUrl: './annotation-list.html',
   styleUrl: './annotation-list.scss',
@@ -68,6 +77,8 @@ export class AnnotationList {
 
   public annotations = input.required<AnnotationOfEntityWithContent[]>();
   public entity = this.entityService.entity;
+
+  protected annotationListLoaded = signal<boolean>(true);
 
   protected readonly annotationNodeLabels =
     this.configService.getAnnotationTypes();
@@ -112,28 +123,34 @@ export class AnnotationList {
     };
   });
 
-  protected readonly groupedAnnotations = computed<AnnotationGroupView[]>(
-    () => {
-      const selectedNodeLabel = this.selectedNodeLabel();
+  protected readonly groupedAnnotations = signal<AnnotationGroupView[]>([]);
 
-      console.log(this.allAnnotationGroups());
+  private readonly recalculateGroupedAnnotations = effect(() => {
+    const selectedNodeLabel = this.selectedNodeLabel();
+    const annotationDirection = this.selectedAnnotationDirection();
+    const allGroups = this.allAnnotationGroups();
+
+    this.annotationListLoaded.set(false);
+
+    requestAnimationFrame(() => {
       const groups =
-        this.selectedAnnotationDirection() === 'INCOMING'
-          ? this.allAnnotationGroups().isReferredTo
-          : this.allAnnotationGroups().refersTo;
+        annotationDirection === 'INCOMING'
+          ? allGroups.isReferredTo
+          : allGroups.refersTo;
 
-      return groups
-        .map((group): AnnotationGroupView => {
-          return {
-            ...group,
-            annotations: group.annotations.filter((annotation) =>
-              annotation.annotation.types.includes(selectedNodeLabel),
-            ),
-          };
-        })
+      const ret = groups
+        .map((group): AnnotationGroupView => ({
+          ...group,
+          annotations: group.annotations.filter((annotation) =>
+            annotation.annotation.types.includes(selectedNodeLabel),
+          ),
+        }))
         .filter((group) => group.annotations.length > 0);
-    },
-  );
+
+      this.groupedAnnotations.set(ret);
+      this.annotationListLoaded.set(true);
+    });
+  });
 
   private toAnnotationView(
     annotation: AnnotationOfEntityWithContent,
@@ -203,4 +220,11 @@ export class AnnotationList {
       ? []
       : [castUnknownToString(value)];
   }
+
+  protected skeletonGroups = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+  protected skeletonWidths = this.skeletonGroups.map(() => {
+    const value = Math.floor(Math.random() * 7) + 4;
+
+    return `${value}rem`;
+  });
 }
