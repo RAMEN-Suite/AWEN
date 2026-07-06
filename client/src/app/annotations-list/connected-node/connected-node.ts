@@ -1,11 +1,22 @@
-import { booleanAttribute, Component, computed, inject, input, OnInit } from '@angular/core';
+import {
+  booleanAttribute,
+  Component,
+  computed,
+  inject,
+  input,
+  OnInit,
+} from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { EntityService } from '../../entity.service';
 import { AnnotationApiService } from '../../api/annotation-api.service';
 import { ConnectedNodeDto, StatementNodeView } from '../../../interfaces';
 import { UtilsService } from '../../utils/utils.service';
-import { ANNOTATION_LABEL_NAME, ANNOTATION_TYPE_NAME, ENTITY_LABEL_NAME } from '../../../constants';
+import {
+  ANNOTATION_LABEL_NAME,
+  ANNOTATION_TYPE_NAME,
+  ENTITY_LABEL_NAME,
+} from '../../../constants';
 import { getLabelProperty } from '../../utils/entity.utils';
 import { NodeTypes } from '../node-types/node-types';
 import { Button } from 'primeng/button';
@@ -102,7 +113,8 @@ export class ConnectedNode implements OnInit {
       return getLabelProperty(node.properties)!.value as string;
     }
     if (node.types.includes(ANNOTATION_LABEL_NAME)) {
-      return getProperty(node.properties, ANNOTATION_TYPE_NAME)!.value as string;
+      return getProperty(node.properties, ANNOTATION_TYPE_NAME)!
+        .value as string;
     }
     return undefined;
   }

@@ -7,7 +7,9 @@ const getKeyProperty = (
   return properties.find((p) => p.isKey);
 };
 
-const getLabelProperty = (properties: NodePropertyDto[]): NodePropertyDto | undefined => {
+const getLabelProperty = (
+  properties: NodePropertyDto[],
+): NodePropertyDto | undefined => {
   return properties.find((p) => p.name === ENTITY_NAME_PROPERTY);
 };
 
