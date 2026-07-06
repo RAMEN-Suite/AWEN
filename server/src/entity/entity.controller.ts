@@ -5,6 +5,7 @@ import {
   Delete,
   Get,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
   Param,
   Post,
@@ -31,6 +32,8 @@ import { AnnotationsOfEntityWithContentDto } from '../annotation/dto/annotations
 
 @Controller('entity')
 export class EntityController {
+  private readonly logger = new Logger(EntityController.name);
+
   constructor(
     private readonly entityService: EntityService,
     private readonly annotationService: AnnotationService,
@@ -89,6 +92,7 @@ export class EntityController {
       await this.entityService.delete(id);
     } catch (error) {
       if (!(error instanceof RAMENError)) {
+        this.logger.error(error);
         throw new InternalServerErrorException('Could not delete entity');
       }
       throw error;
@@ -102,7 +106,11 @@ export class EntityController {
     try {
       await this.entityService.update(id, body.properties);
     } catch (error) {
+      if (error instanceof Error && error.message === 'Invalid Attributes') {
+        throw new BadRequestException(error.cause);
+      }
       if (!(error instanceof RAMENError)) {
+        this.logger.error(error);
         throw new InternalServerErrorException('Could not delete entity');
       }
       throw error;
