@@ -56,23 +56,24 @@ interface CFOption {
 export class FilterPane {
   private destroyRef = inject(DestroyRef);
 
-  searchService = inject(SearchEntityService);
-  collectionService = inject(CollectionService);
-  configService = inject(ConfigService);
+  private readonly searchService = inject(SearchEntityService);
+  private readonly collectionService = inject(CollectionService);
+  private readonly configService = inject(ConfigService);
   private queryParamService = inject(QueryParamsService);
 
-  openLinkInNewTab = input<boolean>(false);
-  setQueryParams = input<boolean>(false);
+  public openLinkInNewTab = input<boolean>(false);
+  public enableLinkToEntity = input<boolean>(true);
+  public setQueryParams = input<boolean>(false);
 
-  remoteConfig = this.configService.getRemoteConfig();
-  config = this.configService.getConfig();
+  protected remoteConfig = this.configService.getRemoteConfig();
+  protected config = this.configService.getConfig();
 
   /** gesamte Kette aus Guidelines (vom spezifischsten → generischsten) */
   private collectionChain: string[] = [];
   /** nur filterbare Typen, in UI-Reihenfolge (generisch → spezifisch) */
   private activeChain: string[] = [];
 
-  form = new FormGroup<{
+  protected form = new FormGroup<{
     label: FormControl<string>;
     collectionFilter: FormGroup<
       Record<string, FormControl<CollectionName | null>>
@@ -89,11 +90,11 @@ export class FilterPane {
     types: new FormControl<string[]>([], { nonNullable: true }),
   });
 
-  collectionFilterOptions = signal<CFOption[]>([]);
-  suggestions = signal<EntityNames[]>([]);
-  showEmptyMessage = signal<boolean>(false);
+  protected collectionFilterOptions = signal<CFOption[]>([]);
+  protected suggestions = signal<EntityNames[]>([]);
+  protected showEmptyMessage = signal<boolean>(false);
 
-  constructor() {
+  public constructor() {
     effect(() => {
       const opts = this.collectionFilterOptions();
       opts.forEach((opt) => {
@@ -164,7 +165,7 @@ export class FilterPane {
     });
   }
 
-  async autocompleteChanges(e: AutoCompleteCompleteEvent) {
+  protected async autocompleteChanges(e: AutoCompleteCompleteEvent) {
     if (this.form.valid) {
       const types = this.form.controls.types.value;
       const collectionFilter = this.form.controls.collectionFilter.value;
@@ -191,7 +192,7 @@ export class FilterPane {
     this.showEmptyMessage.set(this.calcShowEmptyMessage());
   }
 
-  async onSubmit() {
+  protected async onSubmit() {
     if (!this.form.valid) {
       Object.values(this.form.controls).forEach((ctrl) => ctrl.markAsTouched());
       return;
@@ -323,7 +324,7 @@ export class FilterPane {
     this.form.reset();
   }
 
-  async resetFilterClicked(): Promise<void> {
+  protected async resetFilterClicked(): Promise<void> {
     this.resetForm();
     this.searchService.resetEntityList();
     await this.queryParamService.setQueryParams({});
