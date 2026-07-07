@@ -71,6 +71,12 @@ export class ConfigService {
     const storeConfig = this.store.getData<EmConfig>(EM_CONFIG_STORE_KEY);
     if (storeConfig) {
       this.setConfig(storeConfig);
+    } else {
+      this.setConfig({
+        entityTypes: remoteConfig.entityTypes,
+        filterableCollections: [],
+        selectedCollectionChain: [],
+      });
     }
     this._loaded.set(true);
   }

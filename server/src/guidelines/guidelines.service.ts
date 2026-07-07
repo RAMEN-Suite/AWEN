@@ -23,7 +23,7 @@ export class GuidelinesService {
   getConfig(): EmConfig {
     return {
       collectionChains: this.model.getCollectionChains(),
-      entityTypes: this.model.getSubtypes(ENTITY_LABEL_NAME),
+      entityTypes: this.model.getSubtypes(ENTITY_LABEL_NAME).filter((type) => type !== ENTITY_LABEL_NAME),
       annotationTypes: this.getAnnotationTypes(),
       dataTypes: this.model.getDataTypes(),
       camiAvailable: this.camiService.camiAvailable(),

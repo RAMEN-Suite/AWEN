@@ -5,16 +5,23 @@
       [suggestions]="suggestions()"
       [invalid]="form.controls.label.invalid && form.controls.label.touched"
       (completeMethod)="autocompleteChanges($event)"
-      (onSelect)="onItemSelect($event)"
+      (onSelect)="onItemSelect($event); onSubmit()"
+      (keydown.enter)="onSubmit()"
       fluid
       [showEmptyMessage]="showEmptyMessage()"
       optionLabel="label"
       panelStyleClass="w-30rem"
     >
       <ng-template let-entity #item>
-        <a [routerLink]="['/', 'entity', entity.id]" [target]="openLinkInNewTab() ? '_blank' : ''" class="flex items-center gap-2">
-          <span class="text-black-alpha-90">{{ entity.label }}</span>
-        </a>
+        @if (enableLinkToEntity()) {
+          <a [routerLink]="['/', 'entity', entity.id]" [target]="openLinkInNewTab() ? '_blank' : ''" class="flex items-center gap-2">
+            <span class="text-black-alpha-90">{{ entity.label }}</span>
+          </a>
+        } @else {
+          <div class="flex items-center gap-2">
+            <span class="text-black-alpha-90">{{ entity.label }}</span>
+          </div>
+        }
       </ng-template>
     </p-auto-complete>
     @if (form.controls.label.invalid && form.controls.label.touched) {
