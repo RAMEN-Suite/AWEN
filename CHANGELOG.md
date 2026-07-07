@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented here.
 
+## [0.0.5](https://github.com/RAMEN-Suite/AWEN/compare/v0.0.4...v0.0.5) (2026-07-07)
+
+
+### Bug Fixes
+
+* **client:** rm cami links if no cami host is given ([a9d2af3](https://github.com/RAMEN-Suite/AWEN/commit/a9d2af3fc340b7ce6f782fa6fecd6bc12279a3aa))
+
 ## [0.0.4](https://github.com/RAMEN-Suite/AWEN/compare/v0.0.3...v0.0.4) (2026-07-07)
 
 
