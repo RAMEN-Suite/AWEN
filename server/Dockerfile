@@ -49,7 +49,6 @@ RUN npm run build
 FROM base AS prod
 WORKDIR /usr/src/app
 ENV NODE_ENV=production
-RUN echo "APP_VERSION=$(npm pkg get version)" >> ./.env
 ENV PORT=3000
 
 RUN addgroup -S nodeapp && adduser -S nodeapp -G nodeapp && \
@@ -60,6 +59,8 @@ COPY --chown=nodeapp:nodeapp package.json ./
 COPY --from=builder --chown=nodeapp:nodeapp /usr/src/app/dist ./dist
 COPY --from=deps --chown=nodeapp:nodeapp /app/node_modules ./node_modules
 COPY NOTICES.md .
+
+RUN echo "APP_VERSION=$(npm pkg get version)" >> ./.env
 
 USER nodeapp
 EXPOSE ${PORT}

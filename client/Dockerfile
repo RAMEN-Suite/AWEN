@@ -90,7 +90,7 @@ set -eu
 : "${AWEN_APP_NAME:=AWEN - Graph Based Entity Management}"
 : "${AWEN_APP_PREFIX:=/}"
 : "${AWEN_APP_DESCRIPTION:=Entity Management for Graph Applications using the RAMEN-Framework}"
-: "${AWEN_APP_FAVICON:=/favicon-default.jpg}"
+: "${AWEN_APP_FAVICON:=./favicon-default.jpg}"
 
 rm -rf /tmp/www
 mkdir -p /tmp/www
