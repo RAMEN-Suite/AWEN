@@ -2,6 +2,15 @@
 
 All notable changes to this project are documented here.
 
+## [0.0.7](https://github.com/RAMEN-Suite/AWEN/compare/v0.0.6...v0.0.7) (2026-07-07)
+
+
+### Features
+
+* **client:** automatically create config store ([f54054e](https://github.com/RAMEN-Suite/AWEN/commit/f54054e0ddd6e69bf511d79f38cc18a4b6c7ec24))
+* **server:** rm "Entity" from entityTypes config ([df21769](https://github.com/RAMEN-Suite/AWEN/commit/df2176947f61a6886fe617e5c56c454b36eaaf86))
+* submit filter form on selection of auto complete suggestion and on keydown ([bfc079d](https://github.com/RAMEN-Suite/AWEN/commit/bfc079deb5b799e9d6c5a0ef15033c65039cf522))
+
 ## [0.0.6](https://github.com/RAMEN-Suite/AWEN/compare/v0.0.5...v0.0.6) (2026-07-07)
 
 ## [0.0.5](https://github.com/RAMEN-Suite/AWEN/compare/v0.0.4...v0.0.5) (2026-07-07)
