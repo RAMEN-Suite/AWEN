@@ -22,6 +22,9 @@ export class EmConfigDto implements EmConfig {
   @ApiProperty()
   dataTypes!: DataType[];
 
+  @ApiProperty()
+  camiAvailable!: boolean;
+
   constructor(value: EmConfig) {
     Object.assign(this, value);
   }

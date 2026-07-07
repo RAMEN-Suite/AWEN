@@ -112,6 +112,7 @@ export interface EmConfigRemote {
   entityTypes: string[];
   annotationTypes: string[];
   dataTypes: DataType[];
+  camiAvailable: boolean;
 }
 
 export interface EmConfig {
@@ -162,6 +163,9 @@ export type PropertyConfigDataType =
 export interface StatementNodeView {
   node: ConnectedNodeDto;
   id: string | null;
-  entityLink: string | null;
+  link: {
+    router: boolean;
+    href: string;
+  } | null;
   directionIcon: string;
 }

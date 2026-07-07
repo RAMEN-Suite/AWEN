@@ -31,6 +31,7 @@ export class AnnotationService {
   ANNOTATION_KEY_PROPERTY!: string;
   ENTITY_KEY_PROPERTY!: string;
   CONTENT_KEY_PROPERTY!: string;
+  COLLECTION_KEY_PROPERTY!: string;
 
   constructor(
     private readonly neo4jService: Neo4jService,
@@ -42,6 +43,7 @@ export class AnnotationService {
     this.ANNOTATION_KEY_PROPERTY = this.model.getNodeKeyField(ANNOTATION_LABEL_NAME);
     this.ENTITY_KEY_PROPERTY = this.model.getNodeKeyField(ENTITY_LABEL_NAME);
     this.CONTENT_KEY_PROPERTY = this.model.getNodeKeyField(CONTENT_LABEL_NAME);
+    this.COLLECTION_KEY_PROPERTY = this.model.getNodeKeyField(COLLECTION_LABEL_NAME);
   }
 
   async get(id: string): Promise<AnnotationDto> {
@@ -325,6 +327,7 @@ export class AnnotationService {
             eq(connectedNode.property(this.ANNOTATION_KEY_PROPERTY), new Cypher.Param(connectedNodeId)),
             eq(connectedNode.property(this.ENTITY_KEY_PROPERTY), new Cypher.Param(connectedNodeId)),
             eq(connectedNode.property(this.CONTENT_KEY_PROPERTY), new Cypher.Param(connectedNodeId)),
+            eq(connectedNode.property(this.COLLECTION_KEY_PROPERTY), new Cypher.Param(connectedNodeId)),
           ),
         ),
       );
@@ -357,6 +360,7 @@ export class AnnotationService {
           eq(connectedNode.property(this.ANNOTATION_KEY_PROPERTY), new Cypher.Param(connectedNodeId)),
           eq(connectedNode.property(this.ENTITY_KEY_PROPERTY), new Cypher.Param(connectedNodeId)),
           eq(connectedNode.property(this.CONTENT_KEY_PROPERTY), new Cypher.Param(connectedNodeId)),
+          eq(connectedNode.property(this.COLLECTION_KEY_PROPERTY), new Cypher.Param(connectedNodeId)),
         ),
       ),
     );
