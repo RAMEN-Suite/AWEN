@@ -2,6 +2,15 @@
 
 All notable changes to this project are documented here.
 
+## [0.0.4](https://github.com/RAMEN-Suite/AWEN/compare/v0.0.3...v0.0.4) (2026-07-07)
+
+
+### Features
+
+* add redirection to cami collections and contents ([ea38656](https://github.com/RAMEN-Suite/AWEN/commit/ea38656f67966681f6b1f12895a49fd4e729822f))
+* **server:** added cami host to get config route ([29f3351](https://github.com/RAMEN-Suite/AWEN/commit/29f3351210e6a28b40a206c98d56f7445be6f783))
+* **server:** better handling of given cami host url ([682c8eb](https://github.com/RAMEN-Suite/AWEN/commit/682c8eb8730e34f7dc65dac63549f077b4680d12))
+
 ## [0.0.3](https://github.com/RAMEN-Suite/AWEN/compare/v0.0.2...v0.0.3) (2026-07-06)
 
 
