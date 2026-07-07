@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import guidelinesJSON from '../../guidelines.json';
 import { IGuidelines } from '../../shared/IGuidelines';
 import { EmConfig } from './interfaces/em-config.interface';
@@ -10,6 +10,8 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class GuidelinesService {
+  private readonly logger = new Logger(GuidelinesService.name);
+
   constructor(
     private readonly model: RamenModelService,
     private readonly config: ConfigService,
@@ -26,7 +28,7 @@ export class GuidelinesService {
       entityTypes: this.model.getSubtypes(ENTITY_LABEL_NAME),
       annotationTypes: this.getAnnotationTypes(),
       dataTypes: this.model.getDataTypes(),
-      camiHost: this.config.get('AWEN_CAMI_HOST'),
+      camiHost: this.getCamiHost(),
     } satisfies EmConfig;
   }
 
@@ -68,5 +70,19 @@ export class GuidelinesService {
     const oppositeNodeId = relation.to.nodeId === annotationType.id ? relation.to.nodeId : relation.from.nodeId;
 
     return this.model.getNodeTypeById(oppositeNodeId).name;
+  }
+
+  private getCamiHost(): string | undefined {
+    const camiHost = this.config.get<string>('AWEN_CAMI_HOST');
+    if (!camiHost) return undefined;
+    try {
+      const camiUrl = new URL(camiHost);
+      if (camiUrl.protocol === 'http:' || camiUrl.protocol === 'https:') {
+        return camiUrl.toString();
+      }
+    } catch {
+      this.logger.error('The given environment variable "AWEN_CAMI_HOST” is no valid url.');
+    }
+    return undefined;
   }
 }
