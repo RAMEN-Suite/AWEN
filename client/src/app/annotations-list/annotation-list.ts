@@ -194,13 +194,19 @@ export class AnnotationList {
           href: `/entity/${keyValue}`,
         };
       }
-      if (node.types.includes(COLLECTION_LABEL_NAME)) {
+      if (
+        this.configService.camiAvailable() &&
+        node.types.includes(COLLECTION_LABEL_NAME)
+      ) {
         link = {
           router: false,
           href: `/api/cami/collections/${keyValue}`,
         };
       }
-      if (node.types.includes(CONTENT_LABEL_NAME)) {
+      if (
+        this.configService.camiAvailable() &&
+        node.types.includes(CONTENT_LABEL_NAME)
+      ) {
         link = {
           router: false,
           href: `/api/cami/contents/${keyValue}`,
