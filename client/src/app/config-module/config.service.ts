@@ -17,6 +17,7 @@ export class ConfigService {
     entityTypes: [],
     annotationTypes: [],
     dataTypes: [],
+    camiAvailable: false,
   });
   private readonly _config = signal<EmConfig>({
     selectedCollectionChain: [],
@@ -25,40 +26,42 @@ export class ConfigService {
   });
   private readonly _loaded = signal(false);
 
-  constructor() {
-    this.initConfigStore();
+  public constructor() {
+    void this.initConfigStore();
   }
 
-  getConfig() {
+  public camiAvailable = computed(() => this._remoteConfig().camiAvailable);
+
+  public getConfig() {
     return this._config.asReadonly();
   }
 
-  getDataTypes() {
+  public getDataTypes() {
     return computed(() => {
       return this._remoteConfig().dataTypes;
     });
   }
 
-  getAnnotationTypes() {
+  public getAnnotationTypes() {
     return computed(() => {
       return this._remoteConfig().annotationTypes;
     });
   }
 
-  findDataType(id: string) {
+  public findDataType(id: string) {
     return this.getDataTypes()().find((dataType) => dataType.id === id);
   }
 
-  setConfig(value: EmConfig) {
+  public setConfig(value: EmConfig) {
     this._config.set(value);
     this.store.saveData(EM_CONFIG_STORE_KEY, value);
   }
 
-  getRemoteConfig() {
+  public getRemoteConfig() {
     return this._remoteConfig.asReadonly();
   }
 
-  getLoaded() {
+  public getLoaded() {
     return this._loaded.asReadonly();
   }
 

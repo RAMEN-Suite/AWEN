@@ -9,6 +9,7 @@ import { SchemaModule } from './schema/schema.module';
 import { GraphModule } from './graph/graph.module';
 import { HealthController } from './health/health.controller';
 import { AnnotationModule } from './annotation/annotation.module';
+import { CamiModule } from './cami/cami.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { AnnotationModule } from './annotation/annotation.module';
     SchemaModule,
     GraphModule,
     AnnotationModule,
+    CamiModule,
   ],
   controllers: [HealthController],
   providers: [],

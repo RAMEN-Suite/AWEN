@@ -6,5 +6,5 @@ export interface EmConfig {
   annotationTypes: string[];
   // annotationTypeAttributes: string[];
   dataTypes: DataType[];
-  camiHost: string | undefined;
+  camiAvailable: boolean;
 }

@@ -11,7 +11,7 @@ export class UtilsService {
   private readonly configService = inject(ConfigService);
   private readonly messageService = inject(MessageService);
 
-  createPayload = (
+  public createPayload = (
     values: Partial<Record<string, unknown>>,
     properties: (GAttribute | EntityPropertyDto)[],
   ) => {
@@ -47,7 +47,7 @@ export class UtilsService {
     return payload;
   };
 
-  copyToClipboard = async (id: string) => {
+  public copyToClipboard = async (id: string) => {
     await navigator.clipboard.writeText(id);
     this.messageService.add({
       severity: 'success',

@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import guidelinesJSON from '../../guidelines.json';
 import { IGuidelines } from '../../shared/IGuidelines';
 import { EmConfig } from './interfaces/em-config.interface';
@@ -6,15 +6,13 @@ import { RamenModelService } from '../schema/ramen-model.service';
 import { ANNOTATION_LABEL_NAME, ENTITY_LABEL_NAME } from '../constants';
 import { RelationType } from '../schema/interfaces/relation-type.interface';
 import { NodeType } from '../schema/interfaces/node-type.interface';
-import { ConfigService } from '@nestjs/config';
+import { CamiService } from '../cami/cami.service';
 
 @Injectable()
 export class GuidelinesService {
-  private readonly logger = new Logger(GuidelinesService.name);
-
   constructor(
     private readonly model: RamenModelService,
-    private readonly config: ConfigService,
+    private readonly camiService: CamiService,
   ) {}
 
   // eslint-disable-next-line
@@ -28,7 +26,7 @@ export class GuidelinesService {
       entityTypes: this.model.getSubtypes(ENTITY_LABEL_NAME),
       annotationTypes: this.getAnnotationTypes(),
       dataTypes: this.model.getDataTypes(),
-      camiHost: this.getCamiHost(),
+      camiAvailable: this.camiService.camiAvailable(),
     } satisfies EmConfig;
   }
 
@@ -70,19 +68,5 @@ export class GuidelinesService {
     const oppositeNodeId = relation.to.nodeId === annotationType.id ? relation.to.nodeId : relation.from.nodeId;
 
     return this.model.getNodeTypeById(oppositeNodeId).name;
-  }
-
-  private getCamiHost(): string | undefined {
-    const camiHost = this.config.get<string>('AWEN_CAMI_HOST');
-    if (!camiHost) return undefined;
-    try {
-      const camiUrl = new URL(camiHost);
-      if (camiUrl.protocol === 'http:' || camiUrl.protocol === 'https:') {
-        return camiUrl.toString();
-      }
-    } catch {
-      this.logger.error('The given environment variable "AWEN_CAMI_HOST” is no valid url.');
-    }
-    return undefined;
   }
 }

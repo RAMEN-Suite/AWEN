@@ -1,22 +1,22 @@
 <div
   class="flex flex-row w-full align-items-center border-bottom-1 border-gray-300 text-color"
   [class.border-bottom-none]="!firstEntry()"
-  [class.hover:bg-gray-100]="node().entityLink"
+  [class.hover:bg-gray-100]="node().link"
   style="min-height: 2rem"
 >
-  <a class="flex flex-row w-full align-items-center no-underline text-color" [routerLink]="node().entityLink">
-    <div class="flex w-2 p-2 py-3 border-right-1 border-gray-300 justify-content-center">
-      <i class="pi" [class]="node().directionIcon"></i>
+  @if (node().link?.router) {
+    <a class="flex flex-row w-full align-items-center no-underline text-color" [routerLink]="node().link?.href">
+      <ng-container *ngTemplateOutlet="linkContent" />
+    </a>
+  } @else if (!node().link?.router) {
+    <a class="flex flex-row w-full align-items-center no-underline text-color" [href]="node().link?.href">
+      <ng-container *ngTemplateOutlet="linkContent" />
+    </a>
+  } @else {
+    <div class="flex flex-row w-full align-items-center no-underline text-color">
+      <ng-container *ngTemplateOutlet="linkContent" />
     </div>
-
-    <div class="flex flex-row w-full px-2 align-items-center align-content-center">
-      <div class="flex flex-column w-4">
-        <app-node-types [nodeTypes]="node().node.types" asChips hideRamenCoreTypes />
-      </div>
-
-      <div class="flex flex-column w-full">{{ title() }}</div>
-    </div>
-  </a>
+  }
 
   @if (node().id; as nodeId) {
     <div class="flex flex-column justify-content-end px-2">
@@ -30,3 +30,17 @@
     </div>
   }
 </div>
+
+<ng-template #linkContent>
+  <div class="flex w-2 p-2 py-3 border-right-1 border-gray-300 justify-content-center">
+    <i class="pi" [class]="node().directionIcon"></i>
+  </div>
+
+  <div class="flex flex-row w-full px-2 align-items-center align-content-center">
+    <div class="flex flex-column w-4">
+      <app-node-types [nodeTypes]="node().node.types" asChips hideRamenCoreTypes />
+    </div>
+
+    <div class="flex flex-column w-full">{{ title() }}</div>
+  </div>
+</ng-template>

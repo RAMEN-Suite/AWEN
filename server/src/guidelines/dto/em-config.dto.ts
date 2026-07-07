@@ -23,7 +23,7 @@ export class EmConfigDto implements EmConfig {
   dataTypes!: DataType[];
 
   @ApiProperty()
-  camiHost: string | undefined;
+  camiAvailable!: boolean;
 
   constructor(value: EmConfig) {
     Object.assign(this, value);
