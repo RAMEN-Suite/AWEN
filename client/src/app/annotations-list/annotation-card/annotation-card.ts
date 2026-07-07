@@ -47,9 +47,9 @@ export class AnnotationCard {
           annotation: annotation,
         },
         header: 'Create Annotation Connection',
-        styleClass: 'w-11 md:w-9 lg:w-8',
+        styleClass: 'w-11 md:w-10 lg:w-9',
         style: {
-          'min-height': '50vh',
+          'min-height': '60vh',
         },
         contentStyle: {
           'padding-top': '0.5rem',

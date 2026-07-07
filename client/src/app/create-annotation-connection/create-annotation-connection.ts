@@ -32,7 +32,7 @@ export class CreateAnnotationConnection {
 
   private readonly dialogRef = inject(DynamicDialogRef);
 
-  annotation = input.required<Annotation>();
+  public annotation = input.required<Annotation>();
 
   private annotationId: Signal<string | null> = computed(() => {
     const keyProp = getKeyProperty(this.annotation().properties);
@@ -46,7 +46,7 @@ export class CreateAnnotationConnection {
   protected entitiesLoading = this.searchService.getEntitiesLoading();
   protected loadingReq = signal(false);
 
-  protected onSelectEntity = async (entity: OldEntity) => {
+  protected onSelectEntity = (entity: OldEntity) => {
     const annotationId = this.annotationId();
     if (!annotationId) {
       this.messageService.add({
