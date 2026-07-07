@@ -14,7 +14,12 @@ import {
   StatementNodeView,
 } from '../../interfaces';
 import { getKeyProperty } from '../utils/entity.utils';
-import { ANNOTATION_LABEL_NAME, ENTITY_LABEL_NAME } from '../../constants';
+import {
+  ANNOTATION_LABEL_NAME,
+  COLLECTION_LABEL_NAME,
+  CONTENT_LABEL_NAME,
+  ENTITY_LABEL_NAME,
+} from '../../constants';
 import {
   Accordion,
   AccordionContent,
@@ -176,12 +181,37 @@ export class AnnotationList {
     const keyValue = this.propertyValueAsString(
       getKeyProperty(node.properties)?.value,
     );
-    const isEntity = node.types.includes(ENTITY_LABEL_NAME);
+
+    let link: {
+      router: boolean;
+      href: string;
+    } | null = null;
+
+    if (keyValue) {
+      if (node.types.includes(ENTITY_LABEL_NAME)) {
+        link = {
+          router: true,
+          href: `/entity/${keyValue}`,
+        };
+      }
+      if (node.types.includes(COLLECTION_LABEL_NAME)) {
+        link = {
+          router: false,
+          href: `/api/cami/collections/${keyValue}`,
+        };
+      }
+      if (node.types.includes(CONTENT_LABEL_NAME)) {
+        link = {
+          router: false,
+          href: `/api/cami/contents/${keyValue}`,
+        };
+      }
+    }
 
     return {
       node,
       id: keyValue,
-      entityLink: isEntity && keyValue ? `/entity/${keyValue}` : null,
+      link: link,
       directionIcon:
         node.direction === 'OUTGOING' ? 'pi-arrow-right' : 'pi-arrow-left',
     };
