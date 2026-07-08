@@ -36,6 +36,10 @@ export class ConfigService {
     return this._config.asReadonly();
   }
 
+  public getAllEntityTypes = computed(() => {
+    return this._remoteConfig().entityTypes;
+  });
+
   public getDataTypes() {
     return computed(() => {
       return this._remoteConfig().dataTypes;

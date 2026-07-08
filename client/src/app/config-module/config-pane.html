@@ -1,8 +1,8 @@
 <form [formGroup]="configForm" class="flex flex-column gap-2">
   <p-floatlabel class="w-full" variant="on">
-    <p-multiselect
+    <p-multi-select
       formControlName="entityTypes"
-      [options]="configOptions().entityTypes"
+      [options]="entityTypes()"
       display="chip"
       id="config_entity_types_ms"
       [maxSelectedLabels]="10"
@@ -14,7 +14,7 @@
   <p-floatlabel class="" variant="on">
     <p-select
       formControlName="selectedCollectionChain"
-      [options]="configOptions().collectionChains"
+      [options]="collectionChains()"
       class="w-full md:w-80"
       id="config_collection_chain_s"
       fluid

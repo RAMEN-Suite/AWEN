@@ -1,4 +1,4 @@
-import { computed, inject, Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { ConfigService } from '../config-module/config.service';
 import { GuidelinesService } from '../api/guidelines.service';
 import { EntityApiService } from '../api/entity-api.service';
@@ -7,28 +7,25 @@ import { EntityApiService } from '../api/entity-api.service';
   providedIn: 'root',
 })
 export class CreateEntityService {
-  configService = inject(ConfigService);
-  guidelineAPI = inject(GuidelinesService);
-  entityAPI = inject(EntityApiService);
+  private readonly configService = inject(ConfigService);
+  private readonly guidelineAPI = inject(GuidelinesService);
+  private readonly entityAPI = inject(EntityApiService);
 
-  private readonly _config = this.configService.getConfig();
-  private readonly _entityTypes = computed(() => {
-    return this._config().entityTypes;
-  });
+  private readonly _entityTypes = this.configService.getAllEntityTypes;
 
-  getEntityTypesLoaded() {
+  public getEntityTypesLoaded() {
     return this.configService.getLoaded();
   }
 
-  getEntityTypes() {
+  public getEntityTypes() {
     return this._entityTypes;
   }
 
-  async getEntityProperties(type: string) {
+  public async getEntityProperties(type: string) {
     return this.guidelineAPI.getNodeProperties(type);
   }
 
-  async createEntity(type: string, payload: Record<string, unknown>) {
+  public async createEntity(type: string, payload: Record<string, unknown>) {
     return await this.entityAPI.createEntity(type, payload);
   }
 }
