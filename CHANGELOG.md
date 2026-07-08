@@ -2,6 +2,20 @@
 
 All notable changes to this project are documented here.
 
+## [0.0.8](https://github.com/RAMEN-Suite/AWEN/compare/v0.0.7...v0.0.8) (2026-07-08)
+
+
+### Features
+
+* **client:** fallback for annotation-list webworker ([ffde1fc](https://github.com/RAMEN-Suite/AWEN/commit/ffde1fc50581d73e4b42624850136f2d4f951f42))
+* **client:** implement web worker to calculate annotation list ([d91349a](https://github.com/RAMEN-Suite/AWEN/commit/d91349aa1549195654c9c8b26e78f313f6108b35))
+
+
+### Bug Fixes
+
+* **client:** remove root links if cami is not configured ([fa33a84](https://github.com/RAMEN-Suite/AWEN/commit/fa33a84185457e73fc2f66383d6e1e218f64c440))
+* **client:** removed wrong character index-prod.html ([da14d86](https://github.com/RAMEN-Suite/AWEN/commit/da14d8633d0d54d0def08420efd4e12138861bf2))
+
 ## [0.0.7](https://github.com/RAMEN-Suite/AWEN/compare/v0.0.6...v0.0.7) (2026-07-07)
 
 
