@@ -4,11 +4,12 @@
   [class.hover:bg-gray-100]="node().link"
   style="min-height: 2rem"
 >
-  @if (node().link?.router) {
+  @let link = node().link;
+  @if (link && link.router) {
     <a class="flex flex-row w-full align-items-center no-underline text-color" [routerLink]="node().link?.href">
       <ng-container *ngTemplateOutlet="linkContent" />
     </a>
-  } @else if (!node().link?.router) {
+  } @else if (link && !link.router) {
     <a class="flex flex-row w-full align-items-center no-underline text-color" [href]="node().link?.href">
       <ng-container *ngTemplateOutlet="linkContent" />
     </a>
