@@ -24,6 +24,10 @@ import { ConfigService } from '../config-module/config.service';
 import { castUnknownToString } from '../utils/utils';
 import { Skeleton } from 'primeng/skeleton';
 import type { AnnotationGroupView } from './annotation-list.model';
+import {
+  calculateGroupedAnnotations,
+  type AnnotationListCalculationRequest,
+} from './annotation-list-calculation';
 
 @Component({
   selector: 'app-annotations-list',
@@ -83,31 +87,63 @@ export class AnnotationList {
     const selectedNodeLabel = this.selectedNodeLabel();
     const annotationDirection = this.selectedAnnotationDirection();
     const camiAvailable = this.configService.camiAvailable();
-
-    const currentCalculationId = ++this.calculationId;
-    this.annotationListLoaded.set(false);
-    this.worker?.terminate();
-    this.worker = new Worker(
-      new URL('./annotation-list.worker', import.meta.url),
-      { type: 'module' },
-    );
-
-    this.worker.onmessage = ({ data }: MessageEvent<AnnotationGroupView[]>) => {
-      if (currentCalculationId !== this.calculationId) {
-        return;
-      }
-      this.groupedAnnotations.set(data);
-      this.annotationListLoaded.set(true);
-      this.worker?.terminate();
-      this.worker = undefined;
-    };
-
-    this.worker.postMessage({
+    const request: AnnotationListCalculationRequest = {
       annotations,
       annotationDirection,
       selectedNodeLabel,
       camiAvailable,
-    });
+    };
+
+    const currentCalculationId = ++this.calculationId;
+    this.annotationListLoaded.set(false);
+    this.worker?.terminate();
+    this.worker = undefined;
+
+    const calculateOnMainThread = () => {
+      if (currentCalculationId !== this.calculationId) {
+        return;
+      }
+
+      this.groupedAnnotations.set(calculateGroupedAnnotations(request));
+      this.annotationListLoaded.set(true);
+    };
+
+    if (typeof Worker === 'undefined') {
+      calculateOnMainThread();
+      return;
+    }
+
+    try {
+      const worker = new Worker(
+        new URL('./annotation-list.worker', import.meta.url),
+        { type: 'module' },
+      );
+      this.worker = worker;
+
+      worker.onmessage = ({ data }: MessageEvent<AnnotationGroupView[]>) => {
+        if (currentCalculationId !== this.calculationId) {
+          return;
+        }
+        this.groupedAnnotations.set(data);
+        this.annotationListLoaded.set(true);
+        worker.terminate();
+        this.worker = undefined;
+      };
+
+      worker.onerror = () => {
+        worker.terminate();
+        if (this.worker === worker) {
+          this.worker = undefined;
+        }
+        calculateOnMainThread();
+      };
+
+      worker.postMessage(request);
+    } catch {
+      this.worker?.terminate();
+      this.worker = undefined;
+      calculateOnMainThread();
+    }
   });
 
   protected expandAll() {
