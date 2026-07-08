@@ -41,11 +41,13 @@
             </div>
           </p-accordion-header>
           <p-accordion-content>
-            <div class="col-12 mx-0 flex flex-column gap-3">
-              @for (annotation of group.annotations; track annotation.id) {
-                <app-annotation-card [annotation]="annotation" />
-              }
-            </div>
+            @if (activeAccordionPanels().includes(group.type)) {
+              <div class="col-12 mx-0 flex flex-column gap-3">
+                @for (annotation of group.annotations; track annotation.id ?? $index) {
+                  <app-annotation-card [annotation]="annotation" />
+                }
+              </div>
+            }
           </p-accordion-content>
         </p-accordion-panel>
       }

@@ -1,25 +1,14 @@
 import {
   Component,
-  computed,
+  DestroyRef,
   effect,
   inject,
   input,
   signal,
 } from '@angular/core';
 import { EntityService } from '../entity.service';
-import {
-  AnnotationOfEntityWithContent,
-  ConnectedNodeDto,
-  Direction,
-  StatementNodeView,
-} from '../../interfaces';
-import { getKeyProperty } from '../utils/entity.utils';
-import {
-  ANNOTATION_LABEL_NAME,
-  COLLECTION_LABEL_NAME,
-  CONTENT_LABEL_NAME,
-  ENTITY_LABEL_NAME,
-} from '../../constants';
+import { AnnotationOfEntityWithContent, Direction } from '../../interfaces';
+import { ANNOTATION_LABEL_NAME } from '../../constants';
 import {
   Accordion,
   AccordionContent,
@@ -34,22 +23,11 @@ import { SelectButton } from 'primeng/selectbutton';
 import { ConfigService } from '../config-module/config.service';
 import { castUnknownToString } from '../utils/utils';
 import { Skeleton } from 'primeng/skeleton';
-
-export interface StatementAnnotationView {
-  annotation: AnnotationOfEntityWithContent;
-  id: string | null;
-  nodes: StatementNodeView[];
-}
-
-interface AnnotationGroupView {
-  type: string;
-  annotations: StatementAnnotationView[];
-}
-
-interface AnnotationGroupViews {
-  refersTo: AnnotationGroupView[];
-  isReferredTo: AnnotationGroupView[];
-}
+import type { AnnotationGroupView } from './annotation-list.model';
+import {
+  calculateGroupedAnnotations,
+  type AnnotationListCalculationRequest,
+} from './annotation-list-calculation';
 
 @Component({
   selector: 'app-annotations-list',
@@ -71,6 +49,7 @@ interface AnnotationGroupViews {
 export class AnnotationList {
   private readonly entityService = inject(EntityService);
   private readonly configService = inject(ConfigService);
+  private readonly destroyRef = inject(DestroyRef);
   public annotationDirectionOptions: {
     label: string;
     value: Direction;
@@ -92,136 +71,80 @@ export class AnnotationList {
     signal<Direction>('OUTGOING');
   protected readonly activeAccordionPanels = signal<string[]>([]);
 
-  private readonly allAnnotationGroups = computed<AnnotationGroupViews>(() => {
-    const refersToGroups = new Map<string, StatementAnnotationView[]>();
-    const isReferredToGroups = new Map<string, StatementAnnotationView[]>();
-
-    for (const annotation of this.annotations()) {
-      const view = this.toAnnotationView(annotation);
-
-      if (annotation.direction === 'OUTGOING') {
-        const annotations = refersToGroups.get(annotation.type) ?? [];
-        annotations.push(view);
-        refersToGroups.set(annotation.type, annotations);
-      } else {
-        const annotations = isReferredToGroups.get(annotation.type) ?? [];
-        annotations.push(view);
-        isReferredToGroups.set(annotation.type, annotations);
-      }
-    }
-
-    const refersTo = Array.from(refersToGroups, ([type, annotations]) => ({
-      type,
-      annotations,
-    })).sort((a, b) => a.type.localeCompare(b.type));
-    const isReferredTo = Array.from(
-      isReferredToGroups,
-      ([type, annotations]) => ({
-        type,
-        annotations,
-      }),
-    ).sort((a, b) => a.type.localeCompare(b.type));
-
-    return {
-      refersTo: refersTo,
-      isReferredTo: isReferredTo,
-    };
-  });
-
   protected readonly groupedAnnotations = signal<AnnotationGroupView[]>([]);
 
+  private worker?: Worker;
+  private calculationId = 0;
+
+  public constructor() {
+    this.destroyRef.onDestroy(() => {
+      this.worker?.terminate();
+    });
+  }
+
   private readonly recalculateGroupedAnnotations = effect(() => {
+    const annotations = this.annotations();
     const selectedNodeLabel = this.selectedNodeLabel();
     const annotationDirection = this.selectedAnnotationDirection();
-    const allGroups = this.allAnnotationGroups();
+    const camiAvailable = this.configService.camiAvailable();
+    const request: AnnotationListCalculationRequest = {
+      annotations,
+      annotationDirection,
+      selectedNodeLabel,
+      camiAvailable,
+    };
 
+    const currentCalculationId = ++this.calculationId;
     this.annotationListLoaded.set(false);
+    this.worker?.terminate();
+    this.worker = undefined;
 
-    requestAnimationFrame(() => {
-      const groups =
-        annotationDirection === 'INCOMING'
-          ? allGroups.isReferredTo
-          : allGroups.refersTo;
+    const calculateOnMainThread = () => {
+      if (currentCalculationId !== this.calculationId) {
+        return;
+      }
 
-      const ret = groups
-        .map((group): AnnotationGroupView => ({
-          ...group,
-          annotations: group.annotations.filter((annotation) =>
-            annotation.annotation.types.includes(selectedNodeLabel),
-          ),
-        }))
-        .filter((group) => group.annotations.length > 0);
-
-      this.groupedAnnotations.set(ret);
+      this.groupedAnnotations.set(calculateGroupedAnnotations(request));
       this.annotationListLoaded.set(true);
-    });
+    };
+
+    if (typeof Worker === 'undefined') {
+      calculateOnMainThread();
+      return;
+    }
+
+    try {
+      const worker = new Worker(
+        new URL('./annotation-list.worker', import.meta.url),
+        { type: 'module' },
+      );
+      this.worker = worker;
+
+      worker.onmessage = ({ data }: MessageEvent<AnnotationGroupView[]>) => {
+        if (currentCalculationId !== this.calculationId) {
+          return;
+        }
+        this.groupedAnnotations.set(data);
+        this.annotationListLoaded.set(true);
+        worker.terminate();
+        this.worker = undefined;
+      };
+
+      worker.onerror = () => {
+        worker.terminate();
+        if (this.worker === worker) {
+          this.worker = undefined;
+        }
+        calculateOnMainThread();
+      };
+
+      worker.postMessage(request);
+    } catch {
+      this.worker?.terminate();
+      this.worker = undefined;
+      calculateOnMainThread();
+    }
   });
-
-  private toAnnotationView(
-    annotation: AnnotationOfEntityWithContent,
-  ): StatementAnnotationView {
-    return {
-      annotation,
-      id: this.propertyValueAsString(
-        getKeyProperty(annotation.properties)?.value,
-      ),
-      nodes: annotation.connectedNodes.map((node) => this.toNodeView(node)),
-    };
-  }
-
-  private propertyValueAsString(value: unknown): string | null {
-    if (value === null || value === undefined || value === '') {
-      return null;
-    }
-
-    return castUnknownToString(value);
-  }
-
-  private toNodeView(node: ConnectedNodeDto): StatementNodeView {
-    const keyValue = this.propertyValueAsString(
-      getKeyProperty(node.properties)?.value,
-    );
-
-    let link: {
-      router: boolean;
-      href: string;
-    } | null = null;
-
-    if (keyValue) {
-      if (node.types.includes(ENTITY_LABEL_NAME)) {
-        link = {
-          router: true,
-          href: `/entity/${keyValue}`,
-        };
-      }
-      if (
-        this.configService.camiAvailable() &&
-        node.types.includes(COLLECTION_LABEL_NAME)
-      ) {
-        link = {
-          router: false,
-          href: `/api/cami/collections/${keyValue}`,
-        };
-      }
-      if (
-        this.configService.camiAvailable() &&
-        node.types.includes(CONTENT_LABEL_NAME)
-      ) {
-        link = {
-          router: false,
-          href: `/api/cami/contents/${keyValue}`,
-        };
-      }
-    }
-
-    return {
-      node,
-      id: keyValue,
-      link: link,
-      directionIcon:
-        node.direction === 'OUTGOING' ? 'pi-arrow-right' : 'pi-arrow-left',
-    };
-  }
 
   protected expandAll() {
     this.activeAccordionPanels.set(
@@ -240,10 +163,12 @@ export class AnnotationList {
   }
 
   protected setSelectedNodeLabel(value: string) {
+    this.activeAccordionPanels.set([]);
     this.selectedNodeLabel.set(value);
   }
 
   protected setSelectedDirection(value: Direction) {
+    this.activeAccordionPanels.set([]);
     this.selectedAnnotationDirection.set(value);
   }
 
