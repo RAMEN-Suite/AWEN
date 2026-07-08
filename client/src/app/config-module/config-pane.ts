@@ -1,9 +1,10 @@
-import { Component, effect, inject } from '@angular/core';
+import { Component, computed, effect, inject } from '@angular/core';
 import { ConfigService } from './config.service';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MultiSelect } from 'primeng/multiselect';
 import { FloatLabel } from 'primeng/floatlabel';
 import { Select } from 'primeng/select';
+import { ENTITY_LABEL_NAME } from '../../constants';
 
 @Component({
   selector: 'app-config-pane',
@@ -13,11 +14,21 @@ import { Select } from 'primeng/select';
 export class ConfigPane {
   private configService: ConfigService = inject(ConfigService);
 
-  configOptions = this.configService.getRemoteConfig();
-  config = this.configService.getConfig();
-  loaded = this.configService.getLoaded();
+  private configOptions = this.configService.getRemoteConfig();
+  private config = this.configService.getConfig();
+  private loaded = this.configService.getLoaded();
 
-  configForm = new FormGroup({
+  protected entityTypes = computed(() => {
+    return this.configOptions().entityTypes.filter(
+      (type) => type !== ENTITY_LABEL_NAME,
+    );
+  });
+
+  protected collectionChains = computed(() => {
+    return this.configOptions().collectionChains;
+  });
+
+  protected configForm = new FormGroup({
     filterableCollections: new FormControl<string[]>(
       { value: [], disabled: true },
       { nonNullable: true },
@@ -28,7 +39,7 @@ export class ConfigPane {
     entityTypes: new FormControl<string[]>([], { nonNullable: true }),
   });
 
-  constructor() {
+  public constructor() {
     effect(() => {
       const config = this.config();
       const loaded = this.loaded();
@@ -68,7 +79,7 @@ export class ConfigPane {
     });
   }
 
-  displayCollectionChain(chain: string[]) {
+  protected displayCollectionChain(chain: string[]) {
     return chain.join('-->');
   }
 }
