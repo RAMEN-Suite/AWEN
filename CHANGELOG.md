@@ -2,6 +2,33 @@
 
 All notable changes to this project are documented here.
 
+## [0.0.7](https://github.com/RAMEN-Suite/AWEN/compare/v0.0.6...v0.0.7) (2026-07-07)
+
+
+### Features
+
+* **client:** automatically create config store ([f54054e](https://github.com/RAMEN-Suite/AWEN/commit/f54054e0ddd6e69bf511d79f38cc18a4b6c7ec24))
+* **server:** rm "Entity" from entityTypes config ([df21769](https://github.com/RAMEN-Suite/AWEN/commit/df2176947f61a6886fe617e5c56c454b36eaaf86))
+* submit filter form on selection of auto complete suggestion and on keydown ([bfc079d](https://github.com/RAMEN-Suite/AWEN/commit/bfc079deb5b799e9d6c5a0ef15033c65039cf522))
+
+## [0.0.6](https://github.com/RAMEN-Suite/AWEN/compare/v0.0.5...v0.0.6) (2026-07-07)
+
+## [0.0.5](https://github.com/RAMEN-Suite/AWEN/compare/v0.0.4...v0.0.5) (2026-07-07)
+
+
+### Bug Fixes
+
+* **client:** rm cami links if no cami host is given ([a9d2af3](https://github.com/RAMEN-Suite/AWEN/commit/a9d2af3fc340b7ce6f782fa6fecd6bc12279a3aa))
+
+## [0.0.4](https://github.com/RAMEN-Suite/AWEN/compare/v0.0.3...v0.0.4) (2026-07-07)
+
+
+### Features
+
+* add redirection to cami collections and contents ([ea38656](https://github.com/RAMEN-Suite/AWEN/commit/ea38656f67966681f6b1f12895a49fd4e729822f))
+* **server:** added cami host to get config route ([29f3351](https://github.com/RAMEN-Suite/AWEN/commit/29f3351210e6a28b40a206c98d56f7445be6f783))
+* **server:** better handling of given cami host url ([682c8eb](https://github.com/RAMEN-Suite/AWEN/commit/682c8eb8730e34f7dc65dac63549f077b4680d12))
+
 ## [0.0.3](https://github.com/RAMEN-Suite/AWEN/compare/v0.0.2...v0.0.3) (2026-07-06)
 
 
