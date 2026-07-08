@@ -4,7 +4,7 @@ import { ConnectedNode } from '../connected-node/connected-node';
 import { NodeTypes } from '../node-types/node-types';
 import { AttributeList } from '../attribute-list/attribute-list';
 import { UpdateAnnotation } from '../../edit-annotation/update-annotation';
-import { StatementAnnotationView } from '../annotation-list';
+import type { StatementAnnotationView } from '../annotation-list.model';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { CreateAnnotationConnection } from '../../create-annotation-connection/create-annotation-connection';
 import { Annotation } from '../../../interfaces';
