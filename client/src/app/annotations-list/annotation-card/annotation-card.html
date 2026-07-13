@@ -24,7 +24,7 @@
     <div
       class="col-6 p-0 max-h-30rem overflow-y-auto"
       [ngClass]="{
-        'align-items-center justify-content-center flex': annotation().nodes.length <= 0,
+        'align-items-center justify-content-center flex p-3': annotation().nodes.length <= 0,
       }"
     >
       @for (node of annotation().nodes; track node.id; let first = $first; let last = $last) {
