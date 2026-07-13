@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented here.
 
+## [0.0.9](https://github.com/RAMEN-Suite/AWEN/compare/v0.0.8...v0.0.9) (2026-07-08)
+
+
+### Bug Fixes
+
+* **client:** make type "Entity" available for entity creation but not for the filter pane ([e6859f2](https://github.com/RAMEN-Suite/AWEN/commit/e6859f2fde1d4474202ec8f9587d546ae1695f4b))
+
 ## [0.0.8](https://github.com/RAMEN-Suite/AWEN/compare/v0.0.7...v0.0.8) (2026-07-08)
 
 
