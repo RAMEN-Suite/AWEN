@@ -2,6 +2,8 @@
 
 All notable changes to this project are documented here.
 
+## [0.0.10](https://github.com/RAMEN-Suite/AWEN/compare/v0.0.9...v0.0.10) (2026-07-13)
+
 ## [0.0.9](https://github.com/RAMEN-Suite/AWEN/compare/v0.0.8...v0.0.9) (2026-07-08)
 
 
