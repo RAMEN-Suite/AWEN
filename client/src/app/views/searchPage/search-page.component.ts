@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FilterPane } from '../../filter-pane/filter-pane';
 import { SearchEntityService } from '../../search-entity.service';
 import { EntityList } from '../../entity-list/entity-list';
@@ -10,13 +10,7 @@ import { Router } from '@angular/router';
   imports: [FilterPane, EntityList],
   providers: [SearchEntityService],
   templateUrl: './search-page.component.html',
-  styles: `
-    :host {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-    }
-  `,
+  styleUrl: './search-page.component.scss',
 })
 export class SearchPage {
   private router = inject(Router);
@@ -24,8 +18,13 @@ export class SearchPage {
 
   protected entities = this.searchService.getEntities();
   protected loading = this.searchService.getEntitiesLoading();
+  protected readonly hasSearched = signal(false);
 
   protected navigateToDetailPage = async (entity: OldEntity) => {
     await this.router.navigate(['entity', entity.id]);
   };
+
+  protected onSearch(): void {
+    this.hasSearched.set(true);
+  }
 }
