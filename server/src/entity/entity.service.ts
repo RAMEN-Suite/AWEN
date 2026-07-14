@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { Neo4jService } from '../neo4j/neo4j.service';
 import { GuidelinesService } from '../guidelines/guidelines.service';
 import { EntityNamesDto } from './dto/entity-names.dto';
@@ -10,11 +10,7 @@ import { EntityAutocompleteQueryDto } from './dto/entity-autocomplete-query.dto'
 import { RamenModelService } from '../schema/ramen-model.service';
 import { NodeRepository } from '../graph/node-repository.service';
 import { EntityNodeDto } from './dto/entity-node.dto';
-import {
-  transformNodesToEntityNodeDTOs,
-  transformNodesToNameEntityDTOs,
-  transformNodeToEntityDTO,
-} from '../utils/node-transformers';
+import { transformNodesToEntityNodeDTOs, transformNodeToEntityDTO } from '../utils/node-transformers';
 import { Integer, Node } from 'neo4j-driver';
 import {
   ANNOTATION_LABEL_NAME,
@@ -29,7 +25,7 @@ import { RAMENError } from '../schema/RAMENError';
 import { metadataForNewNode, metadataForUpdateNode } from '../utils/utils';
 
 @Injectable()
-export class EntityService {
+export class EntityService implements OnApplicationBootstrap {
   logger = new Logger(EntityService.name);
 
   ENTITY_KEY_PROPERTY!: string;
@@ -42,6 +38,10 @@ export class EntityService {
     private readonly nodes: NodeRepository,
   ) {
     this.ENTITY_KEY_PROPERTY = this.model.getNodeKeyField(ENTITY_LABEL_NAME);
+  }
+
+  async onApplicationBootstrap() {
+    await this.createSearchFulltextIndex();
   }
 
   async getById(id: string): Promise<EntityDto | undefined> {
@@ -64,22 +64,6 @@ export class EntityService {
 
     // TODO: zum normalen DTO
     return transformNodesToEntityNodeDTOs(entityNodes);
-  }
-
-  async findNamesByNameNew(name: string): Promise<EntityNamesDto[]> {
-    const { fulltextIndexes } = await this.guidelinesService.get();
-    const results = await this.nodes.indexFulltextQueryNodes(fulltextIndexes.search, name);
-    const label = this.model.getAttribute(ENTITY_LABEL_NAME, 'label');
-
-    if (!label) {
-      this.logger.error('There is no param named "label" for entity nodes."');
-      throw new RAMENError('There is no param named "label" for entity nodes."');
-    }
-    return transformNodesToNameEntityDTOs(
-      results.map((r) => r.node),
-      label.name,
-      this.ENTITY_KEY_PROPERTY,
-    );
   }
 
   async findNamesByName(name: string, queryParams: EntityAutocompleteQueryDto): Promise<EntityNamesDto[]> {
@@ -404,5 +388,14 @@ export class EntityService {
       .detachDelete(eNode) //TODO: auch annotation properties löschen, die keine weiterne verknüpfungen haben?
       .build();
     await this.neo4jService.write(cypher, params);
+  }
+
+  private async createSearchFulltextIndex() {
+    const guidelines = await this.guidelinesService.get();
+    const searchIndex = guidelines.fulltextIndexes.search;
+    await this.neo4jService.write(
+      `CREATE FULLTEXT INDEX ${searchIndex} IF NOT EXISTS FOR (n:${ENTITY_LABEL_NAME}) ON EACH [n.${ENTITY_NAME_PROPERTY}]`,
+    );
+    this.logger.log(`Successfully created FULLTEXT INDEX ${searchIndex}`);
   }
 }

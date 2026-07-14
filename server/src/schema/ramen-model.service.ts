@@ -133,6 +133,11 @@ export class RamenModelService {
     if (attribute.isKey) {
       return ret;
     }
+    if (attribute.isReadOnly && attributeValue !== null) {
+      ret[0] = false;
+      ret[1].push(`Attribute "${attributeKey}" is readonly`);
+      return ret;
+    }
 
     const { lowerBound, upperBound } = attribute.bounds;
 

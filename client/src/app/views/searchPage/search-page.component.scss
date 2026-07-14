@@ -1,0 +1,49 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.search-page {
+  min-height: 100%;
+}
+
+.search-layout {
+  position: relative;
+  min-height: 100%;
+  padding-top: 2rem;
+}
+
+.filter-pane {
+  position: relative;
+  z-index: 2;
+  transform: translateY(0);
+  will-change: transform;
+}
+
+.search-layout--animated .filter-pane {
+  transition: transform 500ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.search-layout--initial .filter-pane {
+  transform: translateY(clamp(8rem, 24vh, 14rem));
+}
+
+.search-layout--results .filter-pane {
+  transform: translateY(0);
+}
+
+.entity-list {
+  margin-top: 1.5rem;
+  opacity: 0;
+  transform: translateY(1.25rem);
+  transition:
+    opacity 300ms ease 180ms,
+    transform 400ms cubic-bezier(0.22, 1, 0.36, 1) 180ms;
+}
+
+.entity-list--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
