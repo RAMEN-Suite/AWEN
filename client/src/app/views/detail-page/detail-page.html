@@ -31,17 +31,23 @@
             </div>
           }
         </section>
-        @if (annotations().length > 0) {
-          <section class="detail-card col-12 md:col card">
-            <div class="detail-card-header col-12 flex justify-content-between">
-              <span class="text-4xl font-bold">Annotations</span>
-              <app-create-annotation [entityId]="entityId()" label="" icon="pi pi-plus" />
-            </div>
-            <div class="annotations-scroll w-full">
+
+        <section class="detail-card col-12 md:col card">
+          <div class="detail-card-header col-12 flex justify-content-between">
+            <span class="text-4xl font-bold">Annotations</span>
+            <app-create-annotation [entityId]="entityId()" label="" icon="pi pi-plus" />
+          </div>
+          <div class="annotations-scroll w-full">
+            @if (annotations().length > 0) {
               <app-annotations-list [annotations]="annotations()" class="w-full" />
-            </div>
-          </section>
-        }
+            } @else {
+              <span class="text-base text-gray-500 h-min p-2">
+                No connected Annotations. Try adding one by selecting the
+                <span class="pi pi-plus text-primary text-sm"></span> button.
+              </span>
+            }
+          </div>
+        </section>
       </div>
     </div>
   </div>
