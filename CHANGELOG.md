@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented here.
 
+## [0.0.12](https://github.com/RAMEN-Suite/AWEN/compare/v0.0.11...v0.0.12) (2026-07-14)
+
+
+### Features
+
+* create fulltext search index on startup ([e3f0a17](https://github.com/RAMEN-Suite/AWEN/commit/e3f0a17cd6bc35b8f81f7b0194c41efa7788146e))
+* disable attribute form fields that are "readonly", and serverside validation for readonly attributes ([e04f715](https://github.com/RAMEN-Suite/AWEN/commit/e04f715fde75092ae58774b0b68b64c528a0fa61))
+
 ## [0.0.11](https://github.com/RAMEN-Suite/AWEN/compare/v0.0.10...v0.0.11) (2026-07-14)
 
 ## [0.0.10](https://github.com/RAMEN-Suite/AWEN/compare/v0.0.9...v0.0.10) (2026-07-13)
