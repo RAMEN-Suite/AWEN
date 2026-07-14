@@ -70,6 +70,7 @@ export class AttributeForm {
 
     const { lowerBound, upperBound } = prop.bounds;
     const isArray = this.isArray(prop.bounds);
+    const isReadOnly = prop.isReadOnly;
 
     const validators = [...(lowerBound >= 1 ? [Validators.required] : [])];
 
@@ -88,7 +89,10 @@ export class AttributeForm {
             isArray && Array.isArray(prop.value)
               ? castValues<string>(prop.value, 'string')
               : castValue<string>(prop.value, 'string');
-        return new FormControl<string | string[] | null>(val, { validators });
+        return new FormControl<string | string[] | null>(
+          { value: val, disabled: isReadOnly },
+          validators,
+        );
       }
       case 'integer':
       case 'float': {
@@ -98,7 +102,10 @@ export class AttributeForm {
             isArray && Array.isArray(prop.value)
               ? castValues<number>(prop.value, 'float')
               : castValue<number>(prop.value, 'float');
-        return new FormControl<number | number[] | null>(val, { validators });
+        return new FormControl<number | number[] | null>(
+          { value: val, disabled: isReadOnly },
+          validators,
+        );
       }
       case 'boolean': {
         let val: boolean | boolean[] = isArray ? new Array<boolean>() : false;
@@ -108,9 +115,15 @@ export class AttributeForm {
               ? castValues<boolean>(prop.value, 'boolean')
               : castValue<boolean>(prop.value, 'boolean');
         if (isArray && Array.isArray(val)) {
-          return new FormControl<boolean[]>(val, { validators });
+          return new FormControl<boolean[]>(
+            { value: val, disabled: isReadOnly },
+            validators,
+          );
         } else {
-          return new FormControl<boolean>(Boolean(val), { nonNullable: true });
+          return new FormControl<boolean>(
+            { value: Boolean(val), disabled: isReadOnly },
+            { nonNullable: true },
+          );
         }
       }
       default:
