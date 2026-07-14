@@ -5,6 +5,7 @@ import { Button } from 'primeng/button';
 @Component({
   selector: 'app-error-page',
   imports: [Button, RouterLink],
+  styleUrl: './error-page.scss',
   templateUrl: './error-page.html',
 })
 export class ErrorPage {
