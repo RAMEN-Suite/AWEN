@@ -1,15 +1,18 @@
-<div class="grid justify-content-center mt-5">
-  <div class="hidden md:block col"></div>
-  <div class="col-12 md:col-8 lg:col-5 px-4 md:px-2 flex-order-1 md:flex-order-0">
-    <app-filter-pane [setQueryParams]="true" />
-  </div>
-  <div class="col flex md:justify-content-end px-4 md:px-2 flex-order-0 md:flex-order-1">
-    <div class="flex md:mx-3"></div>
-  </div>
-</div>
+<div class="search-page w-12 flex justify-content-center">
+  <div
+    class="search-layout w-12 md:w-8 lg:w-5"
+    [class.search-layout--initial]="!hasSearched()"
+    [class.search-layout--results]="hasSearched()"
+    [class.search-layout--animated]="animationsEnabled()"
+  >
+    <div class="filter-pane w-12 px-4 md:px-2">
+      <app-filter-pane [setQueryParams]="true" (searchSubmitted)="onSearch()" />
+    </div>
 
-<div class="grid justify-content-center">
-  <div class="col-12 md:col-8 lg:col-5">
-    <app-entity-list [entities]="entities()" [entitiesLoading]="loading()" [onSelect]="navigateToDetailPage" height="60vh" />
+    <div class="entity-list w-12" [class.entity-list--visible]="hasSearched()">
+      @if (hasSearched()) {
+        <app-entity-list [entities]="entities()" [entitiesLoading]="loading()" [onSelect]="navigateToDetailPage" height="60vh" />
+      }
+    </div>
   </div>
 </div>

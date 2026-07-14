@@ -4,6 +4,7 @@ import {
   effect,
   inject,
   input,
+  output,
   signal,
 } from '@angular/core';
 import {
@@ -64,6 +65,8 @@ export class FilterPane {
   public openLinkInNewTab = input<boolean>(false);
   public enableLinkToEntity = input<boolean>(true);
   public setQueryParams = input<boolean>(false);
+
+  public readonly searchSubmitted = output();
 
   protected remoteConfig = this.configService.getRemoteConfig();
   protected config = this.configService.getConfig();
@@ -215,6 +218,7 @@ export class FilterPane {
     }
 
     await this.searchService.searchEntities(query);
+    this.searchSubmitted.emit();
     if (this.setQueryParams()) {
       const queryParams = this.queryParamService.transformQueryParams(
         this.form.value,
