@@ -14,29 +14,7 @@ interface NodePatternOptions {
 export class NodeRepository {
   logger = new Logger(NodeRepository.name);
 
-  constructor(private neo4j: Neo4jService) {
-    this.getById('fa3246bc-4ac9-4271-906d-3e4d768ccd5f')
-      .then(() => {
-        this.logger.log('getById() is working!');
-      })
-      .catch((err: unknown) => {
-        this.logger.error(`could not find node`, err instanceof Error ? err.stack : undefined);
-      });
-    this.getByProperty('label', 'Acqui')
-      .then(() => {
-        this.logger.log('getByProperty() is working!');
-      })
-      .catch((err: unknown) => {
-        this.logger.error(`could not find node`, err instanceof Error ? err.stack : undefined);
-      });
-    this.indexFulltextQueryNodes('search', 'Aachen')
-      .then(() => {
-        this.logger.log('indexFulltextQueryNodes() is working!');
-      })
-      .catch((err: unknown) => {
-        this.logger.error(`could not find node`, err instanceof Error ? err.stack : undefined);
-      });
-  }
+  constructor(private neo4j: Neo4jService) {}
 
   async getById(uuid: string, options?: GetNodeByIdOptions) {
     const NODE_NAME = 'node';
@@ -86,19 +64,5 @@ export class NodeRepository {
     }>(cypher, params);
 
     return result.records.map((record) => record.get(NODE_NAME));
-  }
-
-  async indexFulltextQueryNodes(fulltextIndex: string, query: string) {
-    const procedure = Cypher.db.index.fulltext.queryNodes(new Cypher.Literal(fulltextIndex), new Cypher.Param(query));
-    const { cypher, params } = procedure.build();
-    const result = await this.neo4j.read<{
-      node: Node<Integer, Record<string, unknown>>;
-      score: Integer;
-    }>(cypher, params);
-
-    return result.records.map((record) => ({
-      node: record.get('node'),
-      score: record.get('score'),
-    }));
   }
 }
