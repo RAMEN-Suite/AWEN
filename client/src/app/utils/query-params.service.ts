@@ -2,14 +2,11 @@ import { inject, Injectable } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
-export type QueryParamValue =
-  | string
-  | number
-  | boolean
-  | null
-  | undefined
-  | QueryParamValue[]
-  | Record<string, unknown>;
+type QueryParamPrimitive = string | number | boolean;
+type EncodedQueryParamValue =
+  QueryParamPrimitive | readonly QueryParamPrimitive[];
+type EncodedQueryParams = Record<string, EncodedQueryParamValue>;
+type DecodedQueryParams = Record<string, unknown>;
 
 @Injectable({
   providedIn: 'root',
@@ -18,64 +15,89 @@ export class QueryParamsService {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
-  async setQueryParams(
-    params: Record<
-      string,
-      string | number | boolean | readonly (string | number | boolean)[]
-    >,
-  ) {
-    await this.router.navigate([], {
+  public setQueryParams(params: EncodedQueryParams): Promise<boolean> {
+    return this.router.navigate([], {
       queryParams: params,
     });
   }
 
-  async readDecodedQueryParams() {
-    const queryParams: Record<string, never> = (await firstValueFrom(
+  public async readDecodedQueryParams<
+    T extends DecodedQueryParams = DecodedQueryParams,
+  >(): Promise<T> {
+    const queryParams: DecodedQueryParams = await firstValueFrom(
       this.route.queryParams,
-    )) as Record<string, never>;
-    const transformed: Record<string, never> = {};
+    );
+    const transformed: DecodedQueryParams = {};
 
-    Object.keys(queryParams).forEach((key) => {
-      if (
-        queryParams[key] === undefined ||
-        queryParams[key] === null ||
-        queryParams[key] === ''
-      )
-        return undefined;
-      if (typeof queryParams[key] === 'object') {
-        transformed[key] = queryParams[key];
+    for (const [key, value] of Object.entries(queryParams)) {
+      if (value === undefined || value === null || value === '') {
+        continue;
       }
-      try {
-        const dec = decodeURIComponent(queryParams[key]);
-        try {
-          transformed[key] = JSON.parse(dec) as never;
-        } catch {
-          transformed[key] = dec as never;
-        }
-      } catch {
-        transformed[key] = queryParams[key];
-      }
-    });
 
-    return transformed;
+      if (Array.isArray(value)) {
+        transformed[key] = value.map((entry) =>
+          this.decodeQueryParamValue(entry),
+        );
+        continue;
+      }
+
+      transformed[key] = this.decodeQueryParamValue(value);
+    }
+
+    return transformed as T;
   }
 
-  transformQueryParams<T extends object>(params: T) {
-    const httpParams: Record<
-      string,
-      string | number | boolean | readonly (string | number | boolean)[]
-    > = {};
+  public transformQueryParams(params: object): EncodedQueryParams {
+    const httpParams: EncodedQueryParams = {};
 
     Object.entries(params).forEach(([key, value]) => {
-      if (key === 'collectionFilter') {
-        httpParams[key] = encodeURIComponent(JSON.stringify(value));
-      } else if (Array.isArray(value)) {
-        httpParams[key] = encodeURIComponent(JSON.stringify(value));
-      } else if (['string', 'number', 'boolean'].includes(typeof value)) {
-        httpParams[key] = String(value);
+      const encodedValue = this.encodeQueryParamValue(value);
+      if (encodedValue !== undefined) {
+        httpParams[key] = encodedValue;
       }
     });
 
     return httpParams;
+  }
+
+  private encodeQueryParamValue(
+    value: unknown,
+  ): EncodedQueryParamValue | undefined {
+    if (value === null || value === undefined) {
+      return undefined;
+    }
+
+    if (Array.isArray(value) || typeof value === 'object') {
+      return encodeURIComponent(JSON.stringify(value));
+    }
+
+    if (typeof value === 'string') {
+      return value;
+    }
+
+    if (typeof value === 'number' || typeof value === 'boolean') {
+      return String(value);
+    }
+
+    return undefined;
+  }
+
+  private decodeQueryParamValue(value: unknown): unknown {
+    if (typeof value !== 'string') {
+      return value;
+    }
+
+    let decoded: string;
+    try {
+      decoded = decodeURIComponent(value);
+    } catch {
+      return value;
+    }
+
+    try {
+      return JSON.parse(decoded) as unknown;
+    } catch {
+      return decoded;
+    }
   }
 }
