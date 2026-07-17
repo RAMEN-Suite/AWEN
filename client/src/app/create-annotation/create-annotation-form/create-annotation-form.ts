@@ -74,15 +74,15 @@ export class CreateAnnotationForm {
     //     await this.loadAndDisplayPropertyInputs(type);
     //   }
     // });
-    effect(async () => {
+    effect(() => {
       const types = this.types();
       if (types[0]) {
         this.typeInput.setValue(types[0], { emitEvent: false });
-        await this.loadAndDisplayPropertyInputs(types[0]);
+        void this.loadAndDisplayPropertyInputs(types[0]);
       }
     });
-    this.typeInput.valueChanges.subscribe(async (value) => {
-      await this.loadAndDisplayPropertyInputs(value);
+    this.typeInput.valueChanges.subscribe((value) => {
+      void this.loadAndDisplayPropertyInputs(value);
     });
   }
 
@@ -124,7 +124,6 @@ export class CreateAnnotationForm {
         },
         accept: async () => {
           const annotation = await this.annotationApi.get(annotationId);
-          console.log(`Created Annotation ${annotation}`);
           this.clickCreateAnnotationConnection(annotation);
         },
       });

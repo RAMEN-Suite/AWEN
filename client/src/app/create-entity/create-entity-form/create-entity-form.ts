@@ -62,15 +62,15 @@ export class CreateEntityForm {
   );
 
   public constructor() {
-    effect(async () => {
+    effect(() => {
       const type = this.preselectedType();
       if (type) {
         this.typeInput.setValue(type, { emitEvent: false });
-        await this.loadAndDisplayPropertyInputs(type);
+        void this.loadAndDisplayPropertyInputs(type);
       }
     });
-    this.typeInput.valueChanges.subscribe(async (value) => {
-      await this.loadAndDisplayPropertyInputs(value);
+    this.typeInput.valueChanges.subscribe((value) => {
+      void this.loadAndDisplayPropertyInputs(value);
     });
   }
 
