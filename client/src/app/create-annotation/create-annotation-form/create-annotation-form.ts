@@ -110,7 +110,7 @@ export class CreateAnnotationForm {
         );
       console.log(`Created Annotation ${annotationId}`);
       this.confirmationService.confirm({
-        target: event.target!,
+        target: event.target ?? undefined,
         message: `Do you want to connect this annotation to an entity?`,
         icon: 'pi pi-info-circle',
         rejectButtonProps: {
