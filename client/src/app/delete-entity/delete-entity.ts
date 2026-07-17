@@ -15,7 +15,7 @@ export class DeleteEntity {
   private messageService = inject(MessageService);
   private entityAPI = inject(EntityApiService);
 
-  entityId = input.required<string>();
+  public entityId = input.required<string>();
   protected loading = signal(false);
 
   protected clickDeleteBtn(event: PointerEvent) {

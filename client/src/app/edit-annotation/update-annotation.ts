@@ -14,9 +14,9 @@ import { Annotation } from '../../interfaces';
 export class UpdateAnnotation {
   private readonly dialogService = inject(DialogService);
 
-  annotation = input.required<Annotation>();
-  label = input<string>();
-  icon = input<string>('pi pi-pencil');
+  public annotation = input.required<Annotation>();
+  public label = input<string>();
+  public icon = input<string>('pi pi-pencil');
 
   private updateAnnotationDialogRef: DynamicDialogRef<UpdateAnnotationForm> | null =
     null;

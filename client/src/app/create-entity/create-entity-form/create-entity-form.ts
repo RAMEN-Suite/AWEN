@@ -36,26 +36,32 @@ export class CreateEntityForm {
   private readonly createEntityService = inject(CreateEntityService);
   private readonly utilService = inject(UtilsService);
   private readonly router = inject(Router);
-  dialogRef = inject(DynamicDialogRef);
+  private dialogRef = inject(DynamicDialogRef);
 
   private confirmationService = inject(ConfirmationService);
 
-  preselectedType = input<string>();
+  public preselectedType = input<string>();
 
-  readonly types: Signal<string[]> = this.createEntityService.getEntityTypes();
-  readonly typesLoaded: Signal<boolean> =
+  protected readonly types: Signal<string[]> =
+    this.createEntityService.getEntityTypes();
+  protected readonly typesLoaded: Signal<boolean> =
     this.createEntityService.getEntityTypesLoaded();
-  readonly properties: WritableSignal<GAttribute[]> = signal<GAttribute[]>([]);
-  readonly propertiesLoaded: WritableSignal<boolean> = signal<boolean>(true); // TODO: UI Loading state
-  loading = signal<boolean>(false);
+  protected readonly properties: WritableSignal<GAttribute[]> = signal<
+    GAttribute[]
+  >([]);
+  private readonly propertiesLoaded: WritableSignal<boolean> =
+    signal<boolean>(true); // TODO: UI Loading state
+  protected loading = signal<boolean>(false);
 
-  attributeForm = viewChild.required<AttributeForm>(AttributeForm);
+  protected attributeForm = viewChild.required<AttributeForm>(AttributeForm);
 
-  typeInput = new FormControl('', { nonNullable: true });
+  protected typeInput = new FormControl('', { nonNullable: true });
 
-  propertiesForm = computed(() => this.attributeForm().propertiesForm());
+  protected propertiesForm = computed(() =>
+    this.attributeForm().propertiesForm(),
+  );
 
-  constructor() {
+  public constructor() {
     effect(async () => {
       const type = this.preselectedType();
       if (type) {

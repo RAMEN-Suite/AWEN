@@ -11,13 +11,13 @@ export class CollectionService {
   private readonly http = inject(HttpClient);
   private readonly messageService = inject(MessageService);
 
-  getFilterable() {
+  public getFilterable() {
     return this.http.get<{
       collectionFilter: Record<string, CollectionName[]>;
     }>('api/collection/filterable');
   }
 
-  getFilterableByType(type: string, parentId?: string) {
+  public getFilterableByType(type: string, parentId?: string) {
     const params =
       parentId != null
         ? new HttpParams({ fromObject: { parentId } })

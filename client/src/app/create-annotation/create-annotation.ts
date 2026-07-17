@@ -12,9 +12,9 @@ import { CreateAnnotationForm } from './create-annotation-form/create-annotation
 export class CreateAnnotation {
   private readonly dialogService = inject(DialogService);
 
-  entityId = input.required<string>();
-  label = input<string>('Add Annotation');
-  icon = input<string>();
+  public entityId = input.required<string>();
+  public label = input<string>('Add Annotation');
+  public icon = input<string>();
 
   private createAnnotationDialogRef: DynamicDialogRef<CreateAnnotationForm> | null =
     null;

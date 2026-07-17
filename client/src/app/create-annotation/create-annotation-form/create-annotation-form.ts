@@ -48,20 +48,25 @@ export class CreateAnnotationForm {
 
   protected readonly types: Signal<string[]> =
     this.createAnnotationService.getAnnotationTypes();
-  entityId = input.required<string>();
-  readonly properties: WritableSignal<GAttribute[]> = signal<GAttribute[]>([]);
+  public entityId = input.required<string>();
+  protected readonly properties: WritableSignal<GAttribute[]> = signal<
+    GAttribute[]
+  >([]);
   protected loading = signal<boolean>(false);
-  readonly propertiesLoaded: WritableSignal<boolean> = signal<boolean>(true); // TODO: UI Loading state
-  readonly typesLoaded: Signal<boolean> =
+  private readonly propertiesLoaded: WritableSignal<boolean> =
+    signal<boolean>(true); // TODO: UI Loading state
+  protected readonly typesLoaded: Signal<boolean> =
     this.createAnnotationService.geAnnotationTypesLoaded();
 
-  attributeForm = viewChild.required<AttributeForm>(AttributeForm);
+  private attributeForm = viewChild.required<AttributeForm>(AttributeForm);
 
-  typeInput = new FormControl('', { nonNullable: true });
+  protected typeInput = new FormControl('', { nonNullable: true });
 
-  propertiesForm = computed(() => this.attributeForm().propertiesForm());
+  protected propertiesForm = computed(() =>
+    this.attributeForm().propertiesForm(),
+  );
 
-  constructor() {
+  public constructor() {
     // effect(async () => {
     //   const type = this.preselectedType();
     //   if (type) {
