@@ -12,15 +12,15 @@ import { ConfigService } from '../../config-module/config.service';
 export class TypeFilter {
   private configService = inject(ConfigService);
 
-  form = model.required<FormControl<string[]>>();
+  public form = model.required<FormControl<string[]>>();
 
   protected config = this.configService.getConfig();
   protected types = computed(() => this.config().entityTypes);
 
-  constructor() {
+  public constructor() {
     effect(() => {
       const availableTypes = this.types();
-      const current = this.form().value ?? [];
+      const current = this.form().value;
       const next = current.filter((type) => availableTypes.includes(type));
 
       if (!this.arraysEqual(current, next)) {
