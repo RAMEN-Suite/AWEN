@@ -62,7 +62,7 @@ export class ConnectedNode implements OnInit {
         command: ($event) => {
           this.clickDeleteAnnotationRelation(
             this.annotationId(),
-            this.node().id!,
+            this.node().id,
             $event.originalEvent,
           );
         },
@@ -70,8 +70,8 @@ export class ConnectedNode implements OnInit {
       {
         icon: 'pi pi-clipboard',
         label: 'Copy UUID',
-        command: async () => {
-          await this.utils.copyToClipboard(this.node().id!);
+        command: () => {
+          void this.utils.copyToClipboard(this.node().id);
         },
       },
     ];

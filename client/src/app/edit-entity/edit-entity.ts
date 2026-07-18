@@ -12,13 +12,13 @@ import { EditEntityForm } from './edit-entity-form/edit-entity-form';
   templateUrl: './edit-entity.html',
 })
 export class EditEntity {
-  dialogService = inject(DialogService);
+  private readonly dialogService = inject(DialogService);
 
-  editEntityDialogRef: DynamicDialogRef<EditEntityForm> | null = null;
+  private editEntityDialogRef: DynamicDialogRef<EditEntityForm> | null = null;
 
-  entity = input<Entity>();
+  public entity = input<Entity>();
 
-  show() {
+  private show() {
     this.editEntityDialogRef = this.dialogService.open(EditEntityForm, {
       inputValues: {
         entity: this.entity(),

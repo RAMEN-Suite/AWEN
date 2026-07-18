@@ -48,20 +48,25 @@ export class CreateAnnotationForm {
 
   protected readonly types: Signal<string[]> =
     this.createAnnotationService.getAnnotationTypes();
-  entityId = input.required<string>();
-  readonly properties: WritableSignal<GAttribute[]> = signal<GAttribute[]>([]);
+  public entityId = input.required<string>();
+  protected readonly properties: WritableSignal<GAttribute[]> = signal<
+    GAttribute[]
+  >([]);
   protected loading = signal<boolean>(false);
-  readonly propertiesLoaded: WritableSignal<boolean> = signal<boolean>(true); // TODO: UI Loading state
-  readonly typesLoaded: Signal<boolean> =
+  private readonly propertiesLoaded: WritableSignal<boolean> =
+    signal<boolean>(true); // TODO: UI Loading state
+  protected readonly typesLoaded: Signal<boolean> =
     this.createAnnotationService.geAnnotationTypesLoaded();
 
-  attributeForm = viewChild.required<AttributeForm>(AttributeForm);
+  private attributeForm = viewChild.required<AttributeForm>(AttributeForm);
 
-  typeInput = new FormControl('', { nonNullable: true });
+  protected typeInput = new FormControl('', { nonNullable: true });
 
-  propertiesForm = computed(() => this.attributeForm().propertiesForm());
+  protected propertiesForm = computed(() =>
+    this.attributeForm().propertiesForm(),
+  );
 
-  constructor() {
+  public constructor() {
     // effect(async () => {
     //   const type = this.preselectedType();
     //   if (type) {
@@ -69,15 +74,15 @@ export class CreateAnnotationForm {
     //     await this.loadAndDisplayPropertyInputs(type);
     //   }
     // });
-    effect(async () => {
+    effect(() => {
       const types = this.types();
       if (types[0]) {
         this.typeInput.setValue(types[0], { emitEvent: false });
-        await this.loadAndDisplayPropertyInputs(types[0]);
+        void this.loadAndDisplayPropertyInputs(types[0]);
       }
     });
-    this.typeInput.valueChanges.subscribe(async (value) => {
-      await this.loadAndDisplayPropertyInputs(value);
+    this.typeInput.valueChanges.subscribe((value) => {
+      void this.loadAndDisplayPropertyInputs(value);
     });
   }
 
@@ -105,7 +110,7 @@ export class CreateAnnotationForm {
         );
       console.log(`Created Annotation ${annotationId}`);
       this.confirmationService.confirm({
-        target: event.target!,
+        target: event.target ?? undefined,
         message: `Do you want to connect this annotation to an entity?`,
         icon: 'pi pi-info-circle',
         rejectButtonProps: {
@@ -119,7 +124,6 @@ export class CreateAnnotationForm {
         },
         accept: async () => {
           const annotation = await this.annotationApi.get(annotationId);
-          console.log(`Created Annotation ${annotation}`);
           this.clickCreateAnnotationConnection(annotation);
         },
       });

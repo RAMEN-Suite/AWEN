@@ -37,14 +37,13 @@ export class DetailPage implements OnDestroy {
 
   protected readonly visibleProperties = visibleProperties;
 
-  public constructor() {
-    effect(async () => {
-      const id = this.entityId(); // Signal wird getrackt
-      await this.entityService.loadNewEntity(id);
-    });
-  }
+  private readonly loadEntityEffect = effect(() => {
+    const id = this.entityId();
+    void this.entityService.loadNewEntity(id);
+  });
 
   public ngOnDestroy() {
     this.entityService.resetState();
+    this.loadEntityEffect.destroy();
   }
 }

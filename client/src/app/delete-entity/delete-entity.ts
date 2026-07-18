@@ -15,12 +15,12 @@ export class DeleteEntity {
   private messageService = inject(MessageService);
   private entityAPI = inject(EntityApiService);
 
-  entityId = input.required<string>();
+  public entityId = input.required<string>();
   protected loading = signal(false);
 
   protected clickDeleteBtn(event: PointerEvent) {
     this.confirmationService.confirm({
-      target: event.target!,
+      target: event.target ?? undefined,
       message: 'Do you want to delete this Entity?',
       header: 'Danger Zone',
       icon: 'pi pi-info-circle',

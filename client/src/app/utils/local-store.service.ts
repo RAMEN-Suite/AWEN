@@ -1,26 +1,34 @@
 import { Injectable } from '@angular/core';
+import { EmConfig } from '../../interfaces';
+
+interface StorageMap {
+  EM_CONFIG_STORE_KEY: EmConfig;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class LocalStoreService {
-  public saveData<T>(key: string, value: T) {
-    const parsedVal = JSON.stringify(value);
-    localStorage.setItem(key, parsedVal);
+  public saveData<K extends keyof StorageMap>(
+    key: K,
+    value: StorageMap[K],
+  ): void {
+    localStorage.setItem(key, JSON.stringify(value));
   }
 
-  public getData<T>(key: string): T | undefined {
-    const val = localStorage.getItem(key);
-    if (val === null) return undefined;
+  public getData<K extends keyof StorageMap>(
+    key: K,
+  ): StorageMap[K] | undefined {
+    const value = localStorage.getItem(key);
 
-    try {
-      return JSON.parse(val) as T;
-    } catch {
+    if (value === null) {
       return undefined;
     }
+
+    return JSON.parse(value) as StorageMap[K];
   }
 
-  public removeData(key: string) {
+  public removeData(key: keyof StorageMap) {
     localStorage.removeItem(key);
   }
 

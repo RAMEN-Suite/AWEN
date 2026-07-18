@@ -36,30 +36,33 @@ export class EditEntityForm {
   private readonly editEntityService = inject(EditEntityService);
   private readonly utilService = inject(UtilsService);
   private readonly messageService = inject(MessageService);
-  dialogRef = inject(DynamicDialogRef);
+  private dialogRef = inject(DynamicDialogRef);
 
-  entity = input.required<Entity>();
-  loading = signal<boolean>(false);
+  public entity = input.required<Entity>();
+  protected loading = signal<boolean>(false);
 
-  readonly properties: Signal<(GAttribute | EntityPropertyDto)[]> = toSignal(
-    toObservable(this.entity).pipe(
-      switchMap((entity) =>
-        from(
-          this.editEntityService.getEntityProperties(
-            entity.types[entity.types.length - 1],
+  protected readonly properties: Signal<(GAttribute | EntityPropertyDto)[]> =
+    toSignal(
+      toObservable(this.entity).pipe(
+        switchMap((entity) =>
+          from(
+            this.editEntityService.getEntityProperties(
+              entity.types[entity.types.length - 1],
+            ),
           ),
         ),
+        map((attributes) =>
+          this.mergePropArrays(this.entity().properties, attributes),
+        ),
       ),
-      map((attributes) =>
-        this.mergePropArrays(this.entity().properties, attributes),
-      ),
-    ),
-    { initialValue: [] },
+      { initialValue: [] },
+    );
+
+  private attributeForm = viewChild.required<AttributeForm>(AttributeForm);
+
+  protected propertiesForm = computed(() =>
+    this.attributeForm().propertiesForm(),
   );
-
-  attributeForm = viewChild.required<AttributeForm>(AttributeForm);
-
-  propertiesForm = computed(() => this.attributeForm().propertiesForm());
 
   protected async onSubmit(event: SubmitEvent) {
     event.preventDefault();

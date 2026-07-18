@@ -1,6 +1,7 @@
 import { inject, Injectable, signal, WritableSignal } from '@angular/core';
 import { AnnotationOfEntityWithContent, Entity } from '../interfaces';
 import { EntityApiService } from './api/entity-api.service';
+import { Router } from '@angular/router';
 
 /**
  * This service should be a singleton. It holds the entity, currently displayed on the detail page.
@@ -10,6 +11,7 @@ import { EntityApiService } from './api/entity-api.service';
 })
 export class EntityService {
   private readonly entityApi = inject(EntityApiService);
+  private readonly router = inject(Router);
 
   private _entity: WritableSignal<Entity | undefined> = signal<
     Entity | undefined
@@ -41,11 +43,18 @@ export class EntityService {
   }
 
   private async loadAndSet(id: string) {
-    const entity = await this.entityApi.getById(id);
-    const annotations =
-      await this.entityApi.getAnnotationsWithConnectionsOf(id);
-    this._entity.set(entity);
-    this._annotations.set(annotations);
+    try {
+      const entity = await this.entityApi.getById(id);
+      const annotations =
+        await this.entityApi.getAnnotationsWithConnectionsOf(id);
+      this._entity.set(entity);
+      this._annotations.set(annotations);
+    } catch {
+      await this.router.navigate([
+        '/error',
+        'An Entity with the given id could not be found',
+      ]);
+    }
   }
 
   public resetState() {

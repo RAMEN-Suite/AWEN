@@ -17,7 +17,7 @@ import { MessageService } from 'primeng/api';
 import { AttributeForm } from '../../utils/attribute-form/attribute-form';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { from, map, switchMap } from 'rxjs';
-import { ANNOTATION_TYPE_NAME, ENTITY_NAME_PROPERTY } from '../../../constants';
+import { ANNOTATION_TYPE_NAME } from '../../../constants';
 import { UtilsService } from '../../utils/utils.service';
 
 interface AttributeWithOptValue
@@ -36,7 +36,7 @@ export class UpdateAnnotationForm {
   private messageService = inject(MessageService);
   private readonly utilService = inject(UtilsService);
 
-  annotation = input.required<Annotation>();
+  public annotation = input.required<Annotation>();
   protected loading = signal<boolean>(false);
 
   private annotationId: Signal<string | null> = computed(() => {
@@ -47,25 +47,28 @@ export class UpdateAnnotationForm {
     return null;
   });
 
-  readonly properties: Signal<(GAttribute | EntityPropertyDto)[]> = toSignal(
-    toObservable(this.annotation).pipe(
-      switchMap((annotation) =>
-        from(
-          this.updateAnnotationService.getAnnotationProperties(
-            annotation.types[annotation.types.length - 1],
+  protected readonly properties: Signal<(GAttribute | EntityPropertyDto)[]> =
+    toSignal(
+      toObservable(this.annotation).pipe(
+        switchMap((annotation) =>
+          from(
+            this.updateAnnotationService.getAnnotationProperties(
+              annotation.types[annotation.types.length - 1],
+            ),
           ),
         ),
+        map((attributes) =>
+          this.mergePropArrays(this.annotation().properties, attributes),
+        ),
       ),
-      map((attributes) =>
-        this.mergePropArrays(this.annotation().properties, attributes),
-      ),
-    ),
-    { initialValue: [] },
+      { initialValue: [] },
+    );
+
+  private attributeForm = viewChild.required<AttributeForm>(AttributeForm);
+
+  protected propertiesForm = computed(() =>
+    this.attributeForm().propertiesForm(),
   );
-
-  attributeForm = viewChild.required<AttributeForm>(AttributeForm);
-
-  propertiesForm = computed(() => this.attributeForm().propertiesForm());
 
   private mergePropArrays(
     props: EntityPropertyDto[],

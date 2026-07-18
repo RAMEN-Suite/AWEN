@@ -12,10 +12,11 @@ import { MenuItem } from 'primeng/api';
   templateUrl: './create-entity.html',
 })
 export class CreateEntity {
-  createEntityService = inject(CreateEntityService);
-  dialogService = inject(DialogService);
+  private readonly createEntityService = inject(CreateEntityService);
+  private readonly dialogService = inject(DialogService);
 
-  createEntityDialogRef: DynamicDialogRef<CreateEntityForm> | null = null;
+  private createEntityDialogRef: DynamicDialogRef<CreateEntityForm> | null =
+    null;
 
   private entityTypes = this.createEntityService.getEntityTypes();
 
@@ -28,7 +29,7 @@ export class CreateEntity {
     });
   });
 
-  show(preselectedType?: string) {
+  private show(preselectedType?: string) {
     this.createEntityDialogRef = this.dialogService.open(CreateEntityForm, {
       inputValues: {
         preselectedType: preselectedType,

@@ -52,16 +52,19 @@ export const appConfig: ApplicationConfig = {
     provideRouter(
       routes,
       withComponentInputBinding(),
-      withNavigationErrorHandler((error) => {
+      withNavigationErrorHandler(async (error) => {
         const router = inject(Router);
-        if (error.error.message) {
-          console.error('Navigation error occurred:', error.error.message);
-        }
-        if (error.error.status) {
-          router.navigate(['/error', error.error.status]);
-        } else {
-          router.navigate(['/error', 'unknown']);
-        }
+        const cause: unknown = error.error;
+
+        const status =
+          typeof cause === 'object' &&
+          cause !== null &&
+          'status' in cause &&
+          (typeof cause.status === 'string' || typeof cause.status === 'number')
+            ? cause.status
+            : 'unknown';
+
+        await router.navigate(['/error', status]);
       }),
     ),
     providePrimeNG({

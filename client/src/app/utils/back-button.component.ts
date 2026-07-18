@@ -17,13 +17,13 @@ import { Button } from 'primeng/button';
   `,
 })
 export class BackButtonComponent {
-  location = inject(Location);
+  private location = inject(Location);
 
-  label = input<string>('');
-  outlined = input<boolean>(false);
-  text = input<boolean>(true);
+  public label = input<string>('');
+  public outlined = input<boolean>(false);
+  public text = input<boolean>(true);
 
-  goBack(): void {
+  protected goBack(): void {
     this.location.back();
   }
 }

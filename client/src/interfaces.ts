@@ -162,7 +162,7 @@ export type PropertyConfigDataType =
 
 export interface StatementNodeView {
   node: ConnectedNodeDto;
-  id: string | null;
+  id: string;
   link: {
     router: boolean;
     href: string;

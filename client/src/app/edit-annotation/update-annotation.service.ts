@@ -11,13 +11,13 @@ export class UpdateAnnotationService {
   private readonly guidelineAPI = inject(GuidelinesService);
   private readonly entityService = inject(EntityService);
 
-  async update(annotationId: string, payload: Record<string, unknown>) {
+  public async update(annotationId: string, payload: Record<string, unknown>) {
     await this.annotationAPI.update(annotationId, payload);
     // Reload Entity on Detail page
     await this.entityService.reloadEntity();
   }
 
-  async getAnnotationProperties(type: string) {
+  public async getAnnotationProperties(type: string) {
     return this.guidelineAPI.getNodeProperties(type);
   }
 }
