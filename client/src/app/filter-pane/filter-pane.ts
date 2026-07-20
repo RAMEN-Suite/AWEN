@@ -35,6 +35,7 @@ import { TypeFilter } from './type-filter/type-filter';
 import { RouterLink } from '@angular/router';
 import { QueryParamsService } from '../utils/query-params.service';
 import { ConfigService } from '../config-module/config.service';
+import { TranslocoDirective } from '@jsverse/transloco';
 
 interface CFOption {
   type: string;
@@ -51,6 +52,7 @@ interface CFOption {
     Select,
     TypeFilter,
     RouterLink,
+    TranslocoDirective,
   ],
   templateUrl: './filter-pane.html',
 })

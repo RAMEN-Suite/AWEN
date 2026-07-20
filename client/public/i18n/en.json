@@ -25,6 +25,14 @@
       }
     },
     "shared": {
+      "filterPane": {
+        "collection": {
+          "placeholder": "Select a {{ collectionType }}"
+        },
+        "submitBtn": {
+          "label": "Search"
+        }
+      },
       "index": {
         "unknown": "No classification"
       },

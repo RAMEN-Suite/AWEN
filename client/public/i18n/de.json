@@ -1,0 +1,68 @@
+{
+  "app": {
+    "languages": {
+      "de": "Deutsch",
+      "en": "English"
+    },
+    "screens": {
+      "collections": {
+        "available": "Insgesamt {{ count }} Einträge verfügbar",
+        "select": "Sammlung auswählen:",
+        "search": "Sammlung durchsuchen:",
+        "sort": "Sortieren nach:",
+        "tooltips": {
+          "reset": "Zurücksetzen",
+          "ascending": "Aufsteigend",
+          "descending": "Absteigend"
+        }
+      },
+      "entities": {
+        "select": "Register auswählen:",
+        "search": "Register durchsuchen:",
+        "entries": "Einträge zu: {{ value }}",
+        "empty": "Es konnten keine Einträge gefunden werden.",
+        "default": "Alle Register"
+      }
+    },
+    "shared": {
+      "filterPane": {
+        "collection": {
+          "placeholder": "{{ collectionType }}"
+        },
+        "submitBtn": {
+          "label": "Suche"
+        }
+      },
+      "index": {
+        "unknown": "Keine Einsortierung"
+      },
+      "searchableList": {
+        "search": "Liste durchsuchen:",
+        "empty": "Keine Einträge vorhanden."
+      },
+      "textView": {
+        "copyUuid": "UUID kopieren",
+        "references": "Referenziert:",
+        "empty": "Keine weiteren Informationen.",
+        "error": "Die Annotation konnte nicht geladen werden.",
+        "externalLink": "Externen Link öffnen (#{{ source }})",
+        "jumpTo": "Zur Annotation springen"
+      },
+      "citation": {
+        "currentVersion": "Link zur aktuellen Version:",
+        "copyLink": "Link kopieren",
+        "print": "PDF speichern",
+        "usage": "Nutzungshinweis",
+        "usageSoftware": "Die Darstellung erfolgt mit *[ORA](https://ramen-schema.org)*, einer unter Apache 2.0 lizenzierten Editionssoftware."
+      },
+      "footer": {
+        "software": "Präsentiert mit <b>[ORA]({{ url }})</b>."
+      }
+    },
+    "blocks": {
+      "attributes": {
+        "missing": "–"
+      }
+    }
+  }
+}
