@@ -50,7 +50,6 @@ export const appConfig: ApplicationConfig = {
     EntityService,
     ConfirmationService,
     MessageService,
-    ConfigService,
     HealthService,
     LocalStoreService,
     provideBrowserGlobalErrorListeners(),

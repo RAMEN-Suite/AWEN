@@ -8,6 +8,7 @@ import {
 import { TranslocoService } from '@jsverse/transloco';
 import { LanguageKey, LanguageOptions } from './models/config/LanguageOptions';
 import { LocalStoreService } from './utils/local-store.service';
+import { ConfigService } from './config-module/config.service';
 
 @Injectable({
   providedIn: 'root',
@@ -17,6 +18,7 @@ export class LanguageService {
     inject(TranslocoService);
   private readonly storageService: LocalStoreService =
     inject(LocalStoreService);
+  private readonly config: ConfigService = inject(ConfigService);
   private readonly activeLanguageState: WritableSignal<
     LanguageKey | undefined
   > = signal(undefined);
@@ -26,10 +28,7 @@ export class LanguageService {
 
   public init(): void {
     // TODO: set server
-    const options: LanguageOptions = {
-      initial: 'en',
-      available: ['de', 'en'],
-    };
+    const options: LanguageOptions = this.config.getConfig()().language;
     const current: LanguageKey =
       this.getStored(options.available) ??
       this.getBrowser(options.available) ??

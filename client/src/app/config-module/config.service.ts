@@ -21,6 +21,10 @@ export class ConfigService {
     selectedCollectionChain: [],
     filterableCollections: [],
     entityTypes: [],
+    language: {
+      initial: 'en',
+      available: ['de', 'en'],
+    },
   });
   private readonly _loaded = signal(false);
 
@@ -50,9 +54,11 @@ export class ConfigService {
     return this.getDataTypes()().find((dataType) => dataType.id === id);
   }
 
-  public setConfig(value: EmConfig) {
-    this._config.set(value);
-    this.store.saveData('EM_CONFIG_STORE_KEY', value);
+  public setConfig(value: Partial<EmConfig>) {
+    const oldConfig: EmConfig = this._config();
+    const config: EmConfig = { ...oldConfig, ...value };
+    this._config.set(config);
+    this.store.saveData('EM_CONFIG_STORE_KEY', config);
   }
 
   public getRemoteConfig() {
@@ -72,8 +78,6 @@ export class ConfigService {
     } else {
       this.setConfig({
         entityTypes: remoteConfig.entityTypes,
-        filterableCollections: [],
-        selectedCollectionChain: [],
       });
     }
     this._loaded.set(true);
