@@ -25,6 +25,7 @@ import { Button } from 'primeng/button';
 import { getProperty } from '../../utils/utils';
 import { ConfigService } from '../../config-module/config.service';
 import { NgTemplateOutlet } from '@angular/common';
+import { TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-connected-node',
@@ -40,6 +41,7 @@ export class ConnectedNode implements OnInit {
   private readonly confirmationService = inject(ConfirmationService);
   private readonly router = inject(Router);
   private readonly utils = inject(UtilsService);
+  private readonly transloco = inject(TranslocoService);
 
   public annotationId = input.required<string>();
   public node = input.required<StatementNodeView>();
@@ -58,20 +60,24 @@ export class ConnectedNode implements OnInit {
     this.annotationConnectionOptions = [
       {
         icon: 'pi pi-trash',
-        label: 'Delete Connection',
+        label: this.transloco.translate(
+          'app.shared.connectedNode.menu.deleteConnection',
+        ),
         command: ($event) => {
           this.clickDeleteAnnotationRelation(
             this.annotationId(),
-            this.node().id!,
+            this.node().id,
             $event.originalEvent,
           );
         },
       },
       {
         icon: 'pi pi-clipboard',
-        label: 'Copy UUID',
-        command: async () => {
-          await this.utils.copyToClipboard(this.node().id!);
+        label: this.transloco.translate(
+          'app.shared.connectedNode.menu.copyUuid',
+        ),
+        command: () => {
+          void this.utils.copyToClipboard(this.node().id);
         },
       },
     ];
@@ -88,23 +94,29 @@ export class ConnectedNode implements OnInit {
   ) {
     this.confirmationService.confirm({
       target: event?.target ?? undefined,
-      message: `Are you sure you want to delete the relation to this annotation?`,
-      header: 'Danger Zone',
+      message: this.transloco.translate(
+        'app.shared.connectedNode.delete.confirm.message',
+      ),
+      header: this.transloco.translate('app.shared.common.dangerZone'),
       icon: 'pi pi-info-circle',
       rejectButtonProps: {
-        label: 'Cancel',
+        label: this.transloco.translate('app.shared.actions.cancel'),
         severity: 'secondary',
         outlined: true,
       },
       acceptButtonProps: {
-        label: 'Delete Relation',
+        label: this.transloco.translate(
+          'app.shared.connectedNode.delete.confirm.accept',
+        ),
         severity: 'danger',
       },
       accept: async () => {
         await this.deleteAnnotationRelation(id, connectedNodeId);
         this.messageService.add({
           severity: 'success',
-          summary: 'Relation deleted',
+          summary: this.transloco.translate(
+            'app.shared.connectedNode.delete.success',
+          ),
         });
         await this.entityService.reloadEntity();
       },

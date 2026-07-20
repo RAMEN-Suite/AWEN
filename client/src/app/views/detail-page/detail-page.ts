@@ -10,6 +10,7 @@ import { visibleProperties } from '../../utils/utils';
 import { NodeTypes } from '../../annotations-list/node-types/node-types';
 import { AnnotationList } from '../../annotations-list/annotation-list';
 import { AttributeList } from '../../annotations-list/attribute-list/attribute-list';
+import { TranslocoDirective } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-detail-page',
@@ -23,6 +24,7 @@ import { AttributeList } from '../../annotations-list/attribute-list/attribute-l
     NodeTypes,
     AnnotationList,
     AttributeList,
+    TranslocoDirective,
   ],
   styleUrl: './detail-page.scss',
   templateUrl: './detail-page.html',
@@ -37,14 +39,13 @@ export class DetailPage implements OnDestroy {
 
   protected readonly visibleProperties = visibleProperties;
 
-  public constructor() {
-    effect(async () => {
-      const id = this.entityId(); // Signal wird getrackt
-      await this.entityService.loadNewEntity(id);
-    });
-  }
+  private readonly loadEntityEffect = effect(() => {
+    const id = this.entityId();
+    void this.entityService.loadNewEntity(id);
+  });
 
   public ngOnDestroy() {
     this.entityService.resetState();
+    this.loadEntityEffect.destroy();
   }
 }

@@ -6,14 +6,14 @@ import { EntityApiService } from '../api/entity-api.service';
   providedIn: 'root',
 })
 export class EditEntityService {
-  guidelineAPI = inject(GuidelinesService);
-  entityAPI = inject(EntityApiService);
+  private readonly guidelineAPI = inject(GuidelinesService);
+  private readonly entityAPI = inject(EntityApiService);
 
-  async getEntityProperties(type: string) {
+  public async getEntityProperties(type: string) {
     return this.guidelineAPI.getNodeProperties(type);
   }
 
-  async updateEntity(id: string, payload: Record<string, unknown>) {
+  public async updateEntity(id: string, payload: Record<string, unknown>) {
     return await this.entityAPI.updateEntity(id, payload);
   }
 }

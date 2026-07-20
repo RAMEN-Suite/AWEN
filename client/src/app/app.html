@@ -15,8 +15,8 @@
     @if (loaded()) {
       <router-outlet />
     } @else {
-      <div class="loading-wrapper">
-        <p-progress-spinner ariaLabel="loading" />
+      <div class="loading-wrapper" *transloco="let t">
+        <p-progress-spinner [ariaLabel]="t('app.shared.common.loading')" />
       </div>
     }
   </div>

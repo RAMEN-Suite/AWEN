@@ -1,0 +1,300 @@
+{
+  "app": {
+    "languages": {
+      "de": "Deutsch",
+      "en": "English"
+    },
+    "services": {
+      "annotationApi": {
+        "errors": {
+          "getAnnotation": "Error while getting annotation with id {{ id }}. Try again later.",
+          "createAnnotation": "Error while creating a new annotation. Please try again.",
+          "deleteAnnotation": "Error while deleting annotation with id {{ id }}. Try again later.",
+          "deleteRelation": "Error while deleting annotation relation. Try again later.",
+          "createRelation": "Error while creating annotation relation. Try again later.",
+          "updateAnnotation": "Error while updating an annotation. Please try again."
+        }
+      },
+      "collection": {
+        "errors": {
+          "loadingFilter": "Error while loading filter. Reload the page, or try again later."
+        }
+      },
+      "entityApi": {
+        "errors": {
+          "loadingEntities": "Error while loading entities. Reload the page, or try again later.",
+          "loadingEntity": "Error while loading entity with id {{ id }}. Reload the page, or try again later.",
+          "loadingAutocomplete": "Error while loading autocomplete. Reload the page, or try again later.",
+          "createEntity": "Error while creating a new entity. Please try again.",
+          "deleteEntity": "Error while deleting entity with id {{ id }}. Try again later.",
+          "updateEntity": "Error while updating an entity. Please try again."
+        }
+      },
+      "guidelines": {
+        "errors": {
+          "loadingConfig": "Error while loading important data. Reload the page, or try again later.",
+          "loadingNodeProperties": "Could not load attributes of node type {{ type }}. Reload the page, or try again later."
+        }
+      },
+      "health": {
+        "unhealthy": "The server is not healthy. Please try again later."
+      },
+      "utils": {
+        "copiedToClipboard": "Copied \"{{ id }}\" to clipboard."
+      }
+    },
+    "screens": {
+      "common": {
+        "loading": "Loading"
+      },
+      "detail": {
+        "annotations": {
+          "title": "Annotations",
+          "empty": {
+            "prefix": "No connected annotations. Try adding one by selecting the",
+            "suffix": "button."
+          }
+        }
+      },
+      "error": {
+        "titleWithStatus": "Error - {{ status }}",
+        "unknownTitle": "Unknown Error",
+        "messages": {
+          "404": "The page you are looking for cannot be found. Try something different or contact support.",
+          "500": "It seems that the server is currently unavailable. Please try again later.",
+          "unknown": "You have encountered an unknown error.",
+          "default": "Oops! Something went wrong!"
+        },
+        "homepage": "Homepage"
+      },
+      "collections": {
+        "available": "{{ count }} entries available in total",
+        "select": "Select collection:",
+        "search": "Search collection:",
+        "sort": "Sort by:",
+        "tooltips": {
+          "reset": "Reset",
+          "ascending": "Ascending",
+          "descending": "Descending"
+        }
+      },
+      "entities": {
+        "select": "Select register:",
+        "search": "Search register:",
+        "entries": "Entries for: {{ value }}",
+        "empty": "No entries could be found.",
+        "default": "All registers"
+      }
+    },
+    "shared": {
+      "actions": {
+        "cancel": "Cancel",
+        "create": "Create",
+        "no": "No",
+        "update": "Update",
+        "yes": "Yes"
+      },
+      "annotationCard": {
+        "emptyNodes": {
+          "prefix": "No connected nodes. Try adding some by selecting the",
+          "suffix": "button."
+        },
+        "delete": {
+          "confirm": {
+            "message": "Are you sure you want to delete this annotation? Doing so will delete the annotation and disconnect all associated nodes.",
+            "accept": "Delete Annotation"
+          },
+          "success": "Annotation deleted"
+        }
+      },
+      "annotationList": {
+        "directions": {
+          "outgoing": "refers to",
+          "incoming": "is referred to"
+        },
+        "expandAll": "expand all",
+        "collapseAll": "collapse all"
+      },
+      "attributeForm": {
+        "max": "max. {{ max }}",
+        "boolean": {
+          "offLabel": "Not {{ name }}"
+        },
+        "errors": {
+          "minLength": "At least {{ min }} value(s) required.",
+          "maxLength": "At most {{ max }} value(s) allowed.",
+          "required": "This field is required."
+        },
+        "mandatory": "mandatory field",
+        "similar": {
+          "summary": "Similar label found",
+          "detail": "There is already an entity named <b>{{ label }}</b>"
+        }
+      },
+      "attributeList": {
+        "empty": {
+          "prefix": "No properties. Try adding some by selecting the",
+          "suffix": "button."
+        }
+      },
+      "common": {
+        "dangerZone": "Danger Zone",
+        "loading": "Loading",
+        "success": "Success"
+      },
+      "configPane": {
+        "entityTypes": {
+          "label": "Entity Types",
+          "help": "Select which entity types should be available via this application."
+        },
+        "collectionChain": {
+          "label": "Collection Chain",
+          "help": "Select which should be the filter collection chain."
+        },
+        "collectionTypes": {
+          "label": "Collection Types",
+          "help": "Select which collections are filterable."
+        }
+      },
+      "connectedNode": {
+        "menu": {
+          "deleteConnection": "Delete Connection",
+          "copyUuid": "Copy UUID"
+        },
+        "delete": {
+          "confirm": {
+            "message": "Are you sure you want to delete the relation to this annotation?",
+            "accept": "Delete Relation"
+          },
+          "success": "Relation deleted"
+        }
+      },
+      "createAnnotation": {
+        "label": "Add Annotation",
+        "dialog": {
+          "header": "Create Annotation"
+        }
+      },
+      "createAnnotationConnection": {
+        "optionalHeader": "Create an Optional Annotation Connection",
+        "header": "Create Annotation Connection",
+        "create": "Create Connection",
+        "confirm": {
+          "message": "Do you want to create a connection to {{ label }}?"
+        }
+      },
+      "createAnnotationForm": {
+        "type": {
+          "label": "Annotation-Type"
+        },
+        "submit": {
+          "label": "Create Annotation"
+        },
+        "connection": {
+          "message": "Do you want to connect this annotation to an entity?"
+        }
+      },
+      "createEntity": {
+        "label": "Create Entity",
+        "dialog": {
+          "header": "Create Entity"
+        }
+      },
+      "createEntityForm": {
+        "type": {
+          "label": "Entity-Type"
+        },
+        "success": {
+          "message": "The entity was successfully created!",
+          "stayHere": "Stay here",
+          "goToEntity": "Go to Entity"
+        }
+      },
+      "deleteEntity": {
+        "confirm": {
+          "message": "Do you want to delete this entity?",
+          "accept": "Delete Entity"
+        },
+        "success": {
+          "summary": "Entity deleted",
+          "detail": "The entity was deleted successfully"
+        }
+      },
+      "editEntity": {
+        "dialog": {
+          "header": "Edit Entity"
+        }
+      },
+      "editEntityForm": {
+        "errors": {
+          "missingKey": "Error while editing an entity. Please try again."
+        },
+        "success": {
+          "updated": "The entity was successfully updated!"
+        }
+      },
+      "entityList": {
+        "empty": "No entity matches this search",
+        "unknownType": "Unknown",
+        "copyUuidTooltip": "Copy UUID to Clipboard"
+      },
+      "filterPane": {
+        "collection": {
+          "placeholder": "Select a {{ collectionType }}"
+        },
+        "label": {
+          "error": "Value is required to be longer than three characters."
+        },
+        "resetBtn": {
+          "tooltip": "Reset filter"
+        },
+        "submitBtn": {
+          "label": "Search"
+        }
+      },
+      "index": {
+        "unknown": "No classification"
+      },
+      "searchableList": {
+        "search": "Search list:",
+        "empty": "No entries available."
+      },
+      "textView": {
+        "copyUuid": "Copy UUID",
+        "references": "References:",
+        "empty": "No further information.",
+        "error": "The annotation could not be loaded.",
+        "externalLink": "Open external link",
+        "jumpTo": "Jump to annotation"
+      },
+      "citation": {
+        "currentVersion": "Link to current version:",
+        "copyLink": "Copy link",
+        "print": "Save PDF",
+        "usage": "Usage note",
+        "usageSoftware": "The presentation is rendered with *[ORA](https://ramen-schema.org)*, edition software licensed under Apache 2.0."
+      },
+      "footer": {
+        "software": "Presented with <b>[ORA]({{ url }})</b>."
+      },
+      "updateAnnotation": {
+        "dialog": {
+          "header": "Update Annotation"
+        }
+      },
+      "updateAnnotationForm": {
+        "errors": {
+          "missingId": {
+            "summary": "Failed to update annotation",
+            "detail": "Please reload the page and try again. If this problem is recurring notify your administrator."
+          }
+        }
+      }
+    },
+    "blocks": {
+      "attributes": {
+        "missing": "–"
+      }
+    }
+  }
+}

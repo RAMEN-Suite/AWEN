@@ -1,4 +1,4 @@
-<div class="flex flex-column gap-2">
+<div *transloco="let t" class="flex flex-column gap-2">
   @for (property of visibleProperties(properties()); track property.name) {
     <div class="flex flex-row align-items-start">
       <div class="flex w-4 flex-wrap" [class]="textSizeClass()" style="word-break: normal; overflow-wrap: anywhere">
@@ -25,8 +25,9 @@
     </div>
   } @empty {
     <span class="text-gray-500" [class]="textSizeClass()">
-      No properties. Try adding some by selecting the
-      <span [class]="iconSizeClass()" class="pi pi-pencil text-color-secondary"></span> button.
+      {{ t("app.shared.attributeList.empty.prefix") }}
+      <span [class]="iconSizeClass()" class="pi pi-pencil text-color-secondary"></span>
+      {{ t("app.shared.attributeList.empty.suffix") }}
     </span>
   }
 </div>

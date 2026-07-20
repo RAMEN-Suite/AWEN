@@ -20,9 +20,9 @@ const RAMEN_CORE_TYPES = [
   templateUrl: './node-types.html',
 })
 export class NodeTypes {
-  nodeTypes = input.required<string[]>();
-  asChips = input(false, { transform: booleanAttribute });
-  hideRamenCoreTypes = input(false, { transform: booleanAttribute });
+  public nodeTypes = input.required<string[]>();
+  public asChips = input(false, { transform: booleanAttribute });
+  public hideRamenCoreTypes = input(false, { transform: booleanAttribute });
 
   protected readonly formatedTypes = computed(() => {
     const types = [...this.nodeTypes()].reverse();

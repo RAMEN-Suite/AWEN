@@ -28,6 +28,7 @@ import {
   calculateGroupedAnnotations,
   type AnnotationListCalculationRequest,
 } from './annotation-list-calculation';
+import { TranslocoDirective } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-annotations-list',
@@ -42,6 +43,7 @@ import {
     SelectButton,
     FormsModule,
     Skeleton,
+    TranslocoDirective,
   ],
   templateUrl: './annotation-list.html',
   styleUrl: './annotation-list.scss',
@@ -51,12 +53,20 @@ export class AnnotationList {
   private readonly configService = inject(ConfigService);
   private readonly destroyRef = inject(DestroyRef);
   public annotationDirectionOptions: {
-    label: string;
+    labelKey: string;
     value: Direction;
     icon: string;
   }[] = [
-    { label: 'refers to', value: 'OUTGOING', icon: 'pi pi-arrow-right' },
-    { label: 'is referred to', value: 'INCOMING', icon: 'pi pi-arrow-left' },
+    {
+      labelKey: 'app.shared.annotationList.directions.outgoing',
+      value: 'OUTGOING',
+      icon: 'pi pi-arrow-right',
+    },
+    {
+      labelKey: 'app.shared.annotationList.directions.incoming',
+      value: 'INCOMING',
+      icon: 'pi pi-arrow-left',
+    },
   ];
 
   public annotations = input.required<AnnotationOfEntityWithContent[]>();

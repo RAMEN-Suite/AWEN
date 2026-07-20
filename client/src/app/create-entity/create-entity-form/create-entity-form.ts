@@ -20,6 +20,7 @@ import { ConfirmationService } from 'primeng/api';
 import { AttributeForm } from '../../utils/attribute-form/attribute-form';
 import { Router } from '@angular/router';
 import { UtilsService } from '../../utils/utils.service';
+import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-create-entity-form',
@@ -29,6 +30,7 @@ import { UtilsService } from '../../utils/utils.service';
     FloatLabel,
     AttributeForm,
     ButtonDirective,
+    TranslocoDirective,
   ],
   templateUrl: './create-entity-form.html',
 })
@@ -36,35 +38,42 @@ export class CreateEntityForm {
   private readonly createEntityService = inject(CreateEntityService);
   private readonly utilService = inject(UtilsService);
   private readonly router = inject(Router);
-  dialogRef = inject(DynamicDialogRef);
+  private dialogRef = inject(DynamicDialogRef);
+  private readonly transloco = inject(TranslocoService);
 
   private confirmationService = inject(ConfirmationService);
 
-  preselectedType = input<string>();
+  public preselectedType = input<string>();
 
-  readonly types: Signal<string[]> = this.createEntityService.getEntityTypes();
-  readonly typesLoaded: Signal<boolean> =
+  protected readonly types: Signal<string[]> =
+    this.createEntityService.getEntityTypes();
+  protected readonly typesLoaded: Signal<boolean> =
     this.createEntityService.getEntityTypesLoaded();
-  readonly properties: WritableSignal<GAttribute[]> = signal<GAttribute[]>([]);
-  readonly propertiesLoaded: WritableSignal<boolean> = signal<boolean>(true); // TODO: UI Loading state
-  loading = signal<boolean>(false);
+  protected readonly properties: WritableSignal<GAttribute[]> = signal<
+    GAttribute[]
+  >([]);
+  private readonly propertiesLoaded: WritableSignal<boolean> =
+    signal<boolean>(true); // TODO: UI Loading state
+  protected loading = signal<boolean>(false);
 
-  attributeForm = viewChild.required<AttributeForm>(AttributeForm);
+  protected attributeForm = viewChild.required<AttributeForm>(AttributeForm);
 
-  typeInput = new FormControl('', { nonNullable: true });
+  protected typeInput = new FormControl('', { nonNullable: true });
 
-  propertiesForm = computed(() => this.attributeForm().propertiesForm());
+  protected propertiesForm = computed(() =>
+    this.attributeForm().propertiesForm(),
+  );
 
-  constructor() {
-    effect(async () => {
+  public constructor() {
+    effect(() => {
       const type = this.preselectedType();
       if (type) {
         this.typeInput.setValue(type, { emitEvent: false });
-        await this.loadAndDisplayPropertyInputs(type);
+        void this.loadAndDisplayPropertyInputs(type);
       }
     });
-    this.typeInput.valueChanges.subscribe(async (value) => {
-      await this.loadAndDisplayPropertyInputs(value);
+    this.typeInput.valueChanges.subscribe((value) => {
+      void this.loadAndDisplayPropertyInputs(value);
     });
   }
 
@@ -88,16 +97,22 @@ export class CreateEntityForm {
         ),
       );
       this.confirmationService.confirm({
-        message: 'The Entity was successfully created!',
-        header: 'Success',
+        message: this.transloco.translate(
+          'app.shared.createEntityForm.success.message',
+        ),
+        header: this.transloco.translate('app.shared.common.success'),
         icon: 'pi pi-info-circle',
         rejectButtonProps: {
-          label: 'Stay here',
+          label: this.transloco.translate(
+            'app.shared.createEntityForm.success.stayHere',
+          ),
           severity: 'secondary',
           outlined: true,
         },
         acceptButtonProps: {
-          label: 'Go to Entity',
+          label: this.transloco.translate(
+            'app.shared.createEntityForm.success.goToEntity',
+          ),
           severity: 'primary',
         },
 

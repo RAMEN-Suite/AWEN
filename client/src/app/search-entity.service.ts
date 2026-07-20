@@ -10,28 +10,28 @@ import {
   providedIn: 'root',
 })
 export class SearchEntityService {
-  entityApi = inject(EntityApiService);
+  private readonly entityApi = inject(EntityApiService);
 
   private entities = signal<OldEntity[]>([]);
   private entitiesLoading = signal<boolean>(false);
 
-  async getSuggestions(search: string, query: EntityAutocompleteQuery) {
+  public async getSuggestions(search: string, query: EntityAutocompleteQuery) {
     return await this.entityApi.getAutocomplete(search, query);
   }
 
-  getEntitiesLoading() {
+  public getEntitiesLoading() {
     return this.entitiesLoading.asReadonly();
   }
 
-  getEntities() {
+  public getEntities() {
     return this.entities.asReadonly();
   }
 
-  resetEntityList() {
+  public resetEntityList() {
     this.entities.set(new Array<OldEntity>());
   }
 
-  async searchEntities(query: EntitySearchQuery) {
+  public async searchEntities(query: EntitySearchQuery) {
     this.entitiesLoading.set(true);
     const entities = await this.entityApi.searchEntities(query);
     if (Array.isArray(entities)) {

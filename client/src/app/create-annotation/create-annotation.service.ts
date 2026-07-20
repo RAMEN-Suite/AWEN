@@ -13,7 +13,7 @@ export class CreateAnnotationService {
   private readonly annotationAPI = inject(AnnotationApiService);
   private readonly entityService = inject(EntityService);
 
-  async createAnnotationForEntity(
+  public async createAnnotationForEntity(
     entityId: string,
     type: string,
     payload: Record<string, unknown>,
@@ -28,15 +28,15 @@ export class CreateAnnotationService {
     return id;
   }
 
-  getAnnotationTypes() {
+  public getAnnotationTypes() {
     return this.configService.getAnnotationTypes();
   }
 
-  async getAnnotationProperties(type: string) {
+  public async getAnnotationProperties(type: string) {
     return this.guidelineAPI.getNodeProperties(type);
   }
 
-  geAnnotationTypesLoaded() {
+  public geAnnotationTypesLoaded() {
     return this.configService.getLoaded();
   }
 }

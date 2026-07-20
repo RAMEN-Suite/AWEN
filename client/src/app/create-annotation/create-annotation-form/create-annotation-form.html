@@ -1,4 +1,4 @@
-<form (submit)="onSubmit($event)">
+<form *transloco="let t" (submit)="onSubmit($event)">
   <p-floatlabel variant="on" class="field">
     <p-select
       appendTo="body"
@@ -11,10 +11,12 @@
       style="min-width: 12rem"
       id="create-entity-form_type-input"
     />
-    <label for="create-entity-form_type-input">Annotation-Type</label>
+    <label for="create-entity-form_type-input">{{ t("app.shared.createAnnotationForm.type.label") }}</label>
   </p-floatlabel>
   <app-attribute-form [formName]="typeInput.value" [properties]="properties()" [enableCheckForSimilarLabels]="true" />
   <div class="field justify-content-end flex" [class]="typeInput.value === '' ? 'hidden' : ''">
-    <button pButton type="submit" size="large" [disabled]="propertiesForm().invalid">Create Annotation</button>
+    <button pButton type="submit" size="large" [disabled]="propertiesForm().invalid">
+      {{ t("app.shared.createAnnotationForm.submit.label") }}
+    </button>
   </div>
 </form>

@@ -1,0 +1,300 @@
+{
+  "app": {
+    "languages": {
+      "de": "Deutsch",
+      "en": "English"
+    },
+    "services": {
+      "annotationApi": {
+        "errors": {
+          "getAnnotation": "Fehler beim Laden der Annotation mit der ID {{ id }}. Bitte versuche es später erneut.",
+          "createAnnotation": "Fehler beim Erstellen einer neuen Annotation. Bitte versuche es erneut.",
+          "deleteAnnotation": "Fehler beim Löschen der Annotation mit der ID {{ id }}. Bitte versuche es später erneut.",
+          "deleteRelation": "Fehler beim Löschen der Annotation-Relation. Bitte versuche es später erneut.",
+          "createRelation": "Fehler beim Erstellen der Annotation-Relation. Bitte versuche es später erneut.",
+          "updateAnnotation": "Fehler beim Aktualisieren der Annotation. Bitte versuche es erneut."
+        }
+      },
+      "collection": {
+        "errors": {
+          "loadingFilter": "Fehler beim Laden des Filters. Lade die Seite neu oder versuche es später erneut."
+        }
+      },
+      "entityApi": {
+        "errors": {
+          "loadingEntities": "Fehler beim Laden der Entitäten. Lade die Seite neu oder versuche es später erneut.",
+          "loadingEntity": "Fehler beim Laden der Entität mit der ID {{ id }}. Lade die Seite neu oder versuche es später erneut.",
+          "loadingAutocomplete": "Fehler beim Laden der Autovervollständigung. Lade die Seite neu oder versuche es später erneut.",
+          "createEntity": "Fehler beim Erstellen einer neuen Entität. Bitte versuche es erneut.",
+          "deleteEntity": "Fehler beim Löschen der Entität mit der ID {{ id }}. Bitte versuche es später erneut.",
+          "updateEntity": "Fehler beim Aktualisieren der Entität. Bitte versuche es erneut."
+        }
+      },
+      "guidelines": {
+        "errors": {
+          "loadingConfig": "Fehler beim Laden wichtiger Daten. Lade die Seite neu oder versuche es später erneut.",
+          "loadingNodeProperties": "Attribute des Knotentyps {{ type }} konnten nicht geladen werden. Lade die Seite neu oder versuche es später erneut."
+        }
+      },
+      "health": {
+        "unhealthy": "Der Server ist erreichbar. Bitte versuche es später erneut."
+      },
+      "utils": {
+        "copiedToClipboard": "\"{{ id }}\" wurde in die Zwischenablage kopiert."
+      }
+    },
+    "screens": {
+      "common": {
+        "loading": "Wird geladen"
+      },
+      "detail": {
+        "annotations": {
+          "title": "Annotationen",
+          "empty": {
+            "prefix": "Keine verbundenen Annotationen. Füge eine hinzu, indem du den",
+            "suffix": "Button auswählst."
+          }
+        }
+      },
+      "error": {
+        "titleWithStatus": "Fehler - {{ status }}",
+        "unknownTitle": "Unbekannter Fehler",
+        "messages": {
+          "404": "Die gesuchte Seite konnte nicht gefunden werden. Versuche etwas anderes oder kontaktiere den Support.",
+          "500": "Der Server scheint aktuell nicht verfügbar zu sein. Bitte versuche es später erneut.",
+          "unknown": "Es ist ein unbekannter Fehler aufgetreten.",
+          "default": "Ups! Etwas ist schiefgelaufen!"
+        },
+        "homepage": "Startseite"
+      },
+      "collections": {
+        "available": "Insgesamt {{ count }} Einträge verfügbar",
+        "select": "Sammlung auswählen:",
+        "search": "Sammlung durchsuchen:",
+        "sort": "Sortieren nach:",
+        "tooltips": {
+          "reset": "Zurücksetzen",
+          "ascending": "Aufsteigend",
+          "descending": "Absteigend"
+        }
+      },
+      "entities": {
+        "select": "Register auswählen:",
+        "search": "Register durchsuchen:",
+        "entries": "Einträge zu: {{ value }}",
+        "empty": "Es konnten keine Einträge gefunden werden.",
+        "default": "Alle Register"
+      }
+    },
+    "shared": {
+      "actions": {
+        "cancel": "Abbrechen",
+        "create": "Erstellen",
+        "no": "Nein",
+        "update": "Aktualisieren",
+        "yes": "Ja"
+      },
+      "annotationCard": {
+        "emptyNodes": {
+          "prefix": "Keine verbundenen Knoten. Füge welche hinzu, indem du den",
+          "suffix": "Button auswählst."
+        },
+        "delete": {
+          "confirm": {
+            "message": "Möchtest du diese Annotation wirklich löschen? Dabei wird die Annotation gelöscht und alle verbundenen Knoten werden getrennt.",
+            "accept": "Annotation löschen"
+          },
+          "success": "Annotation gelöscht"
+        }
+      },
+      "annotationList": {
+        "directions": {
+          "outgoing": "verweist auf",
+          "incoming": "wird referenziert von"
+        },
+        "expandAll": "alle öffnen",
+        "collapseAll": "alle schließen"
+      },
+      "attributeForm": {
+        "max": "max. {{ max }}",
+        "boolean": {
+          "offLabel": "Nicht {{ name }}"
+        },
+        "errors": {
+          "minLength": "Mindestens {{ min }} Wert(e) erforderlich.",
+          "maxLength": "Höchstens {{ max }} Wert(e) erlaubt.",
+          "required": "Dieses Feld ist erforderlich."
+        },
+        "mandatory": "Pflichtfeld",
+        "similar": {
+          "summary": "Ähnliches Label gefunden",
+          "detail": "Es gibt bereits eine Entität namens <b>{{ label }}</b>"
+        }
+      },
+      "attributeList": {
+        "empty": {
+          "prefix": "Keine Eigenschaften. Füge welche hinzu, indem du den",
+          "suffix": "Button auswählst."
+        }
+      },
+      "common": {
+        "dangerZone": "Achtung!",
+        "loading": "Wird geladen",
+        "success": "Erfolg"
+      },
+      "configPane": {
+        "entityTypes": {
+          "label": "Entitätstypen",
+          "help": "Wähle aus, welche Entitätstypen über diese Anwendung verfügbar sein sollen."
+        },
+        "collectionChain": {
+          "label": "Sammlungskette",
+          "help": "Wähle aus, welche Sammlungskette für den Filter verwendet werden soll."
+        },
+        "collectionTypes": {
+          "label": "Sammlungstypen",
+          "help": "Wähle aus, welche Sammlungen filterbar sind."
+        }
+      },
+      "connectedNode": {
+        "menu": {
+          "deleteConnection": "Verbindung löschen",
+          "copyUuid": "UUID kopieren"
+        },
+        "delete": {
+          "confirm": {
+            "message": "Möchtest du die Relation zu dieser Annotation wirklich löschen?",
+            "accept": "Relation löschen"
+          },
+          "success": "Relation gelöscht"
+        }
+      },
+      "createAnnotation": {
+        "label": "Annotation hinzufügen",
+        "dialog": {
+          "header": "Annotation erstellen"
+        }
+      },
+      "createAnnotationConnection": {
+        "optionalHeader": "Optionale Annotation-Verbindung erstellen",
+        "header": "Annotation-Verbindung erstellen",
+        "create": "Verbindung erstellen",
+        "confirm": {
+          "message": "Möchtest du eine Verbindung zu {{ label }} erstellen?"
+        }
+      },
+      "createAnnotationForm": {
+        "type": {
+          "label": "Annotationstyp"
+        },
+        "submit": {
+          "label": "Annotation erstellen"
+        },
+        "connection": {
+          "message": "Möchtest du diese Annotation mit einer Entität verbinden?"
+        }
+      },
+      "createEntity": {
+        "label": "Entität erstellen",
+        "dialog": {
+          "header": "Entität erstellen"
+        }
+      },
+      "createEntityForm": {
+        "type": {
+          "label": "Entitätstyp"
+        },
+        "success": {
+          "message": "Die Entität wurde erfolgreich erstellt!",
+          "stayHere": "Hier bleiben",
+          "goToEntity": "Zur Entität"
+        }
+      },
+      "deleteEntity": {
+        "confirm": {
+          "message": "Möchtest du diese Entität löschen?",
+          "accept": "Entität löschen"
+        },
+        "success": {
+          "summary": "Entität gelöscht",
+          "detail": "Die Entität wurde erfolgreich gelöscht"
+        }
+      },
+      "editEntity": {
+        "dialog": {
+          "header": "Entität bearbeiten"
+        }
+      },
+      "editEntityForm": {
+        "errors": {
+          "missingKey": "Fehler beim Bearbeiten der Entität. Bitte versuche es erneut."
+        },
+        "success": {
+          "updated": "Die Entität wurde erfolgreich aktualisiert!"
+        }
+      },
+      "entityList": {
+        "empty": "Keine Entität passt zu dieser Suche",
+        "unknownType": "Unbekannt",
+        "copyUuidTooltip": "UUID in die Zwischenablage kopieren"
+      },
+      "filterPane": {
+        "collection": {
+          "placeholder": "{{ collectionType }} auswählen"
+        },
+        "label": {
+          "error": "Der Wert muss länger als drei Zeichen sein."
+        },
+        "resetBtn": {
+          "tooltip": "Filter zurücksetzen"
+        },
+        "submitBtn": {
+          "label": "Suche"
+        }
+      },
+      "index": {
+        "unknown": "Keine Einsortierung"
+      },
+      "searchableList": {
+        "search": "Liste durchsuchen:",
+        "empty": "Keine Einträge vorhanden."
+      },
+      "textView": {
+        "copyUuid": "UUID kopieren",
+        "references": "Referenziert:",
+        "empty": "Keine weiteren Informationen.",
+        "error": "Die Annotation konnte nicht geladen werden.",
+        "externalLink": "Externen Link öffnen (#{{ source }})",
+        "jumpTo": "Zur Annotation springen"
+      },
+      "citation": {
+        "currentVersion": "Link zur aktuellen Version:",
+        "copyLink": "Link kopieren",
+        "print": "PDF speichern",
+        "usage": "Nutzungshinweis",
+        "usageSoftware": "Die Darstellung erfolgt mit *[ORA](https://ramen-schema.org)*, einer unter Apache 2.0 lizenzierten Editionssoftware."
+      },
+      "footer": {
+        "software": "Präsentiert mit <b>[ORA]({{ url }})</b>."
+      },
+      "updateAnnotation": {
+        "dialog": {
+          "header": "Annotation aktualisieren"
+        }
+      },
+      "updateAnnotationForm": {
+        "errors": {
+          "missingId": {
+            "summary": "Annotation konnte nicht aktualisiert werden",
+            "detail": "Bitte lade die Seite neu und versuche es erneut. Wenn dieses Problem wiederholt auftritt, informiere deine Administration."
+          }
+        }
+      }
+    },
+    "blocks": {
+      "attributes": {
+        "missing": "–"
+      }
+    }
+  }
+}

@@ -1,3 +1,5 @@
+import { LanguageOptions } from './app/models/config/LanguageOptions';
+
 export interface Entity {
   label: string;
   types: string[];
@@ -119,6 +121,7 @@ export interface EmConfig {
   filterableCollections: string[];
   selectedCollectionChain: string[];
   entityTypes: string[];
+  language: LanguageOptions;
 }
 
 export interface IEntity {
@@ -162,7 +165,7 @@ export type PropertyConfigDataType =
 
 export interface StatementNodeView {
   node: ConnectedNodeDto;
-  id: string | null;
+  id: string;
   link: {
     router: boolean;
     href: string;

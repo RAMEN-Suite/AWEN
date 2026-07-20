@@ -1,55 +1,63 @@
-<form [formGroup]="form" (ngSubmit)="onSubmit()" class="formgrid grid">
-  <div class="field col-12">
-    <p-auto-complete
-      formControlName="label"
-      [suggestions]="suggestions()"
-      [invalid]="form.controls.label.invalid && form.controls.label.touched"
-      (completeMethod)="autocompleteChanges($event)"
-      (onSelect)="onItemSelect($event); onSubmit()"
-      (keydown.enter)="onSubmit()"
-      fluid
-      [showEmptyMessage]="showEmptyMessage()"
-      optionLabel="label"
-      panelStyleClass="w-30rem"
-      autofocus
-    >
-      <ng-template let-entity #item>
-        @if (enableLinkToEntity()) {
-          <a [routerLink]="['/', 'entity', entity.id]" [target]="openLinkInNewTab() ? '_blank' : ''" class="flex items-center gap-2">
-            <span class="text-black-alpha-90">{{ entity.label }}</span>
-          </a>
-        } @else {
-          <div class="flex items-center gap-2">
-            <span class="text-black-alpha-90">{{ entity.label }}</span>
-          </div>
-        }
-      </ng-template>
-    </p-auto-complete>
-    @if (form.controls.label.invalid && form.controls.label.touched) {
-      <p-message severity="error" size="small" variant="simple">Value is required to be longer then three characters. </p-message>
-    }
-  </div>
-  @for (input of collectionFilterOptions(); track $index) {
-    <form [formGroup]="form.controls.collectionFilter" class="field col-12 md:col">
-      <p-select
-        [options]="input.values"
-        [formControlName]="input.type"
+<ng-container *transloco="let t">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="formgrid grid">
+    <div class="field col-12">
+      <p-auto-complete
+        formControlName="label"
+        [suggestions]="suggestions()"
+        [invalid]="form.controls.label.invalid && form.controls.label.touched"
+        (completeMethod)="autocompleteChanges($event)"
+        (onSelect)="onItemSelect($event); onSubmit()"
+        (keydown.enter)="onSubmit()"
+        fluid
+        [showEmptyMessage]="showEmptyMessage()"
         optionLabel="label"
-        [placeholder]="'Select a ' + input.type"
-        [virtualScroll]="true"
-        [virtualScrollItemSize]="30"
-        showClear
-        filter
-        filterBy="label"
-        class="w-full"
+        panelStyleClass="w-30rem"
+        autofocus
+      >
+        <ng-template let-entity #item>
+          @if (enableLinkToEntity()) {
+            <a [routerLink]="['/', 'entity', entity.id]" [target]="openLinkInNewTab() ? '_blank' : ''" class="flex items-center gap-2">
+              <span class="text-black-alpha-90">{{ entity.label }}</span>
+            </a>
+          } @else {
+            <div class="flex items-center gap-2">
+              <span class="text-black-alpha-90">{{ entity.label }}</span>
+            </div>
+          }
+        </ng-template>
+      </p-auto-complete>
+      @if (form.controls.label.invalid && form.controls.label.touched) {
+        <p-message severity="error" size="small" variant="simple">{{ t("app.shared.filterPane.label.error") }}</p-message>
+      }
+    </div>
+    @for (input of collectionFilterOptions(); track $index) {
+      <form [formGroup]="form.controls.collectionFilter" class="field col-12 md:col">
+        <p-select
+          [options]="input.values"
+          [formControlName]="input.type"
+          optionLabel="label"
+          [placeholder]="t('app.shared.filterPane.collection.placeholder', { collectionType: input.type })"
+          [virtualScroll]="true"
+          [virtualScrollItemSize]="30"
+          showClear
+          filter
+          filterBy="label"
+          class="w-full"
+        />
+      </form>
+    }
+    <div class="field col-12">
+      <app-type-filter [(form)]="form.controls.types" />
+    </div>
+    <div class="field col-12 flex justify-content-end gap-2">
+      <p-button
+        text
+        type="button"
+        icon="pi pi-undo"
+        [pTooltip]="t('app.shared.filterPane.resetBtn.tooltip')"
+        (onClick)="resetFilterClicked()"
       />
-    </form>
-  }
-  <div class="field col-12">
-    <app-type-filter [(form)]="form.controls.types" />
-  </div>
-  <div class="field col-12 flex justify-content-end gap-2">
-    <p-button text type="button" icon="pi pi-undo" (onClick)="resetFilterClicked()" />
-    <p-button type="submitt" label="Search" />
-  </div>
-</form>
+      <p-button type="submitt" [label]="t('app.shared.filterPane.submitBtn.label')" />
+    </div>
+  </form>
+</ng-container>

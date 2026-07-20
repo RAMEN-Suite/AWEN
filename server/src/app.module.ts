@@ -10,6 +10,7 @@ import { GraphModule } from './graph/graph.module';
 import { HealthController } from './health/health.controller';
 import { AnnotationModule } from './annotation/annotation.module';
 import { CamiModule } from './cami/cami.module';
+import { ProjectConfigModule } from './project-config/project-config.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { CamiModule } from './cami/cami.module';
     GraphModule,
     AnnotationModule,
     CamiModule,
+    ProjectConfigModule,
   ],
   controllers: [HealthController],
   providers: [],

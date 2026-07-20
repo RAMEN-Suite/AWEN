@@ -1,6 +1,7 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { MessageService } from 'primeng/api';
 import { HealthApiService, HealthStatus } from './api/health-api.service';
+import { TranslocoService } from '@jsverse/transloco';
 
 @Injectable({
   providedIn: 'root',
@@ -8,6 +9,7 @@ import { HealthApiService, HealthStatus } from './api/health-api.service';
 export class HealthService {
   private readonly healthApi = inject(HealthApiService);
   private readonly messageService = inject(MessageService);
+  private readonly transloco = inject(TranslocoService);
 
   private readonly _statusLoaded = signal<boolean>(false);
   private readonly _version = signal<string>('0.0.0');
@@ -29,14 +31,14 @@ export class HealthService {
       if (!res.healthy) {
         this.messageService.add({
           severity: 'error',
-          detail: `The Server is not healthy. Please try again later.`,
+          detail: this.transloco.translate('app.services.health.unhealthy'),
         });
       }
     } catch {
       this._healthy.set(false);
       this.messageService.add({
         severity: 'error',
-        detail: `The Server is not healthy. Please try again later.`,
+        detail: this.transloco.translate('app.services.health.unhealthy'),
       });
       return;
     }

@@ -1,69 +1,83 @@
-<div class="col-12 flex flex-column gap-2">
-  <p-select-button
-    [options]="annotationDirectionOptions"
-    [ngModel]="selectedAnnotationDirection()"
-    (ngModelChange)="setSelectedDirection($event)"
-    optionLabel="label"
-    optionValue="value"
-    unselectable
-    fluid
-  >
-    <ng-template #item let-item>
-      <div class="flex align-items-center align-content-center text-center gap-3">
-        <span>{{ item.label }}</span>
-        <i [class]="item.icon"></i>
-      </div>
-    </ng-template>
-  </p-select-button>
-  @if (annotationNodeLabels().length > 1) {
+<ng-container *transloco="let t">
+  <div class="col-12 flex flex-column gap-2">
     <p-select-button
-      [options]="annotationNodeLabels()"
-      [ngModel]="selectedNodeLabel()"
-      (ngModelChange)="setSelectedNodeLabel($event)"
+      [options]="annotationDirectionOptions"
+      [ngModel]="selectedAnnotationDirection()"
+      (ngModelChange)="setSelectedDirection($event)"
+      optionLabel="labelKey"
+      optionValue="value"
       unselectable
       fluid
+    >
+      <ng-template #item let-item>
+        <div class="flex align-items-center align-content-center text-center gap-3">
+          <span>{{ t(item.labelKey) }}</span>
+          <i [class]="item.icon"></i>
+        </div>
+      </ng-template>
+    </p-select-button>
+    @if (annotationNodeLabels().length > 1) {
+      <p-select-button
+        [options]="annotationNodeLabels()"
+        [ngModel]="selectedNodeLabel()"
+        (ngModelChange)="setSelectedNodeLabel($event)"
+        unselectable
+        fluid
+      />
+    }
+  </div>
+  <div class="col-12 flex flex-row justify-content-end gap-2">
+    <p-button
+      (onClick)="expandAll()"
+      severity="secondary"
+      outlined
+      [label]="t('app.shared.annotationList.expandAll')"
+      icon="pi pi-chevron-down"
     />
-  }
-</div>
-<div class="col-12 flex flex-row justify-content-end gap-2">
-  <p-button (onClick)="expandAll()" severity="secondary" outlined label="expand all" icon="pi pi-chevron-down" />
-  <p-button (onClick)="closeAll()" severity="secondary" outlined label="collapse all" icon="pi pi-chevron-up" />
-</div>
-<div class="annotation-list-scroll">
-  @if (annotationListLoaded()) {
-    <p-accordion [multiple]="true" class="w-full" [value]="activeAccordionPanels()" (valueChange)="setActiveAccordionPanels($event)">
-      @for (group of groupedAnnotations(); track group.type) {
-        <p-accordion-panel [value]="group.type">
-          <p-accordion-header>
-            <div class="w-full flex align-items-center gap-3 text-color">
-              <span class="text-xl font-bold">{{ group.type }}</span>
-              <p-chip class="text-sm" [label]="group.annotations.length.toString()" />
-            </div>
-          </p-accordion-header>
-          <p-accordion-content>
-            @if (activeAccordionPanels().includes(group.type)) {
-              <div class="col-12 mx-0 flex flex-column gap-3">
-                @for (annotation of group.annotations; track annotation.id ?? $index) {
-                  <app-annotation-card [annotation]="annotation" />
-                }
+    <p-button
+      (onClick)="closeAll()"
+      severity="secondary"
+      outlined
+      [label]="t('app.shared.annotationList.collapseAll')"
+      icon="pi pi-chevron-up"
+    />
+  </div>
+  <div class="annotation-list-scroll">
+    @if (annotationListLoaded()) {
+      <p-accordion [multiple]="true" class="w-full" [value]="activeAccordionPanels()" (valueChange)="setActiveAccordionPanels($event)">
+        @for (group of groupedAnnotations(); track group.type) {
+          <p-accordion-panel [value]="group.type">
+            <p-accordion-header>
+              <div class="w-full flex align-items-center gap-3 text-color">
+                <span class="text-xl font-bold">{{ group.type }}</span>
+                <p-chip class="text-sm" [label]="group.annotations.length.toString()" />
               </div>
-            }
-          </p-accordion-content>
-        </p-accordion-panel>
-      }
-    </p-accordion>
-  } @else {
-    <p-accordion [multiple]="true" class="w-full" [value]="activeAccordionPanels()" (valueChange)="setActiveAccordionPanels($event)">
-      @for (group of skeletonGroups; track group) {
-        <p-accordion-panel [value]="group">
-          <p-accordion-header>
-            <div class="w-full flex align-items-center gap-3 text-color">
-              <p-skeleton [width]="skeletonWidths[group]" height="1.5rem" />
-              <p-skeleton width="1.5rem" height="1.5rem" />
-            </div>
-          </p-accordion-header>
-        </p-accordion-panel>
-      }
-    </p-accordion>
-  }
-</div>
+            </p-accordion-header>
+            <p-accordion-content>
+              @if (activeAccordionPanels().includes(group.type)) {
+                <div class="col-12 mx-0 flex flex-column gap-3">
+                  @for (annotation of group.annotations; track annotation.id ?? $index) {
+                    <app-annotation-card [annotation]="annotation" />
+                  }
+                </div>
+              }
+            </p-accordion-content>
+          </p-accordion-panel>
+        }
+      </p-accordion>
+    } @else {
+      <p-accordion [multiple]="true" class="w-full" [value]="activeAccordionPanels()" (valueChange)="setActiveAccordionPanels($event)">
+        @for (group of skeletonGroups; track group) {
+          <p-accordion-panel [value]="group">
+            <p-accordion-header>
+              <div class="w-full flex align-items-center gap-3 text-color">
+                <p-skeleton [width]="skeletonWidths[group]" height="1.5rem" />
+                <p-skeleton width="1.5rem" height="1.5rem" />
+              </div>
+            </p-accordion-header>
+          </p-accordion-panel>
+        }
+      </p-accordion>
+    }
+  </div>
+</ng-container>

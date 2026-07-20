@@ -29,12 +29,14 @@ import {
 } from '../../interfaces';
 import { CollectionService } from '../api/collection.service';
 import { Select } from 'primeng/select';
-import { distinctUntilChanged, firstValueFrom, map } from 'rxjs';
+import { distinctUntilChanged, firstValueFrom, map, switchMap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TypeFilter } from './type-filter/type-filter';
 import { RouterLink } from '@angular/router';
 import { QueryParamsService } from '../utils/query-params.service';
 import { ConfigService } from '../config-module/config.service';
+import { TranslocoDirective } from '@jsverse/transloco';
+import { Tooltip } from 'primeng/tooltip';
 
 interface CFOption {
   type: string;
@@ -51,6 +53,8 @@ interface CFOption {
     Select,
     TypeFilter,
     RouterLink,
+    TranslocoDirective,
+    Tooltip,
   ],
   templateUrl: './filter-pane.html',
 })
@@ -108,64 +112,68 @@ export class FilterPane {
         }
       });
     });
-    effect(async () => {
-      // Guidelines: letzter Eintrag ist generischster → UI startet dort
-      // Also Kette umdrehen, damit Index 0 = generischster Typ ist.
-      this.collectionChain = this.config().selectedCollectionChain; // [...g.scenarios.findByCollection.collectionChain].reverse();
+    effect(() => {
+      void this.initializeCollectionFilters();
+    });
+  }
 
-      // Nur die filterbaren Typen zeigen
-      const filterable: string[] = this.config().filterableCollections; // g.scenarios.findByCollection.filterable;
-      this.activeChain = this.collectionChain.filter((t) =>
-        filterable.includes(t),
+  private async initializeCollectionFilters(): Promise<void> {
+    this.collectionChain = this.config().selectedCollectionChain;
+
+    // Nur die filterbaren Typen zeigen
+    const filterable: string[] = this.config().filterableCollections;
+    this.activeChain = this.collectionChain.filter((t) =>
+      filterable.includes(t),
+    );
+
+    // 1) Controls & Options nur für activeChain anlegen
+    const optionsInit: CFOption[] = [];
+    for (const type of this.activeChain) {
+      this.form.controls.collectionFilter.addControl(
+        type,
+        new FormControl<CollectionName | null>({
+          value: null,
+          disabled: true,
+        }),
       );
+      optionsInit.push({ type, values: [] });
+    }
+    this.collectionFilterOptions.set(optionsInit);
 
-      // 1) Controls & Options nur für activeChain anlegen
-      const optionsInit: CFOption[] = [];
-      for (const type of this.activeChain) {
-        this.form.controls.collectionFilter.addControl(
-          type,
-          new FormControl<CollectionName | null>({
-            value: null,
-            disabled: true,
-          }),
-        );
-        optionsInit.push({ type, values: [] });
-      }
-      this.collectionFilterOptions.set(optionsInit);
+    // 2) Erstes (generischstes) Select befüllen & enablen
+    if (this.activeChain.length > 0) {
+      await this.loadAndSetOptionsAt(0 /* generischstes Level */);
+      this.enableAt(0, true);
+    }
 
-      // 2) Erstes (generischstes) Select befüllen & enablen
-      if (this.activeChain.length > 0) {
-        await this.loadAndSetOptionsAt(0 /* generischstes Level */);
-        this.enableAt(0, true);
-      }
-
-      // 3) Änderungen kaskadieren – nur für vorhandene Controls
-      this.activeChain.forEach((type, idx) => {
-        const ctrl = this.form.controls.collectionFilter.get(type);
-        if (!ctrl) return;
-        ctrl.valueChanges
-          .pipe(
-            takeUntilDestroyed(this.destroyRef),
-            map((v: CollectionName | null) => v?.id ?? null), // nur id betrachten
-            distinctUntilChanged(),
-          )
-          .subscribe(async (idOrNull) => {
+    // 3) Änderungen kaskadieren – nur für vorhandene Controls
+    this.activeChain.forEach((type, idx) => {
+      const ctrl = this.form.controls.collectionFilter.get(type);
+      if (!ctrl) return;
+      ctrl.valueChanges
+        .pipe(
+          takeUntilDestroyed(this.destroyRef),
+          map((v: CollectionName | null) => v?.id ?? null), // nur id betrachten
+          distinctUntilChanged(),
+          switchMap(async (idOrNull) => {
             const value = idOrNull
               ? (this.form.controls.collectionFilter.get(type)
                   ?.value as CollectionName)
               : null;
-            await this.onLevelChanged(idx, value);
-          });
-      });
 
-      // Fill form
-      const queryParamValues: Record<string, never> =
-        await this.queryParamService.readDecodedQueryParams();
-      this.fillForm(this.form, queryParamValues);
-      if (Object.keys(queryParamValues).length > 0) {
-        await this.onSubmit();
-      }
+            await this.onLevelChanged(idx, value);
+          }),
+        )
+        .subscribe();
     });
+
+    // Fill form
+    const queryParamValues: Record<string, never> =
+      await this.queryParamService.readDecodedQueryParams();
+    this.fillForm(this.form, queryParamValues);
+    if (Object.keys(queryParamValues).length > 0) {
+      await this.onSubmit();
+    }
   }
 
   protected async autocompleteChanges(e: AutoCompleteCompleteEvent) {
@@ -299,7 +307,9 @@ export class FilterPane {
   }
 
   protected onItemSelect(e: AutoCompleteSelectEvent) {
-    this.form.controls.label.setValue(e.value.label);
+    if (this.isEntityName(e.value)) {
+      this.form.controls.label.setValue(e.value.label);
+    }
   }
 
   private fillForm(form: FormGroup, values: Record<string, never>) {
@@ -309,7 +319,7 @@ export class FilterPane {
         continue;
       }
 
-      let val = undefined;
+      let val: unknown;
       try {
         val = values[key];
       } catch {
@@ -326,6 +336,15 @@ export class FilterPane {
 
   private resetForm(): void {
     this.form.reset();
+  }
+
+  private isEntityName(value: unknown): value is EntityNames {
+    return (
+      typeof value === 'object' &&
+      value !== null &&
+      'label' in value &&
+      typeof value.label === 'string'
+    );
   }
 
   protected async resetFilterClicked(): Promise<void> {

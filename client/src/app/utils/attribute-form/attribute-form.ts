@@ -17,6 +17,7 @@ import { EntityApiService } from '../../api/entity-api.service';
 import { MessageService } from 'primeng/api';
 import { KeyFilter } from 'primeng/keyfilter';
 import { castValue, castValues } from '../utils';
+import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 
 interface AttributeWithOptValue
   extends
@@ -33,6 +34,7 @@ interface AttributeWithOptValue
     ReactiveFormsModule,
     ToggleButton,
     KeyFilter,
+    TranslocoDirective,
   ],
   templateUrl: './attribute-form.html',
 })
@@ -40,6 +42,7 @@ export class AttributeForm {
   private readonly configService = inject(ConfigService);
   private readonly entityAPI = inject(EntityApiService);
   private readonly messageService = inject(MessageService);
+  private readonly transloco = inject(TranslocoService);
 
   public properties = input.required<AttributeWithOptValue[]>();
   public formName = input.required<string>();
@@ -149,13 +152,17 @@ export class AttributeForm {
   private async checkForSimilarLabels(label: string) {
     if (label.length === 0) return;
     const similarEntities = await this.entityAPI.getAutocomplete(label);
-    const detailMsg = similarEntities.map(
-      (entity) => `There is already an Entity named <b>${entity.label}</b>`,
+    const detailMsg = similarEntities.map((entity) =>
+      this.transloco.translate('app.shared.attributeForm.similar.detail', {
+        label: entity.label,
+      }),
     );
     if (detailMsg.length === 0) return;
     this.messageService.add({
       severity: 'info',
-      summary: 'Similar Label found',
+      summary: this.transloco.translate(
+        'app.shared.attributeForm.similar.summary',
+      ),
       detail: detailMsg.join('\n'),
       life: 11000,
     });

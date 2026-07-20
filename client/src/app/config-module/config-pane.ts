@@ -5,10 +5,17 @@ import { MultiSelect } from 'primeng/multiselect';
 import { FloatLabel } from 'primeng/floatlabel';
 import { Select } from 'primeng/select';
 import { ENTITY_LABEL_NAME } from '../../constants';
+import { TranslocoDirective } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-config-pane',
-  imports: [ReactiveFormsModule, MultiSelect, FloatLabel, Select],
+  imports: [
+    ReactiveFormsModule,
+    MultiSelect,
+    FloatLabel,
+    Select,
+    TranslocoDirective,
+  ],
   templateUrl: './config-pane.html',
 })
 export class ConfigPane {

@@ -1,4 +1,10 @@
-<p-menubar [model]="items" class="border-noround border-0 bg-primary-50 border-primary-50 px-5" breakpoint="0px">
+<p-menubar
+  *transloco="let t"
+  #menubar
+  [model]="items"
+  class="border-noround border-0 bg-primary-50 border-primary-50 px-5"
+  breakpoint="0px"
+>
   <ng-template #start>
     <div class="flex text-center align-content-center align-items-center">
       <div class="pr-5">
@@ -17,11 +23,24 @@
       <a pButton class="no-underline" severity="secondary" size="large" outlined [routerLink]="['config']">
         <span class="pi pi-cog"></span>
       </a>
-      <!--    @if (header()) {-->
-      <!--    <span class="text-2xl">{{ header() }}</span>-->
-      <!--    } @else if (entityLoading()) {-->
-      <!--    <p-skeleton width="5rem" height="1.5rem" />-->
-      <!--    }-->
+      <p-button icon="pi pi-language" severity="primary" (onClick)="handleOpenLanguages(popover, $event)" outlined />
+      <p-popover #popover [appendTo]="menubar" styleClass="print:hidden">
+        <div class="flex min-w-44 flex-col gap-2 p-2">
+          @for (key of languages(); track key) {
+            @let isActiveLanguage = key === activeLanguage();
+
+            <p-button
+              [label]="t('app.languages.' + key)"
+              [icon]="isActiveLanguage ? 'pi pi-check' : 'fi fi-' + key"
+              [severity]="isActiveLanguage ? 'primary' : 'secondary'"
+              [outlined]="!isActiveLanguage"
+              size="small"
+              styleClass="w-full justify-start"
+              (onClick)="handleLanguageChange(key, popover)"
+            />
+          }
+        </div>
+      </p-popover>
     </div>
   </ng-template>
 </p-menubar>

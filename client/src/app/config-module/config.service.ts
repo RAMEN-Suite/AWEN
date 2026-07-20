@@ -3,8 +3,6 @@ import { EmConfig, EmConfigRemote } from '../../interfaces';
 import { LocalStoreService } from '../utils/local-store.service';
 import { GuidelinesService } from '../api/guidelines.service';
 
-const EM_CONFIG_STORE_KEY = 'EM_CONFIG_STORE_KEY';
-
 @Injectable({
   providedIn: 'root',
 })
@@ -23,12 +21,12 @@ export class ConfigService {
     selectedCollectionChain: [],
     filterableCollections: [],
     entityTypes: [],
+    language: {
+      initial: 'en',
+      available: ['de', 'en'],
+    },
   });
   private readonly _loaded = signal(false);
-
-  public constructor() {
-    void this.initConfigStore();
-  }
 
   public camiAvailable = computed(() => this._remoteConfig().camiAvailable);
 
@@ -56,9 +54,11 @@ export class ConfigService {
     return this.getDataTypes()().find((dataType) => dataType.id === id);
   }
 
-  public setConfig(value: EmConfig) {
-    this._config.set(value);
-    this.store.saveData(EM_CONFIG_STORE_KEY, value);
+  public setConfig(value: Partial<EmConfig>) {
+    const oldConfig: EmConfig = this._config();
+    const config: EmConfig = { ...oldConfig, ...value };
+    this._config.set(config);
+    this.store.saveData('EM_CONFIG_STORE_KEY', config);
   }
 
   public getRemoteConfig() {
@@ -69,17 +69,15 @@ export class ConfigService {
     return this._loaded.asReadonly();
   }
 
-  private async initConfigStore() {
+  public async init() {
     const remoteConfig = await this.getConfigFromRemote();
     this._remoteConfig.set(remoteConfig);
-    const storeConfig = this.store.getData<EmConfig>(EM_CONFIG_STORE_KEY);
+    const storeConfig = this.store.getData('EM_CONFIG_STORE_KEY');
     if (storeConfig) {
       this.setConfig(storeConfig);
     } else {
       this.setConfig({
         entityTypes: remoteConfig.entityTypes,
-        filterableCollections: [],
-        selectedCollectionChain: [],
       });
     }
     this._loaded.set(true);

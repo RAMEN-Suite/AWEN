@@ -1,4 +1,4 @@
-<form [formGroup]="configForm" class="flex flex-column gap-2">
+<form *transloco="let t" [formGroup]="configForm" class="flex flex-column gap-2">
   <p-floatlabel class="w-full" variant="on">
     <p-multi-select
       formControlName="entityTypes"
@@ -8,8 +8,8 @@
       [maxSelectedLabels]="10"
       fluid
     />
-    <label for="config_entity_types_ms">Entity Types</label>
-    <small>Select which entity types should be available via this application.</small>
+    <label for="config_entity_types_ms">{{ t("app.shared.configPane.entityTypes.label") }}</label>
+    <small>{{ t("app.shared.configPane.entityTypes.help") }}</small>
   </p-floatlabel>
   <p-floatlabel class="" variant="on">
     <p-select
@@ -25,8 +25,8 @@
         </div>
       </ng-template>
     </p-select>
-    <label for="config_collection_chain_s">Collection Chain</label>
-    <small>Select which should be the filter collection chain.</small>
+    <label for="config_collection_chain_s">{{ t("app.shared.configPane.collectionChain.label") }}</label>
+    <small>{{ t("app.shared.configPane.collectionChain.help") }}</small>
   </p-floatlabel>
   <p-floatlabel class="" variant="on">
     <p-multi-select
@@ -39,7 +39,7 @@
       fluid
     >
     </p-multi-select>
-    <label for="config_collection_chain_ms">Collection Types</label>
-    <small>Select which collections are filterable.</small>
+    <label for="config_collection_chain_ms">{{ t("app.shared.configPane.collectionTypes.label") }}</label>
+    <small>{{ t("app.shared.configPane.collectionTypes.help") }}</small>
   </p-floatlabel>
 </form>

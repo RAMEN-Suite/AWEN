@@ -12,6 +12,7 @@ import { catchError, firstValueFrom, map, of } from 'rxjs';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { QueryParamsService } from '../utils/query-params.service';
 import { MessageService } from 'primeng/api';
+import { TranslocoService } from '@jsverse/transloco';
 
 @Injectable({
   providedIn: 'root',
@@ -20,6 +21,7 @@ export class EntityApiService {
   private http = inject(HttpClient);
   private queryParamService = inject(QueryParamsService);
   private readonly messageService = inject(MessageService);
+  private readonly transloco = inject(TranslocoService);
 
   public searchEntities(query: EntitySearchQuery) {
     const httpParams = this.queryParamService.transformQueryParams(query);
@@ -32,7 +34,9 @@ export class EntityApiService {
         catchError(() => {
           this.messageService.add({
             severity: 'error',
-            detail: `Error while loading entities. Reload the page, or try again later.`,
+            detail: this.transloco.translate(
+              'app.services.entityApi.errors.loadingEntities',
+            ),
           });
           return of(new Array<OldEntity>());
         }),
@@ -45,7 +49,10 @@ export class EntityApiService {
       catchError((err) => {
         this.messageService.add({
           severity: 'error',
-          detail: `Error while loading entity with id ${id}. Reload the page, or try again later.`,
+          detail: this.transloco.translate(
+            'app.services.entityApi.errors.loadingEntity',
+            { id },
+          ),
         });
         throw err;
       }),
@@ -69,7 +76,9 @@ export class EntityApiService {
         catchError(() => {
           this.messageService.add({
             severity: 'error',
-            detail: `Error while loading autocomplete. Reload the page, or try again later.`,
+            detail: this.transloco.translate(
+              'app.services.entityApi.errors.loadingAutocomplete',
+            ),
           });
           return of(new Array<EntityNames>());
         }),
@@ -84,7 +93,10 @@ export class EntityApiService {
         catchError((err) => {
           this.messageService.add({
             severity: 'error',
-            detail: `Error while loading entity with id ${entityId}. Reload the page, or try again later.`,
+            detail: this.transloco.translate(
+              'app.services.entityApi.errors.loadingEntity',
+              { id: entityId },
+            ),
           });
           throw err;
         }),
@@ -101,7 +113,10 @@ export class EntityApiService {
         catchError((err) => {
           this.messageService.add({
             severity: 'error',
-            detail: `Error while loading entity with id ${entityId}. Reload the page, or try again later.`,
+            detail: this.transloco.translate(
+              'app.services.entityApi.errors.loadingEntity',
+              { id: entityId },
+            ),
           });
           throw err;
         }),
@@ -125,7 +140,9 @@ export class EntityApiService {
           if (error.statusCode === 400) {
             this.messageService.add({
               severity: 'error',
-              summary: `Error while creating a new entity. Please try again.`,
+              summary: this.transloco.translate(
+                'app.services.entityApi.errors.createEntity',
+              ),
               detail: Array.isArray(error.message)
                 ? error.message.join('\n')
                 : error.message,
@@ -135,7 +152,9 @@ export class EntityApiService {
           } else {
             this.messageService.add({
               severity: 'error',
-              summary: `Error while creating a new entity. Please try again.`,
+              summary: this.transloco.translate(
+                'app.services.entityApi.errors.createEntity',
+              ),
             });
           }
         }
@@ -153,7 +172,10 @@ export class EntityApiService {
       catchError((err) => {
         this.messageService.add({
           severity: 'error',
-          detail: `Error while deleting entity with id ${id}. Try again later.`,
+          detail: this.transloco.translate(
+            'app.services.entityApi.errors.deleteEntity',
+            { id },
+          ),
         });
         throw err;
       }),
@@ -177,7 +199,9 @@ export class EntityApiService {
           if (error.statusCode === 400) {
             this.messageService.add({
               severity: 'error',
-              summary: `Error while updating a entity. Please try again.`,
+              summary: this.transloco.translate(
+                'app.services.entityApi.errors.updateEntity',
+              ),
               detail: Array.isArray(error.message)
                 ? error.message.join('\n')
                 : error.message,
@@ -187,7 +211,9 @@ export class EntityApiService {
           } else {
             this.messageService.add({
               severity: 'error',
-              summary: `Error while updating a entity. Please try again.`,
+              summary: this.transloco.translate(
+                'app.services.entityApi.errors.updateEntity',
+              ),
             });
           }
         }

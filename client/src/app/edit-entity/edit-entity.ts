@@ -4,6 +4,7 @@ import { EditEntityService } from './edit-entity.service';
 import { Button } from 'primeng/button';
 import { Entity } from '../../interfaces';
 import { EditEntityForm } from './edit-entity-form/edit-entity-form';
+import { TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-edit-entity',
@@ -12,18 +13,19 @@ import { EditEntityForm } from './edit-entity-form/edit-entity-form';
   templateUrl: './edit-entity.html',
 })
 export class EditEntity {
-  dialogService = inject(DialogService);
+  private readonly dialogService = inject(DialogService);
+  private readonly transloco = inject(TranslocoService);
 
-  editEntityDialogRef: DynamicDialogRef<EditEntityForm> | null = null;
+  private editEntityDialogRef: DynamicDialogRef<EditEntityForm> | null = null;
 
-  entity = input<Entity>();
+  public entity = input<Entity>();
 
-  show() {
+  private show() {
     this.editEntityDialogRef = this.dialogService.open(EditEntityForm, {
       inputValues: {
         entity: this.entity(),
       },
-      header: 'Edit Entity',
+      header: this.transloco.translate('app.shared.editEntity.dialog.header'),
       styleClass: 'w-11 md:w-9 lg:w-8',
       style: {
         'min-height': '20vh',

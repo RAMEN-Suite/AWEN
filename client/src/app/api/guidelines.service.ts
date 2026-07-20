@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { EmConfigRemote, GAttribute } from '../../interfaces';
 import { catchError, firstValueFrom } from 'rxjs';
 import { MessageService } from 'primeng/api';
+import { TranslocoService } from '@jsverse/transloco';
 
 @Injectable({
   providedIn: 'root',
@@ -10,13 +11,16 @@ import { MessageService } from 'primeng/api';
 export class GuidelinesService {
   private readonly http = inject(HttpClient);
   private readonly messageService = inject(MessageService);
+  private readonly transloco = inject(TranslocoService);
 
   public getConfig() {
     const temp = this.http.get<EmConfigRemote>('/api/guidelines/config').pipe(
       catchError((err) => {
         this.messageService.add({
           severity: 'error',
-          detail: `Error while loading important data. Reload the page, or try again later.`,
+          detail: this.transloco.translate(
+            'app.services.guidelines.errors.loadingConfig',
+          ),
         });
         throw err;
       }),
@@ -31,7 +35,10 @@ export class GuidelinesService {
         catchError((err) => {
           this.messageService.add({
             severity: 'error',
-            detail: `Could not load Attributes of node type ${type}. Reload the page, or try again later.`,
+            detail: this.transloco.translate(
+              'app.services.guidelines.errors.loadingNodeProperties',
+              { type },
+            ),
           });
           throw err;
         }),
