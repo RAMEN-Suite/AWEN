@@ -8,6 +8,7 @@ import { Chip } from 'primeng/chip';
 import { Button } from 'primeng/button';
 import { Tooltip } from 'primeng/tooltip';
 import { UtilsService } from '../utils/utils.service';
+import { TranslocoDirective } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-entity-list',
@@ -19,6 +20,7 @@ import { UtilsService } from '../utils/utils.service';
     Chip,
     Button,
     Tooltip,
+    TranslocoDirective,
   ],
   templateUrl: './entity-list.html',
   styles: `

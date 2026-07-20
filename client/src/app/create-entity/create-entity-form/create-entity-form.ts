@@ -20,6 +20,7 @@ import { ConfirmationService } from 'primeng/api';
 import { AttributeForm } from '../../utils/attribute-form/attribute-form';
 import { Router } from '@angular/router';
 import { UtilsService } from '../../utils/utils.service';
+import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-create-entity-form',
@@ -29,6 +30,7 @@ import { UtilsService } from '../../utils/utils.service';
     FloatLabel,
     AttributeForm,
     ButtonDirective,
+    TranslocoDirective,
   ],
   templateUrl: './create-entity-form.html',
 })
@@ -37,6 +39,7 @@ export class CreateEntityForm {
   private readonly utilService = inject(UtilsService);
   private readonly router = inject(Router);
   private dialogRef = inject(DynamicDialogRef);
+  private readonly transloco = inject(TranslocoService);
 
   private confirmationService = inject(ConfirmationService);
 
@@ -94,16 +97,22 @@ export class CreateEntityForm {
         ),
       );
       this.confirmationService.confirm({
-        message: 'The Entity was successfully created!',
-        header: 'Success',
+        message: this.transloco.translate(
+          'app.shared.createEntityForm.success.message',
+        ),
+        header: this.transloco.translate('app.shared.common.success'),
         icon: 'pi pi-info-circle',
         rejectButtonProps: {
-          label: 'Stay here',
+          label: this.transloco.translate(
+            'app.shared.createEntityForm.success.stayHere',
+          ),
           severity: 'secondary',
           outlined: true,
         },
         acceptButtonProps: {
-          label: 'Go to Entity',
+          label: this.transloco.translate(
+            'app.shared.createEntityForm.success.goToEntity',
+          ),
           severity: 'primary',
         },
 

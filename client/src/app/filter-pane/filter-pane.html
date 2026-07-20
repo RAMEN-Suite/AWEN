@@ -27,7 +27,7 @@
         </ng-template>
       </p-auto-complete>
       @if (form.controls.label.invalid && form.controls.label.touched) {
-        <p-message severity="error" size="small" variant="simple">Value is required to be longer then three characters. </p-message>
+        <p-message severity="error" size="small" variant="simple">{{ t("app.shared.filterPane.label.error") }}</p-message>
       }
     </div>
     @for (input of collectionFilterOptions(); track $index) {
@@ -50,7 +50,13 @@
       <app-type-filter [(form)]="form.controls.types" />
     </div>
     <div class="field col-12 flex justify-content-end gap-2">
-      <p-button text type="button" icon="pi pi-undo" (onClick)="resetFilterClicked()" />
+      <p-button
+        text
+        type="button"
+        icon="pi pi-undo"
+        [pTooltip]="t('app.shared.filterPane.resetBtn.tooltip')"
+        (onClick)="resetFilterClicked()"
+      />
       <p-button type="submitt" [label]="t('app.shared.filterPane.submitBtn.label')" />
     </div>
   </form>

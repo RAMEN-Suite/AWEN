@@ -19,6 +19,7 @@ import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { from, map, switchMap } from 'rxjs';
 import { ANNOTATION_TYPE_NAME } from '../../../constants';
 import { UtilsService } from '../../utils/utils.service';
+import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 
 interface AttributeWithOptValue
   extends
@@ -27,7 +28,7 @@ interface AttributeWithOptValue
 
 @Component({
   selector: 'app-update-annotation-form',
-  imports: [FormsModule, ButtonDirective, AttributeForm],
+  imports: [FormsModule, ButtonDirective, AttributeForm, TranslocoDirective],
   templateUrl: './update-annotation-form.html',
 })
 export class UpdateAnnotationForm {
@@ -35,6 +36,7 @@ export class UpdateAnnotationForm {
   private readonly dialogRef = inject(DynamicDialogRef);
   private messageService = inject(MessageService);
   private readonly utilService = inject(UtilsService);
+  private readonly transloco = inject(TranslocoService);
 
   public annotation = input.required<Annotation>();
   protected loading = signal<boolean>(false);
@@ -101,9 +103,12 @@ export class UpdateAnnotationForm {
     if (!annotationId) {
       this.messageService.add({
         severity: 'danger',
-        summary: 'Failed to update annotation',
-        detail:
-          'Please reload the page and try again. If this problem is recurring notify your administrator.',
+        summary: this.transloco.translate(
+          'app.shared.updateAnnotationForm.errors.missingId.summary',
+        ),
+        detail: this.transloco.translate(
+          'app.shared.updateAnnotationForm.errors.missingId.detail',
+        ),
       });
       return;
     }

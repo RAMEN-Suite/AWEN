@@ -1,1 +1,9 @@
-<p-button [label]="label()" [icon]="icon()" (onClick)="clickCreate()" [disabled]="!entityId()" severity="primary" [outlined]="true" />
+<p-button
+  *transloco="let t"
+  [label]="label() ?? t('app.shared.createAnnotation.label')"
+  [icon]="icon()"
+  (onClick)="clickCreate()"
+  [disabled]="!entityId()"
+  severity="primary"
+  [outlined]="true"
+/>

@@ -16,6 +16,7 @@ import { AnnotationApiService } from '../api/annotation-api.service';
 import { getKeyProperty } from '../utils/entity.utils';
 import { DynamicDialogRef } from 'primeng/dynamicdialog';
 import { EntityService } from '../entity.service';
+import { TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-create-annotation-connection',
@@ -29,6 +30,7 @@ export class CreateAnnotationConnection {
   private readonly searchService = inject(SearchEntityService);
   private confirmationService = inject(ConfirmationService);
   private messageService = inject(MessageService);
+  private readonly transloco = inject(TranslocoService);
 
   private readonly dialogRef = inject(DynamicDialogRef);
 
@@ -51,24 +53,34 @@ export class CreateAnnotationConnection {
     if (!annotationId) {
       this.messageService.add({
         severity: 'danger',
-        summary: 'Failed to update annotation',
-        detail:
-          'Please reload the page and try again. If this problem is recurring notify your administrator.',
+        summary: this.transloco.translate(
+          'app.shared.updateAnnotationForm.errors.missingId.summary',
+        ),
+        detail: this.transloco.translate(
+          'app.shared.updateAnnotationForm.errors.missingId.detail',
+        ),
       });
       return;
     }
     this.confirmationService.confirm({
-      message: `Do you want to create a Connection to ${entity.label}`,
-      header: 'Create Connection',
+      message: this.transloco.translate(
+        'app.shared.createAnnotationConnection.confirm.message',
+        { label: entity.label },
+      ),
+      header: this.transloco.translate(
+        'app.shared.createAnnotationConnection.header',
+      ),
       icon: 'pi pi-info-circle',
-      rejectLabel: 'Cancel',
+      rejectLabel: this.transloco.translate('app.shared.actions.cancel'),
       rejectButtonProps: {
-        label: 'Cancel',
+        label: this.transloco.translate('app.shared.actions.cancel'),
         severity: 'secondary',
         outlined: true,
       },
       acceptButtonProps: {
-        label: 'Create Connection',
+        label: this.transloco.translate(
+          'app.shared.createAnnotationConnection.create',
+        ),
         severity: 'primary',
       },
 

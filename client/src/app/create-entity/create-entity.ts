@@ -4,16 +4,18 @@ import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { CreateEntityForm } from './create-entity-form/create-entity-form';
 import { SplitButton } from 'primeng/splitbutton';
 import { MenuItem } from 'primeng/api';
+import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-create-entity',
-  imports: [SplitButton],
+  imports: [SplitButton, TranslocoDirective],
   providers: [CreateEntityService, DialogService],
   templateUrl: './create-entity.html',
 })
 export class CreateEntity {
   private readonly createEntityService = inject(CreateEntityService);
   private readonly dialogService = inject(DialogService);
+  private readonly transloco = inject(TranslocoService);
 
   private createEntityDialogRef: DynamicDialogRef<CreateEntityForm> | null =
     null;
@@ -34,7 +36,7 @@ export class CreateEntity {
       inputValues: {
         preselectedType: preselectedType,
       },
-      header: 'Select a Product',
+      header: this.transloco.translate('app.shared.createEntity.dialog.header'),
       styleClass: 'w-11 md:w-9 lg:w-8',
       style: {
         'min-height': '20vh',

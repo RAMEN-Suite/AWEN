@@ -1,107 +1,114 @@
-@for (property of properties(); track property.name) {
-  @if (findDataType(property.typeId); as dataType) {
-    <div class="field" [formGroup]="propertiesForm()">
-      @let isArray = property.bounds.upperBound === -1 || property.bounds.upperBound > 1;
-      @let fieldId = "create-entity-form_" + formName + "_" + property.name;
-      @if (isArray) {
-        <!-- Array-Input via AutoComplete Chips -->
-        <p-floatlabel variant="on">
-          @let keyFilter =
-            dataType.name.toLowerCase() === "integer" ? "pint" : dataType.name.toLowerCase() === "float" ? "pnum" : undefined;
-          <p-auto-complete
-            [pKeyFilter]="keyFilter"
-            [formControlName]="property.name"
-            [inputId]="fieldId"
-            [multiple]="true"
-            [typeahead]="false"
-            fluid
-            appendTo="body"
-          />
-          <label [for]="fieldId">
-            {{ property.name }}
-            @if (property.bounds.upperBound !== -1) {
-              <small class="text-gray-400"> (max. {{ property.bounds.upperBound }})</small>
-            }
-            @if (property.bounds.lowerBound > 0) {
-              <small class="text-red-400"> *</small>
-            }
-          </label>
-        </p-floatlabel>
-      } @else {
-        <!-- Single Value Inputs -->
-        @if (dataType.name.toLowerCase() === "string") {
-          @let isLabel = property.name === ENTITY_NAME_PROPERTY;
+<ng-container *transloco="let t">
+  @for (property of properties(); track property.name) {
+    @if (findDataType(property.typeId); as dataType) {
+      <div class="field" [formGroup]="propertiesForm()">
+        @let isArray = property.bounds.upperBound === -1 || property.bounds.upperBound > 1;
+        @let fieldId = "create-entity-form_" + formName + "_" + property.name;
+        @if (isArray) {
+          <!-- Array-Input via AutoComplete Chips -->
           <p-floatlabel variant="on">
-            <input
-              pInputText
+            @let keyFilter =
+              dataType.name.toLowerCase() === "integer" ? "pint" : dataType.name.toLowerCase() === "float" ? "pnum" : undefined;
+            <p-auto-complete
+              [pKeyFilter]="keyFilter"
               [formControlName]="property.name"
-              (blur)="isLabel ? onLabelBlur($event) : null"
-              [id]="fieldId"
-              autocomplete="off"
+              [inputId]="fieldId"
+              [multiple]="true"
+              [typeahead]="false"
               fluid
+              appendTo="body"
             />
-            <label [for]="fieldId"
-              >{{ property.name }}
+            <label [for]="fieldId">
+              {{ property.name }}
+              @if (property.bounds.upperBound !== -1) {
+                <small class="text-gray-400"> ({{ t("app.shared.attributeForm.max", { max: property.bounds.upperBound }) }})</small>
+              }
               @if (property.bounds.lowerBound > 0) {
                 <small class="text-red-400"> *</small>
               }
             </label>
           </p-floatlabel>
-        }
-        @if (dataType.name.toLowerCase() === "boolean") {
-          <p-toggle-button [formControlName]="property.name" [onLabel]="property.name" [offLabel]="'Not ' + property.name" [id]="fieldId" />
-        }
-        @if (dataType.name.toLowerCase() === "integer") {
-          <p-floatlabel variant="on">
-            <p-input-number
+        } @else {
+          <!-- Single Value Inputs -->
+          @if (dataType.name.toLowerCase() === "string") {
+            @let isLabel = property.name === ENTITY_NAME_PROPERTY;
+            <p-floatlabel variant="on">
+              <input
+                pInputText
+                [formControlName]="property.name"
+                (blur)="isLabel ? onLabelBlur($event) : null"
+                [id]="fieldId"
+                autocomplete="off"
+                fluid
+              />
+              <label [for]="fieldId"
+                >{{ property.name }}
+                @if (property.bounds.lowerBound > 0) {
+                  <small class="text-red-400"> *</small>
+                }
+              </label>
+            </p-floatlabel>
+          }
+          @if (dataType.name.toLowerCase() === "boolean") {
+            <p-toggle-button
               [formControlName]="property.name"
+              [onLabel]="property.name"
+              [offLabel]="t('app.shared.attributeForm.boolean.offLabel', { name: property.name })"
               [id]="fieldId"
-              mode="decimal"
-              [useGrouping]="false"
-              [maxFractionDigits]="0"
-              autocomplete="off"
-              fluid
             />
-            <label [for]="fieldId"
-              >{{ property.name }}
-              @if (property.bounds.lowerBound > 0) {
-                <small class="text-red-400"> *</small>
-              }
-            </label>
-          </p-floatlabel>
+          }
+          @if (dataType.name.toLowerCase() === "integer") {
+            <p-floatlabel variant="on">
+              <p-input-number
+                [formControlName]="property.name"
+                [id]="fieldId"
+                mode="decimal"
+                [useGrouping]="false"
+                [maxFractionDigits]="0"
+                autocomplete="off"
+                fluid
+              />
+              <label [for]="fieldId"
+                >{{ property.name }}
+                @if (property.bounds.lowerBound > 0) {
+                  <small class="text-red-400"> *</small>
+                }
+              </label>
+            </p-floatlabel>
+          }
+          @if (dataType.name.toLowerCase() === "float") {
+            <p-floatlabel variant="on">
+              <p-input-number
+                [formControlName]="property.name"
+                [id]="fieldId"
+                mode="decimal"
+                [useGrouping]="false"
+                [minFractionDigits]="1"
+                autocomplete="off"
+                fluid
+              />
+              <label [for]="fieldId">{{ property.name }}<small class="text-red-400"> *</small></label>
+            </p-floatlabel>
+          }
         }
-        @if (dataType.name.toLowerCase() === "float") {
-          <p-floatlabel variant="on">
-            <p-input-number
-              [formControlName]="property.name"
-              [id]="fieldId"
-              mode="decimal"
-              [useGrouping]="false"
-              [minFractionDigits]="1"
-              autocomplete="off"
-              fluid
-            />
-            <label [for]="fieldId">{{ property.name }}<small class="text-red-400"> *</small></label>
-          </p-floatlabel>
-        }
-      }
 
-      <!-- Validierungsfehler -->
-      @let control = propertiesForm().get(property.name);
-      @if (control?.invalid && control?.dirty) {
-        <small class="text-red-400">
-          @if (control?.errors?.["minlength"]) {
-            At least {{ property.bounds.lowerBound }} value(s) required.
-          }
-          @if (control?.errors?.["maxlength"]) {
-            At most {{ property.bounds.upperBound }} value(s) allowed.
-          }
-          @if (control?.errors?.["required"]) {
-            This field is required.
-          }
-        </small>
-      }
-    </div>
+        <!-- Validierungsfehler -->
+        @let control = propertiesForm().get(property.name);
+        @if (control?.invalid && control?.dirty) {
+          <small class="text-red-400">
+            @if (control?.errors?.["minlength"]) {
+              {{ t("app.shared.attributeForm.errors.minLength", { min: property.bounds.lowerBound }) }}
+            }
+            @if (control?.errors?.["maxlength"]) {
+              {{ t("app.shared.attributeForm.errors.maxLength", { max: property.bounds.upperBound }) }}
+            }
+            @if (control?.errors?.["required"]) {
+              {{ t("app.shared.attributeForm.errors.required") }}
+            }
+          </small>
+        }
+      </div>
+    }
   }
-}
-<small><span class="text-red-400">*</span> mandatory field</small>
+  <small><span class="text-red-400">*</span> {{ t("app.shared.attributeForm.mandatory") }}</small>
+</ng-container>

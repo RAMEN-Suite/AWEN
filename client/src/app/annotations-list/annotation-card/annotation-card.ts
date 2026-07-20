@@ -13,6 +13,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { UtilsService } from '../../utils/utils.service';
 import { EntityService } from '../../entity.service';
 import { NgClass } from '@angular/common';
+import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-annotation-card',
@@ -23,6 +24,7 @@ import { NgClass } from '@angular/common';
     AttributeList,
     UpdateAnnotation,
     NgClass,
+    TranslocoDirective,
   ],
   templateUrl: './annotation-card.html',
 })
@@ -33,6 +35,7 @@ export class AnnotationCard {
   private readonly messageService = inject(MessageService);
   private readonly utils = inject(UtilsService);
   private readonly entityService = inject(EntityService);
+  private readonly transloco = inject(TranslocoService);
 
   public annotation = input.required<StatementAnnotationView>();
 
@@ -46,7 +49,9 @@ export class AnnotationCard {
         inputValues: {
           annotation: annotation,
         },
-        header: 'Create Annotation Connection',
+        header: this.transloco.translate(
+          'app.shared.createAnnotationConnection.header',
+        ),
         styleClass: 'w-11 md:w-10 lg:w-9',
         style: {
           'min-height': '60vh',
@@ -62,23 +67,29 @@ export class AnnotationCard {
   protected clickDeleteAnnotation(id: string, event?: Event) {
     this.confirmationService.confirm({
       target: event?.target ?? undefined,
-      message: `Are you sure you want to delete this annotation?\n Doing so will delete the annotation and disconnect all associated nodes.`,
-      header: 'Danger Zone',
+      message: this.transloco.translate(
+        'app.shared.annotationCard.delete.confirm.message',
+      ),
+      header: this.transloco.translate('app.shared.common.dangerZone'),
       icon: 'pi pi-info-circle',
       rejectButtonProps: {
-        label: 'Cancel',
+        label: this.transloco.translate('app.shared.actions.cancel'),
         severity: 'secondary',
         outlined: true,
       },
       acceptButtonProps: {
-        label: 'Delete Annotation',
+        label: this.transloco.translate(
+          'app.shared.annotationCard.delete.confirm.accept',
+        ),
         severity: 'danger',
       },
       accept: async () => {
         await this.deleteAnnotation(id);
         this.messageService.add({
           severity: 'success',
-          summary: 'Annotation deleted',
+          summary: this.transloco.translate(
+            'app.shared.annotationCard.delete.success',
+          ),
         });
         await this.entityService.reloadEntity();
       },

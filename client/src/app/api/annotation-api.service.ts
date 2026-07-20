@@ -3,6 +3,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { MessageService } from 'primeng/api';
 import { catchError, firstValueFrom, map } from 'rxjs';
 import { Annotation } from '../../interfaces';
+import { TranslocoService } from '@jsverse/transloco';
 
 @Injectable({
   providedIn: 'root',
@@ -10,13 +11,17 @@ import { Annotation } from '../../interfaces';
 export class AnnotationApiService {
   private readonly http = inject(HttpClient);
   private readonly messageService = inject(MessageService);
+  private readonly transloco = inject(TranslocoService);
 
   public async get(id: string) {
     const res = this.http.get<Annotation>('/api/annotation/' + id).pipe(
       catchError((err) => {
         this.messageService.add({
           severity: 'error',
-          detail: `Error while getting Annotation with id ${id}. Try again later.`,
+          detail: this.transloco.translate(
+            'app.services.annotationApi.errors.getAnnotation',
+            { id },
+          ),
         });
         throw err;
       }),
@@ -47,7 +52,9 @@ export class AnnotationApiService {
             if (error.statusCode === 400) {
               this.messageService.add({
                 severity: 'error',
-                summary: `Error while creating a new annotation. Please try again.`,
+                summary: this.transloco.translate(
+                  'app.services.annotationApi.errors.createAnnotation',
+                ),
                 detail: Array.isArray(error.message)
                   ? error.message.join('\n')
                   : error.message,
@@ -57,7 +64,9 @@ export class AnnotationApiService {
             } else {
               this.messageService.add({
                 severity: 'error',
-                summary: `Error while creating a new annotation. Please try again.`,
+                summary: this.transloco.translate(
+                  'app.services.annotationApi.errors.createAnnotation',
+                ),
               });
             }
           }
@@ -75,7 +84,10 @@ export class AnnotationApiService {
       catchError((err) => {
         this.messageService.add({
           severity: 'error',
-          detail: `Error while deleting Annotation with id ${id}. Try again later.`,
+          detail: this.transloco.translate(
+            'app.services.annotationApi.errors.deleteAnnotation',
+            { id },
+          ),
         });
         throw err;
       }),
@@ -91,7 +103,9 @@ export class AnnotationApiService {
         catchError((err) => {
           this.messageService.add({
             severity: 'error',
-            detail: `Error while deleting Annotation-Relation. Try again later.`,
+            detail: this.transloco.translate(
+              'app.services.annotationApi.errors.deleteRelation',
+            ),
           });
           throw err;
         }),
@@ -108,7 +122,9 @@ export class AnnotationApiService {
       catchError((err) => {
         this.messageService.add({
           severity: 'error',
-          detail: `Error while creating Annotation-Relation. Try again later.`,
+          detail: this.transloco.translate(
+            'app.services.annotationApi.errors.createRelation',
+          ),
         });
         throw err;
       }),
@@ -132,7 +148,9 @@ export class AnnotationApiService {
           if (error.statusCode === 400) {
             this.messageService.add({
               severity: 'error',
-              summary: `Error while updating an annotation. Please try again.`,
+              summary: this.transloco.translate(
+                'app.services.annotationApi.errors.updateAnnotation',
+              ),
               detail: Array.isArray(error.message)
                 ? error.message.join('\n')
                 : error.message,
@@ -142,7 +160,9 @@ export class AnnotationApiService {
           } else {
             this.messageService.add({
               severity: 'error',
-              summary: `Error while updating an annotation. Please try again.`,
+              summary: this.transloco.translate(
+                'app.services.annotationApi.errors.updateAnnotation',
+              ),
             });
           }
         }

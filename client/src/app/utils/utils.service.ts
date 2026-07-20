@@ -3,6 +3,7 @@ import { castValue, castValues } from './utils';
 import { EntityPropertyDto, GAttribute } from '../../interfaces';
 import { ConfigService } from '../config-module/config.service';
 import { MessageService } from 'primeng/api';
+import { TranslocoService } from '@jsverse/transloco';
 
 @Injectable({
   providedIn: 'root',
@@ -10,6 +11,7 @@ import { MessageService } from 'primeng/api';
 export class UtilsService {
   private readonly configService = inject(ConfigService);
   private readonly messageService = inject(MessageService);
+  private readonly transloco = inject(TranslocoService);
 
   public createPayload = (
     values: Partial<Record<string, unknown>>,
@@ -51,7 +53,9 @@ export class UtilsService {
     await navigator.clipboard.writeText(id);
     this.messageService.add({
       severity: 'success',
-      detail: `Copied "${id}" to clipboard.`,
+      detail: this.transloco.translate('app.services.utils.copiedToClipboard', {
+        id,
+      }),
     });
   };
 }

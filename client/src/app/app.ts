@@ -10,13 +10,13 @@ import { Toast } from 'primeng/toast';
 import { ConfigService } from './config-module/config.service';
 import { ProgressSpinner } from 'primeng/progressspinner';
 import { MenubarModule } from 'primeng/menubar';
-import { MenuItem } from 'primeng/api';
 import { Button, ButtonDirective, ButtonLabel } from 'primeng/button';
 import { HealthService } from './health.service';
 import { filter } from 'rxjs';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Navbar } from './navbar/navbar';
 import { Skeleton } from 'primeng/skeleton';
+import { TranslocoDirective } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-root',
@@ -31,6 +31,7 @@ import { Skeleton } from 'primeng/skeleton';
     ConfirmDialog,
     Navbar,
     Skeleton,
+    TranslocoDirective,
   ],
   styleUrl: './app.scss',
   templateUrl: './app.html',
@@ -72,12 +73,4 @@ export class App {
 
   protected version = this.status.getServerVersion();
   protected ramenVersion = this.status.getRamenVersion();
-
-  protected menuItems: MenuItem[] = [
-    {
-      label: 'Home',
-      icon: 'pi pi-home',
-      routerLink: [''],
-    },
-  ];
 }

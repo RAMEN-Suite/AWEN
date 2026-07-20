@@ -1,40 +1,43 @@
-@if (annotation().id) {
-  @let annotationId = annotation().id!;
+<ng-container *transloco="let t">
+  @if (annotation().id) {
+    @let annotationId = annotation().id!;
 
-  <div class="card p-0 w-full flex flex-row" style="min-height: 12rem">
-    <div class="col-6 flex flex-column p-3 pr-2 border-right-1 border-gray-200">
-      <div class="mb-3">
-        <app-node-types [nodeTypes]="annotation().annotation.types" asChips class="flex flex-column gap-1" />
+    <div class="card p-0 w-full flex flex-row" style="min-height: 12rem">
+      <div class="col-6 flex flex-column p-3 pr-2 border-right-1 border-gray-200">
+        <div class="mb-3">
+          <app-node-types [nodeTypes]="annotation().annotation.types" asChips class="flex flex-column gap-1" />
+        </div>
+        <div>
+          <app-attribute-list [properties]="annotation().annotation.properties" />
+        </div>
+        <div class="flex flex-row gap-1 justify-content-start align-content-end mt-auto">
+          <p-button icon="pi pi-trash" severity="danger" outlined size="small" (onClick)="clickDeleteAnnotation(annotationId, $event)" />
+          <app-update-annotation [annotation]="annotation().annotation" />
+          <p-button
+            icon="pi pi-plus-circle"
+            severity="primary"
+            outlined
+            size="small"
+            (onClick)="clickCreateAnnotationConnection(annotation().annotation)"
+          />
+        </div>
       </div>
-      <div>
-        <app-attribute-list [properties]="annotation().annotation.properties" />
-      </div>
-      <div class="flex flex-row gap-1 justify-content-start align-content-end mt-auto">
-        <p-button icon="pi pi-trash" severity="danger" outlined size="small" (onClick)="clickDeleteAnnotation(annotationId, $event)" />
-        <app-update-annotation [annotation]="annotation().annotation" />
-        <p-button
-          icon="pi pi-plus-circle"
-          severity="primary"
-          outlined
-          size="small"
-          (onClick)="clickCreateAnnotationConnection(annotation().annotation)"
-        />
+      <div
+        class="col-6 p-0 max-h-30rem overflow-y-auto"
+        [ngClass]="{
+          'align-items-center justify-content-center flex p-3': annotation().nodes.length <= 0,
+        }"
+      >
+        @for (node of annotation().nodes; track node.id; let first = $first; let last = $last) {
+          <app-connected-node [annotationId]="annotationId" [node]="node" [firstEntry]="first" [lastEntry]="last" />
+        } @empty {
+          <span class="text-base text-gray-500 h-min">
+            {{ t("app.shared.annotationCard.emptyNodes.prefix") }}
+            <span class="pi pi-plus-circle text-primary text-sm"></span>
+            {{ t("app.shared.annotationCard.emptyNodes.suffix") }}
+          </span>
+        }
       </div>
     </div>
-    <div
-      class="col-6 p-0 max-h-30rem overflow-y-auto"
-      [ngClass]="{
-        'align-items-center justify-content-center flex p-3': annotation().nodes.length <= 0,
-      }"
-    >
-      @for (node of annotation().nodes; track node.id; let first = $first; let last = $last) {
-        <app-connected-node [annotationId]="annotationId" [node]="node" [firstEntry]="first" [lastEntry]="last" />
-      } @empty {
-        <span class="text-base text-gray-500 h-min">
-          No connected nodes. Try adding some by selecting the
-          <span class="pi pi-plus-circle text-primary text-sm"></span> button.
-        </span>
-      }
-    </div>
-  </div>
-}
+  }
+</ng-container>

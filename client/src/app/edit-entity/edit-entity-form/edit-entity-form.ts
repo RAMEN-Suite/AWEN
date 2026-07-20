@@ -20,6 +20,7 @@ import { from, map, switchMap } from 'rxjs';
 import { ENTITY_NAME_PROPERTY } from '../../../constants';
 import { EntityService } from '../../entity.service';
 import { UtilsService } from '../../utils/utils.service';
+import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 
 interface AttributeWithOptValue
   extends
@@ -28,7 +29,12 @@ interface AttributeWithOptValue
 
 @Component({
   selector: 'app-create-entity-form',
-  imports: [ReactiveFormsModule, AttributeForm, ButtonDirective],
+  imports: [
+    ReactiveFormsModule,
+    AttributeForm,
+    ButtonDirective,
+    TranslocoDirective,
+  ],
   templateUrl: './edit-entity-form.html',
 })
 export class EditEntityForm {
@@ -36,6 +42,7 @@ export class EditEntityForm {
   private readonly editEntityService = inject(EditEntityService);
   private readonly utilService = inject(UtilsService);
   private readonly messageService = inject(MessageService);
+  private readonly transloco = inject(TranslocoService);
   private dialogRef = inject(DynamicDialogRef);
 
   public entity = input.required<Entity>();
@@ -70,7 +77,9 @@ export class EditEntityForm {
     if (!key?.value) {
       this.messageService.add({
         severity: 'error',
-        summary: `Error while editing a new entity. Please try again.`,
+        summary: this.transloco.translate(
+          'app.shared.editEntityForm.errors.missingKey',
+        ),
         closable: true,
       });
       return;
@@ -84,7 +93,9 @@ export class EditEntityForm {
       await this.editEntityService.updateEntity(key.value as string, payload);
       this.messageService.add({
         severity: 'success',
-        summary: `The Entity was successfully updated!`,
+        summary: this.transloco.translate(
+          'app.shared.editEntityForm.success.updated',
+        ),
         closable: true,
       });
       await this.entityService.reloadEntity();

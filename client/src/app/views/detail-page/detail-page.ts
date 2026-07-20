@@ -10,6 +10,7 @@ import { visibleProperties } from '../../utils/utils';
 import { NodeTypes } from '../../annotations-list/node-types/node-types';
 import { AnnotationList } from '../../annotations-list/annotation-list';
 import { AttributeList } from '../../annotations-list/attribute-list/attribute-list';
+import { TranslocoDirective } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-detail-page',
@@ -23,6 +24,7 @@ import { AttributeList } from '../../annotations-list/attribute-list/attribute-l
     NodeTypes,
     AnnotationList,
     AttributeList,
+    TranslocoDirective,
   ],
   styleUrl: './detail-page.scss',
   templateUrl: './detail-page.html',

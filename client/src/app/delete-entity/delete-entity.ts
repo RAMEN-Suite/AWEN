@@ -3,6 +3,7 @@ import { Button } from 'primeng/button';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { EntityApiService } from '../api/entity-api.service';
 import { Router } from '@angular/router';
+import { TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-delete-entity',
@@ -14,6 +15,7 @@ export class DeleteEntity {
   private confirmationService = inject(ConfirmationService);
   private messageService = inject(MessageService);
   private entityAPI = inject(EntityApiService);
+  private readonly transloco = inject(TranslocoService);
 
   public entityId = input.required<string>();
   protected loading = signal(false);
@@ -21,17 +23,21 @@ export class DeleteEntity {
   protected clickDeleteBtn(event: PointerEvent) {
     this.confirmationService.confirm({
       target: event.target ?? undefined,
-      message: 'Do you want to delete this Entity?',
-      header: 'Danger Zone',
+      message: this.transloco.translate(
+        'app.shared.deleteEntity.confirm.message',
+      ),
+      header: this.transloco.translate('app.shared.common.dangerZone'),
       icon: 'pi pi-info-circle',
-      rejectLabel: 'Cancel',
+      rejectLabel: this.transloco.translate('app.shared.actions.cancel'),
       rejectButtonProps: {
-        label: 'Cancel',
+        label: this.transloco.translate('app.shared.actions.cancel'),
         severity: 'secondary',
         outlined: true,
       },
       acceptButtonProps: {
-        label: 'Delete Entity',
+        label: this.transloco.translate(
+          'app.shared.deleteEntity.confirm.accept',
+        ),
         severity: 'danger',
       },
 
@@ -55,8 +61,12 @@ export class DeleteEntity {
     await this.entityAPI.deleteEntity(id);
     this.messageService.add({
       severity: 'info',
-      summary: 'Entity deleted',
-      detail: 'The Entity was deleted successfully',
+      summary: this.transloco.translate(
+        'app.shared.deleteEntity.success.summary',
+      ),
+      detail: this.transloco.translate(
+        'app.shared.deleteEntity.success.detail',
+      ),
     });
   }
 }

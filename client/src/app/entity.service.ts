@@ -50,10 +50,7 @@ export class EntityService {
       this._entity.set(entity);
       this._annotations.set(annotations);
     } catch {
-      await this.router.navigate([
-        '/error',
-        'An Entity with the given id could not be found',
-      ]);
+      await this.router.navigate(['/error', '404']);
     }
   }
 

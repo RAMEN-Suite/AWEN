@@ -1,6 +1,8 @@
-<form (submit)="onSubmit($event)" class="my-2">
+<form *transloco="let t" (submit)="onSubmit($event)" class="my-2">
   <app-attribute-form formName="edit-entity" [properties]="properties()" />
   <div class="field justify-content-end flex">
-    <button pButton type="submit" size="large" [loading]="loading()" [disabled]="propertiesForm().invalid || loading()">Update</button>
+    <button pButton type="submit" size="large" [loading]="loading()" [disabled]="propertiesForm().invalid || loading()">
+      {{ t("app.shared.actions.update") }}
+    </button>
   </div>
 </form>

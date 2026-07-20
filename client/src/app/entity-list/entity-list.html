@@ -1,67 +1,69 @@
-@if (entitiesLoading()) {
-  <p-virtualscroller
-    [items]="entities()"
-    [itemSize]="50"
-    [scrollHeight]="height()"
-    styleClass="border border-surface"
-    [style]="{ width: width(), height: height() }"
-  >
-    <ng-template pTemplate="content">
-      <div class="flex items-center align-items-center p-2">
-        <p-progress-spinner ariaLabel="loading" />
-      </div>
-    </ng-template>
-  </p-virtualscroller>
-} @else if (entities().length === 0) {
-  <div class="w-full flex justify-content-center">
-    <span>No Entity matches this search</span>
-  </div>
-} @else {
-  <div class="border border-surface overflow-y-auto" [style]="{ width: width(), height: height() }">
-    @for (item of entities(); track $index; let odd = $odd) {
-      <div class="flex flex-row items-center p-2 justify-content-between" [ngClass]="{ 'bg-surface-100 dark:bg-surface-700': odd }">
-        <div class="col">
-          <div class="flex flex-row align-items-center gap-2 flex-wrap">
-            @if (item.types.length !== 0) {
-              @for (type of item.types; track $index) {
-                <p-chip icon="pi pi-tag" class="text-sm flex-shrink-0" [label]="type" />
+<ng-container *transloco="let t">
+  @if (entitiesLoading()) {
+    <p-virtualscroller
+      [items]="entities()"
+      [itemSize]="50"
+      [scrollHeight]="height()"
+      styleClass="border border-surface"
+      [style]="{ width: width(), height: height() }"
+    >
+      <ng-template pTemplate="content">
+        <div class="flex items-center align-items-center p-2">
+          <p-progress-spinner [ariaLabel]="t('app.shared.common.loading')" />
+        </div>
+      </ng-template>
+    </p-virtualscroller>
+  } @else if (entities().length === 0) {
+    <div class="w-full flex justify-content-center">
+      <span>{{ t("app.shared.entityList.empty") }}</span>
+    </div>
+  } @else {
+    <div class="border border-surface overflow-y-auto" [style]="{ width: width(), height: height() }">
+      @for (item of entities(); track $index; let odd = $odd) {
+        <div class="flex flex-row items-center p-2 justify-content-between" [ngClass]="{ 'bg-surface-100 dark:bg-surface-700': odd }">
+          <div class="col">
+            <div class="flex flex-row align-items-center gap-2 flex-wrap">
+              @if (item.types.length !== 0) {
+                @for (type of item.types; track $index) {
+                  <p-chip icon="pi pi-tag" class="text-sm flex-shrink-0" [label]="type" />
+                }
+              } @else {
+                <p-chip icon="pi pi-tag" class="text-sm flex-shrink-0" [label]="t('app.shared.entityList.unknownType')" />
               }
-            } @else {
-              <p-chip icon="pi pi-tag" class="text-sm flex-shrink-0" label="Unknown" />
-            }
-            @if (item.collections.length !== 0) {
-              @for (collection of item.collections; track $index) {
-                <p-chip icon="pi pi-folder" class="text-sm flex-shrink-0" [label]="collection.label" />
+              @if (item.collections.length !== 0) {
+                @for (collection of item.collections; track $index) {
+                  <p-chip icon="pi pi-folder" class="text-sm flex-shrink-0" [label]="collection.label" />
+                }
               }
-            }
-          </div>
-          <div class="flex flex-row justify-content-between">
-            <div class="flex col">
-              <a
-                class="text-lg font-medium text-900 mt-2 cursor-pointer no-underline hover:underline focus:underline"
-                role="button"
-                tabindex="0"
-                (click)="selectEntity(item)"
-                (keydown.enter)="selectEntity(item)"
-                (keydown.space)="selectEntity(item)"
-              >
-                {{ item.label }}
-              </a>
             </div>
-            <div class="flex col-fixed justify-content-end align-items-center gap-5">
-              <p-button
-                icon="pi pi-clipboard"
-                rounded
-                text
-                size="large"
-                pTooltip="Copy UUID to Clipboard"
-                tooltipPosition="bottom"
-                (onClick)="copyToClipboard(item.id)"
-              />
+            <div class="flex flex-row justify-content-between">
+              <div class="flex col">
+                <a
+                  class="text-lg font-medium text-900 mt-2 cursor-pointer no-underline hover:underline focus:underline"
+                  role="button"
+                  tabindex="0"
+                  (click)="selectEntity(item)"
+                  (keydown.enter)="selectEntity(item)"
+                  (keydown.space)="selectEntity(item)"
+                >
+                  {{ item.label }}
+                </a>
+              </div>
+              <div class="flex col-fixed justify-content-end align-items-center gap-5">
+                <p-button
+                  icon="pi pi-clipboard"
+                  rounded
+                  text
+                  size="large"
+                  [pTooltip]="t('app.shared.entityList.copyUuidTooltip')"
+                  tooltipPosition="bottom"
+                  (onClick)="copyToClipboard(item.id)"
+                />
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    }
-  </div>
-}
+      }
+    </div>
+  }
+</ng-container>

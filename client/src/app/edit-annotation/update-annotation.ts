@@ -4,6 +4,7 @@ import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { UpdateAnnotationService } from './update-annotation.service';
 import { UpdateAnnotationForm } from './update-annotation-form/update-annotation-form';
 import { Annotation } from '../../interfaces';
+import { TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-update-annotation',
@@ -13,6 +14,7 @@ import { Annotation } from '../../interfaces';
 })
 export class UpdateAnnotation {
   private readonly dialogService = inject(DialogService);
+  private readonly transloco = inject(TranslocoService);
 
   public annotation = input.required<Annotation>();
   public label = input<string>();
@@ -28,7 +30,9 @@ export class UpdateAnnotation {
         inputValues: {
           annotation: this.annotation(),
         },
-        header: 'Update Annotation',
+        header: this.transloco.translate(
+          'app.shared.updateAnnotation.dialog.header',
+        ),
         styleClass: 'w-11 md:w-9 lg:w-8',
         style: {
           'min-height': '20vh',

@@ -21,6 +21,7 @@ import { AnnotationApiService } from '../../api/annotation-api.service';
 import { Select } from 'primeng/select';
 import { AttributeForm } from '../../utils/attribute-form/attribute-form';
 import { UtilsService } from '../../utils/utils.service';
+import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 
 // Using experimental Signal Form. Cause why not
 @Component({
@@ -33,6 +34,7 @@ import { UtilsService } from '../../utils/utils.service';
     Select,
     ReactiveFormsModule,
     AttributeForm,
+    TranslocoDirective,
   ],
   templateUrl: './create-annotation-form.html',
 })
@@ -41,6 +43,7 @@ export class CreateAnnotationForm {
   private readonly dialogService = inject(DialogService);
   private confirmationService = inject(ConfirmationService);
   private readonly utilService = inject(UtilsService);
+  private readonly transloco = inject(TranslocoService);
   private readonly createAnnotationService = inject(CreateAnnotationService);
   private readonly dialogRef = inject(DynamicDialogRef);
   private createAnnotationConnectionDialogRef: DynamicDialogRef<CreateAnnotationConnection> | null =
@@ -111,15 +114,17 @@ export class CreateAnnotationForm {
       console.log(`Created Annotation ${annotationId}`);
       this.confirmationService.confirm({
         target: event.target ?? undefined,
-        message: `Do you want to connect this annotation to an entity?`,
+        message: this.transloco.translate(
+          'app.shared.createAnnotationForm.connection.message',
+        ),
         icon: 'pi pi-info-circle',
         rejectButtonProps: {
-          label: 'No',
+          label: this.transloco.translate('app.shared.actions.no'),
           severity: 'secondary',
           outlined: true,
         },
         acceptButtonProps: {
-          label: 'Yes',
+          label: this.transloco.translate('app.shared.actions.yes'),
           severity: 'primary',
         },
         accept: async () => {
@@ -140,7 +145,9 @@ export class CreateAnnotationForm {
         inputValues: {
           annotation: annotation,
         },
-        header: 'Create An Optional Annotation Connection',
+        header: this.transloco.translate(
+          'app.shared.createAnnotationConnection.optionalHeader',
+        ),
         styleClass: 'w-11 md:w-9 lg:w-8',
         style: {
           'min-height': '50vh',

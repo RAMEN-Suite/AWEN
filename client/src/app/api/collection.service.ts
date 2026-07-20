@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { CollectionName } from '../../interfaces';
 import { catchError, map, of } from 'rxjs';
 import { MessageService } from 'primeng/api';
+import { TranslocoService } from '@jsverse/transloco';
 
 @Injectable({
   providedIn: 'root',
@@ -10,6 +11,7 @@ import { MessageService } from 'primeng/api';
 export class CollectionService {
   private readonly http = inject(HttpClient);
   private readonly messageService = inject(MessageService);
+  private readonly transloco = inject(TranslocoService);
 
   public getFilterable() {
     return this.http.get<{
@@ -36,7 +38,9 @@ export class CollectionService {
         catchError(() => {
           this.messageService.add({
             severity: 'error',
-            detail: `Error while loading filter. Reload the page, or try again later.`,
+            detail: this.transloco.translate(
+              'app.services.collection.errors.loadingFilter',
+            ),
           });
 
           return of(new Array<CollectionName>());
