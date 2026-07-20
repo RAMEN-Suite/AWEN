@@ -5,6 +5,7 @@ import {
   input,
   Signal,
   signal,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { SearchEntityService } from '../search-entity.service';
 import { FilterPane } from '../filter-pane/filter-pane';
@@ -21,6 +22,7 @@ import { EntityService } from '../entity.service';
   selector: 'app-create-annotation-connection',
   providers: [SearchEntityService],
   imports: [FilterPane, FormsModule, EntityList],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './create-annotation-connection.html',
 })
 export class CreateAnnotationConnection {

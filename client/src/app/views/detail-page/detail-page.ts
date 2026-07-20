@@ -1,4 +1,11 @@
-import { Component, effect, inject, input, OnDestroy } from '@angular/core';
+import {
+  Component,
+  effect,
+  inject,
+  input,
+  OnDestroy,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { TableModule } from 'primeng/table';
 import { DeleteEntity } from '../../delete-entity/delete-entity';
 import { EditEntity } from '../../edit-entity/edit-entity';
@@ -25,6 +32,7 @@ import { AttributeList } from '../../annotations-list/attribute-list/attribute-l
     AttributeList,
   ],
   styleUrl: './detail-page.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './detail-page.html',
 })
 export class DetailPage implements OnDestroy {

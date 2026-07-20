@@ -4,6 +4,7 @@ import {
   ElementRef,
   inject,
   ViewChild,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { Toast } from 'primeng/toast';
@@ -33,6 +34,7 @@ import { Skeleton } from 'primeng/skeleton';
     Skeleton,
   ],
   styleUrl: './app.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './app.html',
 })
 export class App {

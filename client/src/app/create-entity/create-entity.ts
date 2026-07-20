@@ -1,4 +1,9 @@
-import { Component, computed, inject } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CreateEntityService } from './create-entity.service';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { CreateEntityForm } from './create-entity-form/create-entity-form';
@@ -9,6 +14,7 @@ import { MenuItem } from 'primeng/api';
   selector: 'app-create-entity',
   imports: [SplitButton],
   providers: [CreateEntityService, DialogService],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './create-entity.html',
 })
 export class CreateEntity {

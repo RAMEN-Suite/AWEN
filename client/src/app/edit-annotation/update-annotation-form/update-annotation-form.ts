@@ -6,6 +6,7 @@ import {
   Signal,
   signal,
   viewChild,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { UpdateAnnotationService } from '../update-annotation.service';
 import { FormsModule } from '@angular/forms';
@@ -28,6 +29,7 @@ interface AttributeWithOptValue
 @Component({
   selector: 'app-update-annotation-form',
   imports: [FormsModule, ButtonDirective, AttributeForm],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './update-annotation-form.html',
 })
 export class UpdateAnnotationForm {

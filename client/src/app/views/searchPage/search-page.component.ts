@@ -1,4 +1,10 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { FilterPane } from '../../filter-pane/filter-pane';
 import { SearchEntityService } from '../../search-entity.service';
 import { EntityList } from '../../entity-list/entity-list';
@@ -10,6 +16,7 @@ import { ActivatedRoute, Router } from '@angular/router';
   imports: [FilterPane, EntityList],
   providers: [SearchEntityService],
   templateUrl: './search-page.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './search-page.component.scss',
 })
 export class SearchPage implements OnInit {

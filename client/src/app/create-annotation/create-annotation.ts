@@ -1,4 +1,9 @@
-import { Component, inject, input } from '@angular/core';
+import {
+  Component,
+  inject,
+  input,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { Button } from 'primeng/button';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { CreateAnnotationForm } from './create-annotation-form/create-annotation-form';
@@ -7,6 +12,7 @@ import { CreateAnnotationForm } from './create-annotation-form/create-annotation
   selector: 'app-create-annotation',
   providers: [DialogService],
   imports: [Button],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './create-annotation.html',
 })
 export class CreateAnnotation {

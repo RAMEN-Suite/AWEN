@@ -6,11 +6,11 @@
 >
   @let link = node().link;
   @if (link && link.router) {
-    <a class="flex flex-row w-full align-items-center no-underline text-color" [routerLink]="node().link?.href">
+    <a class="flex flex-row w-full align-items-center no-underline text-color" [routerLink]="$safeNavigationMigration(node().link?.href)">
       <ng-container *ngTemplateOutlet="linkContent" />
     </a>
   } @else if (link && !link.router) {
-    <a class="flex flex-row w-full align-items-center no-underline text-color" [href]="node().link?.href">
+    <a class="flex flex-row w-full align-items-center no-underline text-color" [href]="$safeNavigationMigration(node().link?.href)">
       <ng-container *ngTemplateOutlet="linkContent" />
     </a>
   } @else {

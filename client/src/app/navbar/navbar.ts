@@ -1,4 +1,9 @@
-import { Component, computed, inject } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { Menubar } from 'primeng/menubar';
 import { MenuItem } from 'primeng/api';
 import { BackButtonComponent } from '../utils/back-button.component';
@@ -18,6 +23,7 @@ const HEADER_MAX_LENGTH = 20;
     CreateEntity,
     ButtonDirective,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './navbar.html',
 })
 export class Navbar {

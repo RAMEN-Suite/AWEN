@@ -1,10 +1,16 @@
-import { Component, inject, input } from '@angular/core';
+import {
+  Component,
+  inject,
+  input,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { Location } from '@angular/common';
 import { Button } from 'primeng/button';
 
 @Component({
   selector: 'app-back-button',
   imports: [Button],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <p-button
       [label]="label()"

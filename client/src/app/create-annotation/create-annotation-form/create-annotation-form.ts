@@ -8,6 +8,7 @@ import {
   signal,
   viewChild,
   WritableSignal,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { CreateAnnotationService } from '../create-annotation.service';
 import { FloatLabel } from 'primeng/floatlabel';
@@ -34,6 +35,7 @@ import { UtilsService } from '../../utils/utils.service';
     ReactiveFormsModule,
     AttributeForm,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './create-annotation-form.html',
 })
 export class CreateAnnotationForm {

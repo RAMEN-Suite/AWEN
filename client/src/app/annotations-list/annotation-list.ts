@@ -5,6 +5,7 @@ import {
   inject,
   input,
   signal,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { EntityService } from '../entity.service';
 import { AnnotationOfEntityWithContent, Direction } from '../../interfaces';
@@ -44,6 +45,7 @@ import {
     Skeleton,
   ],
   templateUrl: './annotation-list.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './annotation-list.scss',
 })
 export class AnnotationList {

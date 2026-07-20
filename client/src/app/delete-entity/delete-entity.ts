@@ -1,4 +1,10 @@
-import { Component, inject, input, signal } from '@angular/core';
+import {
+  Component,
+  inject,
+  input,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { Button } from 'primeng/button';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { EntityApiService } from '../api/entity-api.service';
@@ -7,6 +13,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-delete-entity',
   imports: [Button],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './delete-entity.html',
 })
 export class DeleteEntity {

@@ -1,4 +1,9 @@
-import { Component, inject, input } from '@angular/core';
+import {
+  Component,
+  inject,
+  input,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { OldEntity } from '../../interfaces';
 import { Scroller } from 'primeng/scroller';
 import { NgClass } from '@angular/common';
@@ -21,6 +26,7 @@ import { UtilsService } from '../utils/utils.service';
     Tooltip,
   ],
   templateUrl: './entity-list.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: `
     :host {
       display: flex;

@@ -1,4 +1,10 @@
-import { Component, computed, effect, inject } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { ConfigService } from './config.service';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MultiSelect } from 'primeng/multiselect';
@@ -9,6 +15,7 @@ import { ENTITY_LABEL_NAME } from '../../constants';
 @Component({
   selector: 'app-config-pane',
   imports: [ReactiveFormsModule, MultiSelect, FloatLabel, Select],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './config-pane.html',
 })
 export class ConfigPane {
