@@ -24,10 +24,6 @@ export class ConfigService {
   });
   private readonly _loaded = signal(false);
 
-  public constructor() {
-    void this.initConfigStore();
-  }
-
   public camiAvailable = computed(() => this._remoteConfig().camiAvailable);
 
   public getConfig() {
@@ -67,7 +63,7 @@ export class ConfigService {
     return this._loaded.asReadonly();
   }
 
-  private async initConfigStore() {
+  public async init() {
     const remoteConfig = await this.getConfigFromRemote();
     this._remoteConfig.set(remoteConfig);
     const storeConfig = this.store.getData('EM_CONFIG_STORE_KEY');

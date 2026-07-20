@@ -1,0 +1,60 @@
+{
+  "app": {
+    "languages": {
+      "de": "Deutsch",
+      "en": "English"
+    },
+    "screens": {
+      "collections": {
+        "available": "{{ count }} entries available in total",
+        "select": "Select collection:",
+        "search": "Search collection:",
+        "sort": "Sort by:",
+        "tooltips": {
+          "reset": "Reset",
+          "ascending": "Ascending",
+          "descending": "Descending"
+        }
+      },
+      "entities": {
+        "select": "Select register:",
+        "search": "Search register:",
+        "entries": "Entries for: {{ value }}",
+        "empty": "No entries could be found.",
+        "default": "All registers"
+      }
+    },
+    "shared": {
+      "index": {
+        "unknown": "No classification"
+      },
+      "searchableList": {
+        "search": "Search list:",
+        "empty": "No entries available."
+      },
+      "textView": {
+        "copyUuid": "Copy UUID",
+        "references": "References:",
+        "empty": "No further information.",
+        "error": "The annotation could not be loaded.",
+        "externalLink": "Open external link",
+        "jumpTo": "Jump to annotation"
+      },
+      "citation": {
+        "currentVersion": "Link to current version:",
+        "copyLink": "Copy link",
+        "print": "Save PDF",
+        "usage": "Usage note",
+        "usageSoftware": "The presentation is rendered with *[ORA](https://ramen-schema.org)*, edition software licensed under Apache 2.0."
+      },
+      "footer": {
+        "software": "Presented with <b>[ORA]({{ url }})</b>."
+      }
+    },
+    "blocks": {
+      "attributes": {
+        "missing": "–"
+      }
+    }
+  }
+}

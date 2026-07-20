@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { EmConfig } from '../../interfaces';
+import { LanguageKey } from '../models/config/LanguageOptions';
 
 interface StorageMap {
   EM_CONFIG_STORE_KEY: EmConfig;
+  EM_LANGUAGE_STORE_KEY: LanguageKey;
 }
 
 @Injectable({
@@ -16,13 +18,11 @@ export class LocalStoreService {
     localStorage.setItem(key, JSON.stringify(value));
   }
 
-  public getData<K extends keyof StorageMap>(
-    key: K,
-  ): StorageMap[K] | undefined {
+  public getData<K extends keyof StorageMap>(key: K): StorageMap[K] | null {
     const value = localStorage.getItem(key);
 
     if (value === null) {
-      return undefined;
+      return null;
     }
 
     return JSON.parse(value) as StorageMap[K];
